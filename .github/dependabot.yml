@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # Next.js and React move quickly, and the site pins exact versions, so the
+  # updates arrive as pull requests that CI checks rather than as silent drift.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      types:
+        patterns: ["@types/*"]
+      eslint:
+        patterns: ["eslint", "eslint-config-next"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3

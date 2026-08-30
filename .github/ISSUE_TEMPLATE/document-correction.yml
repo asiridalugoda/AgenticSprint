@@ -1,0 +1,23 @@
+name: Document correction
+description: A factual error, a broken link, a typo or a formatting problem in a published document.
+labels: ["correction"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The URL on theagenticsprint.com, or the file in content/.
+      placeholder: https://theagenticsprint.com/specification
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+      description: Quote the text if you can, so it is easy to find.
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: What it should say
