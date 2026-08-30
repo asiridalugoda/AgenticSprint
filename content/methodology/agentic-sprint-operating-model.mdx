@@ -1,0 +1,284 @@
+---
+title: "Agentic Sprint Operating Model"
+description: "How a software delivery team can organise roles, decisions, ceremonies, work in progress and escalation around human-gated agent execution."
+date: "2026-08-03"
+updated: "2026-08-03"
+type: "concept"
+topics: ["Delivery & Organisations", "Agentic Systems", "Engineering"]
+tags: ["Agentic Sprint", "operating model", "engineering organisations", "delivery governance", "review capacity", "decision throughput"]
+featured: false
+pinned: false
+draft: false
+canonical: "/operating-model"
+image: "/social/operating-model"
+series: "Agentic Sprint Methodology"
+seriesOrder: 3
+version: "0.1"
+status: "Operating model"
+documentId: "D3"
+documentKind: "operating-model"
+normative: false
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D2"]
+claimClasses: ["operating-model", "recommended-practice", "implementation-guidance"]
+citation: "Dalugoda, Siri. Agentic Sprint Operating Model. Agentic Sprint Methodology, v0.1, 3 August 2026. https://theagenticsprint.com/operating-model"
+references: ["https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"]
+externalLinks: []
+---
+
+## Purpose
+
+The Agentic Sprint changes where engineering work happens and where engineering decisions happen. It does not remove the need for product intent, architecture, quality engineering or accountable release decisions.
+
+This operating model describes how a team can organise those responsibilities. It is designed for teams that want to delegate bounded implementation and verification work while retaining human control over the decisions that can materially affect customers, systems or risk.
+
+The central distinction is:
+
+> **Agents provide execution capacity. Humans provide intent, judgement and acceptance.**
+
+The model does not assume that implementation capacity is infinite, that review is cheap or that a passing test suite proves product correctness.
+
+This is an informative companion to D1. Its lowercase recommendations describe one way to organise the work and do not add requirements to core Agentic Sprint conformance. Teams can use the operating model with Autonomous Loop or another execution protocol.
+
+## What changes
+
+In a conventional delivery model, planning is often an attempt to fit a set of human implementation tasks into a timebox. In an Agentic Sprint, the team also has to manage:
+
+- the quality of the requirements supplied to agents;
+- the capacity of humans to review plans and changes;
+- the risk class of each work item;
+- the context available to the execution system;
+- the independence of verification;
+- the evidence required before release;
+- the rate at which the team can learn from corrections.
+
+The work may be implemented in parallel by several agents, but the team's decision capacity remains bounded. More generated changes can increase review queues, QA load and architectural risk.
+
+## Roles
+
+Roles are capabilities that can be held by people, teams or controlled services. They are not a claim that every organisation needs one person per role.
+
+### Product authority
+
+The product authority defines the problem, intended user or system outcome, priority and acceptance criteria. This role owns ambiguity in the requirement. It must not delegate the meaning of success to an implementation agent.
+
+### Senior or Staff Engineer
+
+The senior engineer reviews the Build Plan, architecture, constraints, implementation and technical evidence. This role is accountable for engineering acceptance, material deviations and unresolved technical risk.
+
+### Quality engineer or QA authority
+
+Quality engineering translates product intent into verification, exploratory testing, regression strategy and evidence. QA is not merely a downstream test executor. It is an independent product assurance function.
+
+### Coordinator
+
+The Coordinator operates the delivery control plane. It creates runs, assigns work, pauses at gates, routes findings, manages retries and makes the state of the system visible. The Coordinator should not have permission to approve its own work or release to production.
+
+### Maker agent
+
+The Maker analyses the approved plan and changes an isolated workspace. It may write code, tests, migrations or documentation within the assigned scope. It cannot expand its own authority because it encounters a new dependency.
+
+### Reviewer and verifier agents
+
+Reviewers assess specific properties such as requirements traceability, architecture, maintainability or security. Verifiers execute deterministic or reproducible checks. They should receive a clear question and return findings that a human can inspect.
+
+### Security authority
+
+Security review is required when the work affects identity, permissions, secrets, sensitive data, tenant boundaries, externally reachable interfaces, financial or safety-sensitive actions, or other declared high-risk areas.
+
+### Release authority
+
+Release authority controls merge, deploy or production activation. The person or group holding this role accepts the final evidence and risk disposition. An agent completion status is never a substitute for this decision.
+
+### Context steward
+
+The context steward maintains repository instructions, agent skills, architecture guidance, review rules and examples. The role treats context as a changeable engineering dependency, not as an informal prompt collection.
+
+## Decision rights
+
+The following table describes the minimum decision boundary.
+
+| Decision | Agent contribution | Human authority |
+| --- | --- | --- |
+| Is the requirement ready? | Identify missing information and assumptions | Product authority accepts intent and acceptance criteria |
+| Is the plan safe to implement? | Propose scope, design, tests and risks | Plan approver approves, rejects or requests revision |
+| Is the goal complete? | Produce implementation and evidence | Checker and engineer judge whether evidence is sufficient |
+| Is the product behaviour acceptable? | Generate cases and analyse results | QA authority accepts or returns the feature |
+| Is the change releasable? | Summarise evidence and open risks | Release authority decides |
+| Should a correction become shared context? | Suggest a rule, test or example | Context steward and designated reviewer approve the change |
+
+For high-risk changes, the same human should not approve intent, accept security risk and release the change without an explicit reason and compensating control.
+
+## The work item flow
+
+:::figure operating-model
+The operating model for an Agentic Sprint. Product intent enters a readiness review, a planning agent prepares a Build Plan, and a human approves the scope. Makers execute bounded goals while Checkers and CI produce evidence. Engineering review, QA and release authority remain human decision points. Feedback is triaged into local rework or versioned organisational context.
+:::
+
+### 1. Intake and readiness
+
+The team assesses the work item before assigning it to the agentic system. The assessment asks:
+
+- Is the problem understood well enough to state acceptance criteria?
+- Is the work bounded enough to inspect and verify?
+- Are the relevant repositories, systems and data boundaries known?
+- What risk class applies?
+- Which human roles must approve the plan, implementation and release?
+- What actions are prohibited?
+
+An item that is not ready becomes a discovery or clarification task. The system should make that state visible instead of hiding it behind a low-quality plan.
+
+### 2. Plan review
+
+The planning agent produces a Build Plan. The human plan approver reviews interpretation, scope, architecture, dependencies, security, test strategy and rollback.
+
+Plan review is a decision activity, not a formality. A reviewer should focus on the assumptions most likely to cause an expensive or unsafe implementation. If the requirement is wrong or incomplete, the plan should expose that before code is written.
+
+### 3. Execution and verification
+
+After approval, the Coordinator creates an execution run and decomposes the plan into goals. Makers work in isolated environments. Independent Checkers and CI inspect the result.
+
+The Coordinator should keep work visible at goal level. A single status such as `agent working` conceals whether the run is implementing, waiting for a dependency, retrying a failed test or blocked on human input.
+
+### 4. Engineering review
+
+The engineer receives a review package that includes the original requirement, approved plan, change set, test and review evidence, deviations, unresolved risks and relevant context versions.
+
+The review package should reduce search time, not reduce judgement. The engineer remains responsible for understanding enough of the change to accept it.
+
+### 5. Quality and release
+
+QA validates product behaviour, business rules, regression risk and important user journeys. Release authority then decides whether the change may enter the target environment.
+
+The final decision records what was accepted, under which conditions, and what follow-up remains. A release can be blocked even when all automated checks pass.
+
+### 6. Learning review
+
+The team reviews meaningful corrections and repeated failure patterns. It classifies each lesson:
+
+| Lesson type | Immediate action | Possible durable action |
+| --- | --- | --- |
+| Local implementation defect | Rework the goal | None, unless the defect exposes a general rule |
+| Missing repository convention | Correct the change | Add a reviewed repository rule or example |
+| Ambiguous product rule | Pause and clarify | Improve the work-item template or readiness check |
+| Weak test boundary | Add or revise verification | Add a reusable test pattern or QA criterion |
+| Unsafe permission request | Stop and investigate | Tighten policy, credentials or risk routing |
+| Repeated architectural error | Rework and review design | Update architecture context and Checker rules |
+
+Durable context changes should be versioned and reviewed. Agents may propose such changes, but they must not silently change security invariants or release policy.
+
+## Ceremonies
+
+The model keeps useful decision ceremonies and changes their focus.
+
+### Readiness review
+
+Held before a work item enters planning. The group confirms intent, acceptance criteria, risk, context and decision owners.
+
+### Plan approval
+
+A focused review of the Build Plan. It should be short when the work is routine and deep when architecture, data or security risk is material.
+
+### Execution triage
+
+A Coordinator or engineer reviews runs that are blocked, repeatedly retrying, drifting from scope or consuming disproportionate Checker capacity. The purpose is to make a decision, not to watch agent output continuously.
+
+### Implementation acceptance
+
+An engineer reviews the completed change and evidence. The review should include deviations from the approved plan and unresolved findings.
+
+### QA and release review
+
+QA confirms product assurance. Release authority confirms required approvals, evidence, risk disposition and rollback readiness.
+
+### Learning review
+
+The team decides which corrections remain local and which become shared context, tests or process changes.
+
+### Retrospective
+
+The retrospective considers both delivery outcome and system behaviour. It asks whether the right work was selected, whether the agent context was useful, whether review load was sustainable and whether quality controls caught the important risks.
+
+## Escalation and exception handling
+
+Escalation is required when a run:
+
+- discovers a requirement conflict;
+- needs access outside the approved scope;
+- changes an architecture boundary;
+- encounters sensitive data or an unexpected trust boundary;
+- fails the same condition repeatedly;
+- produces evidence that cannot be reproduced;
+- creates a review queue that exceeds the team's safe capacity;
+- proposes a change to security, release or agent policy.
+
+The escalation record should state the trigger, current state, decision owner, options considered, temporary controls and next review time.
+
+Exceptions require a named human authority, a bounded scope and an expiry. An exception should make risk visible. It should not become a permanent bypass for a control that is inconvenient.
+
+## Work in progress and review capacity
+
+Agent execution can be parallel, but the team should limit the number of changes awaiting human decisions. Useful limits include:
+
+- maximum plans awaiting approval;
+- maximum implementations awaiting engineering review;
+- maximum features awaiting QA;
+- maximum high-risk runs in execution;
+- maximum retries for one goal;
+- maximum unresolved context changes awaiting review.
+
+The right limit depends on team size, system risk and change complexity. The important point is to measure the queue at human gates. If agents can create work faster than humans can evaluate it, adding more Makers can reduce safety rather than improve delivery.
+
+## Service classes and risk tiers
+
+One operating model can support different levels of control.
+
+| Tier | Typical work | Minimum human controls | Execution posture |
+| --- | --- | --- | --- |
+| Low | Documentation, tests, local refactoring | Plan or issue approval, engineering review | Limited parallel execution |
+| Moderate | Product behaviour, APIs, integrations | Plan approval, independent checks, engineering review, QA | Bounded execution with repository controls |
+| High | Identity, payments, sensitive data, migrations, production controls | Architecture, security, engineering, QA and release decisions | Small goals, stronger isolation, explicit escalation |
+| Exceptional | Safety-critical or irreversible operations | Named authority, documented risk assessment and bespoke controls | Agent assistance may be limited to analysis |
+
+The tiers are examples. Each organisation should define the properties that put work into a tier and should not treat a label as a substitute for threat modelling.
+
+## Planning economics
+
+Traditional sprint planning often estimates the implementation capacity of people and selects work to fit. Agentic planning has at least two capacities:
+
+1. **Execution capacity:** how much bounded work agents can attempt.
+2. **Governance capacity:** how much intent, design, evidence and risk humans can safely review.
+
+The second capacity is not automatically increased by adding models. It includes plan review, code comprehension, QA, security decisions, architecture coherence and release accountability.
+
+Teams should track both. Useful observations include queue time at each human gate, review minutes per accepted change, first-pass plan acceptance, rework, escaped defects and the number of changes awaiting QA. These are signals for learning, not targets to optimise in isolation.
+
+## Comparison with a conventional sprint
+
+| Question | Conventional emphasis | Agentic Sprint emphasis |
+| --- | --- | --- |
+| What limits delivery? | Human implementation capacity | Human decision and assurance capacity, plus execution capacity |
+| What starts the work? | A refined task assigned to engineers | A ready requirement assigned to a governed run |
+| What does planning produce? | Estimates and task breakdown | A reviewable Build Plan and verification conditions |
+| What does implementation mean? | Humans write and integrate most changes | Agents may perform bounded execution in isolated workspaces |
+| What does review protect? | Code quality and shared ownership | Intent, architecture, evidence, risk and accountability |
+| How does the team learn? | Retrospective and documentation | Retrospective plus versioned agent context and Checker rules |
+| What is a dangerous failure? | Defective code or missed scope | Defective code, review overload, context poisoning or bypassed authority |
+
+The comparison is not a claim that one model is always better. It describes a change in the constraint the team must manage.
+
+## A practical team pattern
+
+A small team might use one product authority, one senior engineer, one QA authority and one release authority, with a Coordinator service and several bounded agent roles. The senior engineer may also act as context steward. A larger or higher-risk team may separate architecture, security, QA and release decisions.
+
+The team should begin with a narrow service class, a small number of repositories and explicit evidence requirements. It can expand only when the review and failure data justify the next step.
+
+## What this model does not claim
+
+This operating model does not promise fewer people, automatic productivity gains or reliable autonomy. It does not imply that agents understand business intent, that human review can be superficial, or that quality is measurable through velocity alone.
+
+It proposes a way to place agent execution inside an accountable engineering organisation. The model is successful only if the resulting decisions remain understandable, reversible where possible and supported by evidence.
+
+## Document status
+
+This is an operating model proposal in the Agentic Sprint Methodology series. It is intended for critique, adaptation and controlled implementation. It is not a prescription for every engineering organisation.

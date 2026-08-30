@@ -1,0 +1,297 @@
+---
+title: "Agentic Sprint Reference Architecture"
+description: "A reference architecture for moving approved software work through orchestration, bounded agent execution, independent verification, human review and controlled release."
+date: "2026-08-02"
+updated: "2026-08-02"
+type: "technical"
+topics: ["Agentic Systems", "Engineering", "AI Governance & Security", "Delivery & Organisations"]
+tags: ["Agentic Sprint", "reference architecture", "orchestration", "sandboxing", "software supply chain", "observability"]
+featured: false
+pinned: false
+draft: false
+canonical: "/reference-architecture"
+image: "/social/reference-architecture"
+series: "Agentic Sprint Methodology"
+seriesOrder: 2
+version: "0.1"
+status: "Reference architecture"
+documentId: "D2"
+documentKind: "reference-architecture"
+normative: false
+owner: "Siri Dalugoda"
+dependsOn: ["D1"]
+claimClasses: ["reference-architecture", "recommended-practice", "implementation-guidance"]
+citation: "Dalugoda, Siri. Agentic Sprint Reference Architecture. Agentic Sprint Methodology, v0.1, 2 August 2026. https://theagenticsprint.com/reference-architecture"
+references: ["https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://git-scm.com/docs/git-worktree.html", "https://slsa.dev/spec/v1.2/provenance", "https://opentelemetry.io/docs/concepts/signals/", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"]
+externalLinks: ["https://github.com/asiridalugoda/autonomous-loop"]
+---
+
+## Purpose
+
+This document describes a deployable reference architecture for an Agentic Sprint. It shows where work enters, where authority is exercised, where agents are allowed to operate, and where evidence is retained.
+
+The architecture is intentionally product-neutral. An implementation can use Jira or GitHub for work intake, n8n or another workflow engine for orchestration, and different model or execution providers. The control boundaries are more important than the product names.
+
+The architecture assumes that approved work is still bounded work. It does not claim that a collection of agents is a reliable substitute for experienced engineering judgement.
+
+## Architectural principles
+
+1. **Intent enters before execution.** A work item and its acceptance criteria are the source of product intent.
+2. **Planning precedes implementation.** The system creates a Build Plan before allowing agent-authored code changes.
+3. **Authority is explicit.** Identity, permission and delegation scope are recorded for actions that can affect engineering state.
+4. **Execution is isolated.** Agents work in disposable or recoverable environments with least-privilege credentials.
+5. **Creation and checking are separated.** The Maker is not the sole Checker.
+6. **State survives sessions.** The run can resume without relying on one model conversation.
+7. **Evidence travels with the change.** A reviewer can reconstruct what was approved, attempted, checked and released.
+8. **Production is a separate trust boundary.** Coding capability does not imply release capability.
+9. **Context is versioned.** Instructions and skills that influence delivery are treated as engineering inputs.
+10. **Failure is contained and legible.** A failed run stops or returns to a known state with a recorded reason.
+
+## Reference topology
+
+:::figure reference-architecture
+The Agentic Sprint reference architecture. A work item enters an intake system and is normalised by an orchestrator. Context assembly feeds a planning agent, then a human plan gate. Approved work enters Autonomous Loop, which coordinates isolated Maker agents and independent Checker agents. Deterministic CI, engineering review, QA and release authority remain separate control points. Evidence and telemetry cross-cut the execution path, while production credentials remain outside the coding plane.
+:::
+
+:::figure trust-boundaries
+Trust boundaries in an Agentic Sprint. Five zones are separated: the intake and planning zone, the isolated agent execution zone, the verification zone, the human decision zone and the protected release and production zone. Identity, secrets, network access, source control and evidence cross those boundaries only through explicit interfaces.
+:::
+
+## Components
+
+### Work intake
+
+The intake system holds the product request, priority, acceptance criteria, risk class and responsible authority. It can be a Jira issue, GitHub issue or another system with an auditable API.
+
+The intake adapter needs to validate that the request is eligible for agentic processing. It should reject items with missing acceptance criteria, ambiguous ownership or prohibited data before they reach a planning agent.
+
+### Orchestrator
+
+The orchestrator is the control-plane service that implements the Coordinator role defined in D1. It creates and advances execution runs. Its responsibilities include:
+
+- receiving an eligible work event;
+- selecting the appropriate workflow and risk controls;
+- assembling the context manifest;
+- requesting a Build Plan;
+- pausing at human gates;
+- creating the Autonomous Loop run after approval;
+- assigning goals to permitted executors;
+- recording state transitions and evidence references;
+- escalating failures and exceptions;
+- closing the run after release or cancellation.
+
+The orchestrator should be a control-plane service. It should not execute arbitrary repository code with the same credentials as a Maker.
+
+### Context assembly
+
+Context assembly creates a bounded input set for the planning and execution agents. It may include:
+
+- the work item and acceptance criteria;
+- repository maps and relevant files;
+- architecture decisions and service contracts;
+- coding and security rules;
+- test commands and environment requirements;
+- known failure modes;
+- the approved tool and repository scope;
+- versions or digests for context assets.
+
+The context manifest needs to identify what was supplied to an agent. If context is retrieved dynamically, the system should retain the retrieval time, source and version or content digest.
+
+### Planning agent
+
+The planning agent analyses the assembled context and produces a Build Plan. It should not receive authority to merge, release or broaden its own scope. The plan is a proposal until an authorised human approves its specific version.
+
+### Human decision service
+
+Human gates can be implemented in the work-management system, source-control system or a dedicated approval service. The decision service needs to record the human identity, decision, time, plan or change identity, and any comment or conditions.
+
+An agent status such as `approved`, an automated green check or a comment generated by a model is not a human decision.
+
+### Autonomous Loop
+
+Autonomous Loop is one possible execution protocol within the approved boundary. It converts the Build Plan into dependency-ordered goals, maintains persistent state, coordinates Makers and Checkers, records failures and advances only when completion evidence exists.
+
+The reference architecture does not require Autonomous Loop or any other particular implementation. A deployment should provide equivalent state, evidence, recovery and separation controls when it claims to implement the D1 core model or the optional `AS-AL` profile.
+
+### Maker workspaces
+
+Each Maker should work in an isolated branch, container, virtual machine or Git worktree. The workspace identity should be associated with the run and goal. A Maker should not write to a protected release branch directly.
+
+For Git repositories, [Git worktree](https://git-scm.com/docs/git-worktree.html) provides one documented way to attach multiple working trees to one repository. Worktrees do not by themselves provide security isolation, so a deployment can add containers, operating-system isolation, network policy and credential boundaries.
+
+### Checker and verification services
+
+Checker services inspect the change against one or more explicit conditions. They may include code review, requirements verification, security analysis, test generation, architecture checks and red-team exercises.
+
+The Checker should have a separate task context from the Maker. The system needs to retain the Checker result, including findings and the inputs used to produce it.
+
+### CI and quality controls
+
+CI executes deterministic checks such as compilation, linting, unit tests, integration tests, contract tests, migrations, dependency checks and secret scanning. The exact set is determined by repository and risk class.
+
+Agents can attempt remediation within their permission scope. They should not remove a required check, weaken a threshold or edit a test only to make a failing run pass unless that change is separately authorised and reviewed.
+
+### Human engineering review and QA
+
+Engineering review assesses the implementation against the approved plan, architecture and evidence. QA assesses product behaviour, acceptance criteria and regression risk. A passing CI pipeline does not replace either decision.
+
+### Release authority
+
+Release authority is the final control plane before a protected merge or deployment. It should use separate credentials from the coding plane. Production credentials should not be present in a Maker workspace.
+
+## Canonical data path
+
+The following sequence describes the normal path without tying it to a specific vendor:
+
+1. An intake adapter receives a work item.
+2. The orchestrator validates readiness and assigns a run identity.
+3. Context assembly creates a versioned manifest.
+4. The planning agent produces a Build Plan.
+5. A human approves or rejects the plan.
+6. Autonomous Loop converts the approved plan into goals.
+7. Makers execute goals in bounded workspaces.
+8. CI and independent Checkers evaluate the change.
+9. The run pauses for human engineering acceptance.
+10. QA performs the required product assurance.
+11. Release authority reviews evidence and controls the merge or deployment.
+12. The system records learning proposals and closes the run.
+
+Every step should reference the same run identifier and the relevant work-item, plan, goal and change identities.
+
+## Repository topologies
+
+### Monorepo
+
+A monorepo can simplify cross-service discovery and atomic changes. It can also enlarge the context and permission surface.
+
+The orchestrator should limit each goal to the relevant packages or directories. CI should retain affected-component checks as well as repository-wide controls. A Maker should not infer permission to change the whole repository merely because it can read the whole repository.
+
+### Multi-repository
+
+A multi-repository implementation needs an explicit coordination record. The Build Plan should list repositories, branches, interface versions, dependency order and integration owner.
+
+Each repository should retain its own branch protection and CI evidence. The orchestrator can create a logical change group that links the repository-level pull requests, but a group link should not replace repository-level review.
+
+| Concern | Monorepo pattern | Multi-repository pattern |
+| --- | --- | --- |
+| Scope | Package or directory boundary | Repository and path allow-list |
+| Integration | Atomic change or coordinated branch | Linked change set with explicit dependency order |
+| CI | Shared pipeline with affected-component rules | Per-repository checks plus integration checks |
+| Approval | One change decision may cover several packages | Each repository retains local protection |
+| Failure containment | Revert or isolate package change | Stop dependent repositories and preserve partial evidence |
+
+## Identity, credentials and authority
+
+Every agent action that changes source, executes a command, calls a tool or advances a run should be attributable to:
+
+- a human principal or approved system principal;
+- an agent role and run identity;
+- a goal or task identity;
+- a tool or service identity;
+- the permission scope in force;
+- the result and evidence reference.
+
+Authentication answers which principal is acting. It does not, by itself, prove that the principal is authorised for the particular action. Implementations that require delegated authority should record scope, expiry and parent decision separately from login identity.
+
+Credentials should be least privilege, time bounded where practical and scoped to the repository, branch and tools required by the goal. Long-lived personal access tokens should not be placed in agent workspaces.
+
+## Secrets and sensitive data
+
+Secrets should be injected at execution time through a controlled secret service. They should not be written into prompts, logs, commits, generated artefacts or evidence bundles in plaintext.
+
+The system should classify repositories and data sources before a run starts. A Maker should receive synthetic or masked data unless real data is required and separately authorised. Tool output should be treated as potentially sensitive before it enters durable context.
+
+## Sandboxing and network policy
+
+An agent workspace should be disposable, recoverable or both. The execution policy should define:
+
+- permitted commands and interpreters;
+- writable directories;
+- repository and branch scope;
+- package and dependency sources;
+- inbound and outbound network rules;
+- maximum runtime and resource limits;
+- handling of subprocesses;
+- what happens when a permission is denied.
+
+The system should fail closed for requests outside the policy. Network access should be disabled by default for tasks that do not need it. If external access is permitted, the host, method, purpose and result should be recorded.
+
+These controls align with the general risk boundary described in [GitHub's cloud agent guidance](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations). They are architectural controls, not evidence that every implementation is safe.
+
+## State and evidence storage
+
+The control plane should separate mutable operational state from append-oriented evidence. Mutable state helps the run progress. Evidence allows a later reviewer to reconstruct what happened.
+
+At minimum, the evidence record should retain:
+
+- work-item and plan identities;
+- context manifest and versions;
+- model and tool identifiers where available;
+- command, tool and repository actions;
+- changed files or immutable change references;
+- check inputs, outputs and timestamps;
+- review findings and dispositions;
+- human decisions and approval scope;
+- release identity and rollback reference;
+- failures, retries and exception records.
+
+For build or release provenance, an implementation can use a format aligned with [SLSA provenance](https://slsa.dev/spec/v1.2/provenance). Provenance is useful only when the stated predicates are actually supported by the system that produced it.
+
+## Observability
+
+The architecture should expose three related kinds of telemetry:
+
+- **Traces:** the relationship between a work item, run, goal, tool call, check and decision.
+- **Metrics:** execution duration, queue time, retries, review load, failure counts and other aggregate measures.
+- **Logs or events:** detailed state changes and diagnostic output.
+
+The terminology follows the signal model described by [OpenTelemetry](https://opentelemetry.io/docs/concepts/signals/). Telemetry should be redacted and access controlled. It should distinguish model output from human decisions and deterministic check results.
+
+## Deployment topologies
+
+### Single-environment development topology
+
+A small team can run the orchestrator, workers and evidence store in one controlled environment. It still needs to separate production credentials and protected branch authority from Maker execution.
+
+### Isolated worker topology
+
+The orchestrator runs in a control plane and launches short-lived worker environments. Each worker receives a signed or otherwise attributable run assignment, limited credentials and an explicit expiry. This topology improves failure containment and makes the workspace easier to discard.
+
+### Enterprise control-plane topology
+
+An enterprise implementation can separate intake, orchestration, context, worker, verification, human approval, evidence and release services. It should define ownership and availability for each service. A larger topology increases integration and operational complexity, so every service should have a clear control purpose.
+
+## Failure containment
+
+The system should stop a run when it detects scope drift, policy violation, missing approval or evidence that cannot be trusted. It should isolate failed work from successful work and preserve the failing workspace or a reproducible reference when investigation requires it.
+
+Retries should be bounded. A retry should change a meaningful condition, such as a corrected hypothesis, new context or repaired dependency. Repeating the same model instruction indefinitely is not recovery.
+
+When a multi-repository run partially succeeds, the orchestrator should record which repositories changed, which checks passed, which dependencies remain blocked and whether any local branch can be safely closed. It should not silently merge a partial change group.
+
+## Architecture requirements checklist
+
+An implementation using this reference architecture should be able to answer these questions before production use:
+
+- What enters the system, and how is readiness checked?
+- Which human can approve the Build Plan?
+- What exact scope does that approval authorise?
+- Where are agent workspaces created and destroyed?
+- Which credentials can a Maker use?
+- How is network access constrained?
+- Which agent or service is the independent Checker?
+- Which checks are deterministic and mandatory?
+- Where are human decisions stored?
+- How are context changes reviewed and rolled back?
+- What protects merge and deployment authority?
+- Can a new worker resume from persistent state?
+- Can a reviewer reconstruct the run from retained evidence?
+- What happens when the orchestrator, model, repository or test environment fails?
+
+## Limitations
+
+This is a reference architecture, not a complete security assessment or implementation blueprint for every organisation. Workload-specific threat modelling remains necessary. Isolation, provenance and logging do not make an incorrect requirement correct, and a Checker can miss a defect. The architecture provides decision boundaries and evidence paths so those limitations are visible.
+
+## Document status
+
+This document is a reference architecture for the Agentic Sprint methodology. It is not a certification, a security standard or evidence that a particular deployment is safe.

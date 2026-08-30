@@ -1,0 +1,249 @@
+---
+title: "Agent Skill Template"
+description: "A reusable, reviewable definition for an agent skill with explicit scope, permissions, evidence and evaluation."
+date: "2026-08-15"
+updated: "2026-08-15"
+type: "technical"
+topics: ["Agentic Systems", "AI Governance & Security", "Engineering"]
+tags: ["agent skills", "permissions", "context governance", "evaluations", "least privilege"]
+featured: false
+pinned: false
+draft: false
+canonical: "/templates/agent-skill"
+image: "/social/template-agent-skill"
+series: "Agentic Sprint Templates"
+seriesOrder: 2
+version: "0.1"
+status: "Working template"
+documentKind: "Template"
+normative: false
+documentId: "T2"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D8"]
+claimClasses: ["methodology", "template", "authorial"]
+citation: "Dalugoda, Siri. Agent Skill Template. Agentic Sprint Templates, v0.1, 15 August 2026. https://theagenticsprint.com/templates/agent-skill"
+references: ["https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions-for-github-copilot", "https://slsa.dev/spec/v1.2/provenance"]
+externalLinks: []
+---
+
+Use this template when creating or changing a reusable instruction set, tool workflow or specialist role for an agent. The skill owner is accountable for its purpose and behaviour. A context steward and the relevant permission owner review changes before the skill is available to an execution agent.
+
+This is an informative working artefact for adapting the Agentic Sprint. It is not an independent normative standard; teams should record their own decisions, controls and approval rules.
+
+The `T2-SK-*` labels below are local template cross-references. They are not methodology requirements and do not override D1 to D10. A skill remains subordinate to approved intent, architecture, security and release authority.
+
+A skill is part of the delivery environment. It can influence future implementation, so its permissions, prohibitions, examples and evaluation cases need the same care as other operational engineering assets.
+
+## When to use it
+
+- A team is introducing a new Maker, Checker, planning, security or documentation role.
+- A repeated correction should become durable context.
+- An existing skill needs a new trigger, tool, permission or rule.
+- A skill is being moved between repositories or execution environments.
+
+Do not use a skill to grant broad access merely because it makes a task easier. Separate capability from authority and specify the smallest useful scope.
+
+## Ownership and approval
+
+- **Skill owner:** maintains purpose, scope, examples and evaluations.
+- **Permission owner:** approves tool, repository, network and secret access.
+- **Context steward:** checks consistency with architecture and other skills.
+- **Approval boundary:** a Context Change is approved before the version is published to agents.
+- **Required evidence:** trigger examples, negative examples, permission review, evaluation results, provenance and rollback version.
+- **Completion rule:** the skill has an immutable version, a passing evaluation set, explicit prohibitions and a recorded approval.
+- **Failure path:** disable or roll back the version, preserve the failing trace, open a correction record and re-run evaluations before reactivation.
+
+## Lifecycle mapping
+
+| Requirement ID | Skill obligation | Agentic Sprint point |
+| --- | --- | --- |
+| T2-SK-001 | Define the skill's purpose, owner and bounded scope. | Context assembly |
+| T2-SK-002 | Define reliable triggers and explicit non-triggers. | Planning |
+| T2-SK-003 | Declare tools, permissions, network and secret boundaries. | Guardrails |
+| T2-SK-004 | State required context and precedence when sources conflict. | Context assembly |
+| T2-SK-005 | Define the workflow, stopping conditions and escalation path. | Autonomous execution |
+| T2-SK-006 | Prohibit unsafe shortcuts and self-authorised scope expansion. | Guardrails |
+| T2-SK-007 | Record evidence and evaluate the skill against positive and negative cases. | Verification |
+| T2-SK-008 | Version, review, publish and roll back the skill as a Context Change. | Organisational learning |
+
+## Design prompts
+
+- What task is this skill allowed to help with?
+- What similar tasks must it refuse or route elsewhere?
+- Which facts must be loaded before the skill can act?
+- Which tool calls are read-only, mutating or externally consequential?
+- What is the maximum repository, branch, time and cost scope?
+- What evidence must be returned after each action?
+- What does the skill do when context is stale, contradictory or missing?
+- Which human role can approve an exception?
+
+## Copyable template
+
+````yaml
+skill_id: [organisation.skill-name]
+skill_version: "0.1.0"
+status: [draft | review | active | suspended | retired]
+document_owner: [name or team]
+context_steward: [name or team]
+permission_owner: [name or team]
+created_at: [YYYY-MM-DD]
+last_reviewed_at: [YYYY-MM-DD]
+next_review_at: [YYYY-MM-DD]
+change_record: [context-change-id]
+
+purpose: >-
+  [State the bounded outcome this skill helps an agent achieve.]
+
+scope:
+  allowed_tasks:
+    - [task]
+  excluded_tasks:
+    - [task that must be refused]
+  repositories:
+    - [repository and permitted path]
+  branches:
+    - [branch pattern]
+  maximum_change_size: [files, lines, goals or other limit]
+
+triggers:
+  positive:
+    - [event, work-item label or request pattern]
+  negative:
+    - [pattern that looks similar but must not trigger]
+  required_preconditions:
+    - [approved Build Plan]
+    - [architecture context version]
+
+inputs:
+  required:
+    - name: [input name]
+      source: [path, event, document or tool]
+      freshness: [version, timestamp or validity rule]
+      handling: [read-only | sensitive | restricted]
+  optional:
+    - name: [input name]
+      source: [source]
+      fallback: [safe fallback]
+
+authority_and_permissions:
+  human_principal: [name or role that authorised the work]
+  agent_role: [Maker | Checker | Planner | Security Reviewer | other]
+  authority_scope: [exact authorised action]
+  read:
+    - [resource]
+  write:
+    - [resource and path]
+  execute:
+    - command: [command]
+      purpose: [why it is needed]
+      limits: [time, arguments, output or environment limit]
+  network:
+    allowed_destinations:
+      - [host or service]
+    denied_destinations:
+      - [host or service]
+  secrets:
+    allowed_secret_references:
+      - [reference, never the secret value]
+    forbidden_secret_actions:
+      - [print, copy, export or persist secret]
+  approval_required_for:
+    - [merge, release, production access or other consequential action]
+
+tools:
+  - name: [tool]
+    mode: [read | write | execute]
+    input_schema: [path or description]
+    output_schema: [path or description]
+    failure_handling: [stop, retry, escalate or record]
+
+context:
+  precedence:
+    - [human approval or current requirement]
+    - [versioned architecture rule]
+    - [this skill]
+    - [repository convention]
+  required_documents:
+    - path: [document]
+      version: [version]
+      purpose: [purpose]
+  prohibited_assumptions:
+    - [assumption that cannot be made without evidence]
+
+workflow:
+  steps:
+    - id: [S01]
+      action: [action]
+      input: [input]
+      output: [evidence or state]
+      stop_if: [stop condition]
+    - id: [S02]
+      action: [action]
+      input: [input]
+      output: [evidence or state]
+      stop_if: [stop condition]
+  completion_condition: >-
+    [Observable condition. Do not use confidence or appearance as the only condition.]
+  escalation_condition:
+    - [missing authority]
+    - [conflicting context]
+    - [unsafe or out-of-scope request]
+
+prohibitions:
+  - [Do not broaden scope without a human decision.]
+  - [Do not approve, merge or release work created by this skill.]
+  - [Do not weaken a deterministic check to obtain a pass.]
+  - [Do not edit tests, logs or evidence to conceal a failure.]
+  - [Do not expose secrets or restricted data.]
+
+evidence:
+  required_per_run:
+    - run_id
+    - input_snapshot
+    - tool_calls
+    - files_changed
+    - checks_run
+    - result
+    - unresolved_risks
+  retention: [retention rule]
+  integrity: [hash, signed record or repository commit]
+  reviewer: [independent reviewer]
+
+evaluation:
+  dataset_version: [version]
+  positive_cases:
+    - id: [case id]
+      prompt: [prompt]
+      expected_behaviour: [behaviour]
+      required_evidence: [evidence]
+  negative_cases:
+    - id: [case id]
+      prompt: [prompt]
+      refusal_or_escalation: [required response]
+  deterministic_checks:
+    - [check]
+  acceptance_threshold: [threshold and rationale]
+  last_result: [pass, fail or not-run]
+  result_evidence: [link]
+
+release_and_rollback:
+  approver: [name or role]
+  approved_version: [version]
+  publish_location: [path or registry]
+  rollback_version: [last known good version]
+  rollback_trigger: [condition]
+  rollback_owner: [name or role]
+  post_change_review: [date or event]
+
+traceability:
+  - requirement_id: T2-SK-001
+    evidence: [link]
+  - requirement_id: T2-SK-002
+    evidence: [link]
+````
+
+## Worked example
+
+A repository review skill might be triggered only when a pull request has an approved plan and a completed machine verification bundle. It may read the diff, test results and architecture rules, but it may not merge, change branch protection or edit the acceptance tests. Its negative evaluation cases should include a request to approve its own Maker output and a request to ignore a failed security check.
+
+The GitHub instructions reference shows one way repository context can be supplied to a coding assistant. The provenance reference is relevant to recording build evidence. Neither source defines the Agentic Sprint skill model.

@@ -1,0 +1,437 @@
+---
+title: "Agentic Sprint Implementation Guide"
+description: "A practical 30, 60 and 90 day path from AI-assisted engineering to governed agentic delivery."
+date: "2026-08-12"
+updated: "2026-08-12"
+type: "technical"
+topics: ["Agentic Systems", "Delivery & Organisations", "AI Governance & Security", "Engineering"]
+tags: ["implementation guide", "adoption", "human gates", "agentic delivery", "engineering operating model"]
+featured: false
+pinned: false
+draft: false
+canonical: "/implementation-guide"
+image: "/social/implementation-guide"
+series: "Agentic Sprint Methodology"
+seriesOrder: 12
+version: "0.1"
+status: "Implementation guide"
+documentId: "D12"
+documentKind: "implementation-guide"
+normative: false
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11"]
+claimClasses: ["implementation-guidance", "proposed-methodology", "non-empirical"]
+citation: "Dalugoda, Siri. Agentic Sprint Implementation Guide. Agentic Sprint Methodology, v0.1, 12 August 2026. https://theagenticsprint.com/implementation-guide"
+references: ["https://www.nist.gov/itl/ai-risk-management-framework", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://git-scm.com/docs/git-worktree.html", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/", "https://opentelemetry.io/docs/concepts/signals/"]
+externalLinks: ["https://www.nist.gov/itl/ai-risk-management-framework", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://git-scm.com/docs/git-worktree.html", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/", "https://opentelemetry.io/docs/concepts/signals/"]
+---
+
+## Purpose
+
+This guide describes a measured route from ordinary AI assistance to a human-gated Agentic Sprint. It is written for an engineering team that wants to test the operating model in a real repository without treating autonomy as a switch that can be turned on all at once.
+
+The goal is not to maximise model activity. The goal is to establish a delivery system in which:
+
+- a human-approved requirement becomes a bounded execution plan;
+- agents can work without continuous prompting;
+- independent checks challenge the implementation;
+- humans retain architecture, acceptance and release authority; and
+- the team can stop, explain and reduce autonomy when the evidence is not good enough.
+
+The Agentic Sprint [Specification](/specification) defines the proposed model. This guide focuses on adoption decisions, sequencing and practical controls. It does not claim that current AI systems can reliably perform all professional engineering work without supervision, and it does not promise a particular productivity result.
+
+Autonomous Loop is one possible implementation of the inner execution protocol. Core Agentic Sprint conformance does not require the Autonomous Loop implementation. A team may use another protocol if it preserves the equivalent state, evidence, recovery and separation boundaries described by the methodology.
+
+:::figure adoption-roadmap
+Adoption moves through prerequisites, a governed pilot and one expansion dimension at a time, with the option to reduce autonomy at any stage.
+:::
+
+## Before the first day: prerequisites
+
+An agentic pilot is a software delivery change, not only a model integration. Start by checking whether the team has enough engineering structure to observe and control the experiment.
+
+### Minimum technical prerequisites
+
+- A repository with a clear owner and a protected default branch.
+- Repeatable build, lint and test commands that can run in an isolated environment.
+- Continuous integration with results retained as evidence.
+- A way to scan dependencies and secrets before a change is accepted.
+- Credentials separated by environment, with the pilot using least-privilege access.
+- A work-management item with acceptance conditions that can be checked.
+- A defined human who can approve the plan and a different human or control that can challenge the result.
+- A route for QA or product assurance to test behaviour independently of the maker agent.
+
+GitHub's documented risks and mitigations for cloud agents are a useful practical reference for branch controls, permissions, network access and human review. The exact controls will differ by platform, but the boundary is general: an agent should be productive inside a constrained environment and should not receive authority that the task does not require.
+
+### Minimum organisational prerequisites
+
+- The product owner can describe the intended outcome and unacceptable outcomes.
+- A senior engineer can review a build plan and identify architectural risk.
+- The team can reserve review time. Generated work does not remove the need to understand it.
+- Security, privacy and operational owners are known for higher-risk work.
+- The team agrees what evidence is required before a work item is called complete.
+- Someone owns the context files, skills and rules that influence future runs.
+
+### Readiness checklist
+
+Mark each item as ready, partial or not ready. A partial result should become pilot work, not hidden risk.
+
+- [ ] Work items have testable acceptance conditions.
+- [ ] Repository instructions and architecture constraints are discoverable.
+- [ ] Build and test commands work without an engineer's private machine state.
+- [ ] The agent can be limited to a branch, workspace and approved tools.
+- [ ] Production data and production credentials are outside the pilot boundary.
+- [ ] Review, QA and release owners have been named.
+- [ ] Baseline measures exist for lead time, review effort, defects and rework.
+- [ ] A stop condition and rollback path have been agreed in advance.
+
+## Days 1 to 30: establish the baseline and prepare the boundary
+
+The first month is about making the environment understandable and measurable. Do not begin by delegating a large backlog. Begin by deciding what the system is allowed to do and how the team will know whether it is behaving acceptably.
+
+### 1. Select a narrow pilot domain
+
+Choose one repository, service or bounded product area. Favour work with these properties:
+
+- the acceptance conditions are clear;
+- the change is reversible;
+- test coverage is adequate for the intended behaviour;
+- the data is non-sensitive or suitably sanitised;
+- the change does not require direct production access;
+- a reviewer can understand the affected architecture; and
+- the team can complete the pilot without changing every delivery practice at once.
+
+Avoid selecting work solely because it is large or repetitive. A large task can hide too many independent failure modes for a first pilot.
+
+### 2. Map the delivery and authority boundaries
+
+Write down the path from work item to release. For each stage, identify the actor, permission, input, output and evidence. Include the places where the system must stop for a human decision.
+
+At minimum, document:
+
+- who defines and accepts the requirement;
+- who approves the Build Plan;
+- which agent or role may modify a branch;
+- which checks are deterministic;
+- who performs independent review;
+- who performs product or QA validation;
+- who may merge or release; and
+- which events must be recorded for later investigation.
+
+Use the NIST AI Risk Management Framework as a way to organise the pilot's governance conversation across govern, map, measure and manage. It is a risk management reference, not a ready-made workflow for this methodology.
+
+### 3. Assemble the context pack
+
+Create a small, version-controlled context pack. It should be useful to a new engineer as well as to an agent.
+
+Include:
+
+- repository purpose and boundaries;
+- architecture map and service ownership;
+- terminology and domain invariants;
+- supported commands and test entry points;
+- coding and API conventions;
+- security and privacy constraints;
+- forbidden shortcuts;
+- Definition of Ready and Definition of Done;
+- examples of accepted changes; and
+- escalation contacts for ambiguous or high-risk work.
+
+Do not treat every suggestion from a model as a rule. Context changes need review because a bad instruction can influence many future changes.
+
+### 4. Establish the controls
+
+Before the pilot starts, verify that:
+
+- the default branch is protected;
+- agent branches require human review;
+- agents cannot approve their own work;
+- production credentials are unavailable to implementation agents;
+- network access is limited to the task's needs;
+- destructive commands and infrastructure changes require explicit approval;
+- test and review results are retained; and
+- a failed run can be paused without losing the current state.
+
+If agents work in parallel, use isolated workspaces. Git worktrees are one repository-native option for creating multiple working trees attached to separate branches. Isolation does not solve dependency conflicts by itself, so the integration plan still needs explicit ownership and merge order.
+
+### 5. Record the baseline
+
+Take a baseline from recent comparable work. Record the method used to calculate each measure so that later comparisons are meaningful.
+
+Useful baseline fields include:
+
+- time from ready to accepted;
+- engineer minutes spent implementing and reviewing;
+- number of review cycles;
+- number of defects found before release;
+- number of defects found after release;
+- test duration and flaky test rate;
+- work item size and risk class; and
+- the number of unresolved requirement or architecture questions.
+
+Do not compare raw agent output with accepted delivery. The comparison unit is an accepted, safe change with the required evidence.
+
+### Exit criteria for day 30
+
+Move to the governed pilot only when the team can answer yes to all of these questions:
+
+- Is the pilot boundary written down?
+- Can the agent run without production authority?
+- Can a human approve the plan before implementation?
+- Can independent checks inspect the implementation?
+- Can QA validate the requirement independently?
+- Can the team recover a failed run?
+- Is there a baseline and an agreed review period?
+- Is there a named release authority?
+
+If not, spend the next iteration improving readiness. More model access will not compensate for missing controls.
+
+## Days 31 to 60: run one governed pilot
+
+The second month is a controlled experiment. Keep the number of variables small enough that the team can identify what caused a result.
+
+### Pilot design
+
+Use a small set of work items from one product area. A useful first pilot may contain:
+
+- one low-risk documentation or test improvement;
+- one bounded feature with clear acceptance conditions;
+- one change that crosses a known module boundary; and
+- one deliberately rejected or clarified item, to test whether the workflow can stop safely.
+
+Do not include production migrations, privileged infrastructure changes, sensitive data processing or high-impact financial decisions in the first pilot unless the organisation already has the controls and assurance required for them.
+
+### The pilot flow
+
+1. The product owner confirms the requirement, scope and acceptance conditions.
+2. A context assembly step collects repository, architecture, security and test information.
+3. A planning agent produces a Build Plan with affected components, risks, dependencies, test strategy and acceptance traceability.
+4. A human engineer approves, rejects or requests changes to the plan.
+5. The approved plan is converted into bounded execution goals.
+6. Maker agents work in the approved branch or isolated worktrees.
+7. Deterministic checks and independent review run before the implementation reaches the engineer.
+8. The engineer evaluates the diff, evidence, deviations and unresolved risks.
+9. QA or product assurance tests the accepted implementation against the requirement.
+10. The release authority decides whether the change may merge or ship.
+11. The team records corrections and decides whether any should update shared context.
+
+This flow makes the plan approval, engineering review and release decision visible. Agents may iterate within a gate, but they do not silently cross it.
+
+### Example pilot backlog
+
+| Work item | Risk class | Proposed autonomy | Required evidence | Human decision |
+| --- | --- | --- | --- | --- |
+| Add missing unit tests for a stable parser | Low | Maker and verifier may iterate in a branch | Test diff, passing suite, coverage context | Engineer review before merge |
+| Add an idempotent endpoint to an existing service | Moderate | Plan approval, bounded implementation, independent review | API contract, negative tests, security checks | Engineer and QA acceptance |
+| Update a shared database migration | High | Agent may analyse and draft only | Migration plan, rollback path, compatibility analysis | Human implementation and release approval |
+| Change a production access policy | Critical | No autonomous implementation | Written risk decision and reviewed change | Named security and release authorities |
+
+The table is an example of risk-tiered delegation. It is not a universal classification scheme.
+
+### Pilot decision log
+
+Keep a decision log with one record per material gate decision. A small, durable record is more useful than an informal conversation that cannot be reconstructed.
+
+```text
+decision_id: AS-PILOT-004
+work_item: example-work-item
+gate: build-plan
+decision: approved-with-changes
+decided_by: named-human-role
+date: YYYY-MM-DDThh:mm:ssZ
+scope: example-service change
+conditions:
+  - add an idempotency test
+  - document the audit event contract
+  - keep the migration out of this change
+evidence:
+  - build-plan-reference
+  - architecture-review-reference
+expiry: next-architecture-review
+```
+
+The record should distinguish an approval from an observation. It should also record conditions that would invalidate the decision.
+
+### Pilot stop and go criteria
+
+| Area | Go signal | Stop or reduce autonomy signal |
+| --- | --- | --- |
+| Requirements | Acceptance conditions remain stable and testable | The agent repeatedly fills gaps with assumptions |
+| Review | Reviewers can inspect the work within the agreed time | Review queue grows faster than it can be understood |
+| Quality | Required checks are stable and failures are diagnosable | Agents alter tests or boundaries to make checks pass |
+| Security | Permissions and network access remain within scope | A run requests unplanned secrets, data or privileges |
+| Recovery | State and next hypotheses are recorded | A restart loses work or makes the result unreproducible |
+| Product assurance | QA can exercise the intended behaviour independently | Passing machine checks are treated as product acceptance |
+
+At the end of the pilot, compare accepted changes with the baseline. Also record what the system could not safely do. Those exclusions are useful evidence.
+
+Proceed to the expansion phase only when the predeclared go conditions are met: required gates are complete for the pilot cohort, no unresolved control violation remains, the evidence can be reconstructed, reviewers and QA can absorb the work, and the baseline comparison uses a defined cohort. If any stop signal is present, pause expansion, record the decision and either correct the boundary or move the work to a lower-autonomy workflow. Do not treat the absence of a reported incident as evidence that expansion is safe.
+
+## Days 61 to 90: expand one dimension at a time
+
+Expansion should be earned by evidence from the pilot. Increase only one of these dimensions at a time:
+
+- work item complexity;
+- number of repositories;
+- number of specialised agents;
+- degree of parallel execution;
+- permitted tool or network access; or
+- amount of work that can continue without a prompt.
+
+Changing all six at once makes a failure difficult to diagnose.
+
+### Add specialised roles carefully
+
+A mature workflow may use a coordinator, maker, code reviewer, test verifier, security auditor and documentation agent. Specialisation is valuable when it creates independent responsibility and distinct evidence. It is not valuable when it only creates more model calls that repeat the same assumptions.
+
+For each role, document:
+
+- purpose and allowed inputs;
+- tools and repositories it may access;
+- actions it may take;
+- actions it must refuse;
+- evidence it must produce;
+- escalation conditions; and
+- the human owner of its configuration.
+
+### Expand to multi-repository work
+
+When a change crosses repositories, extend the Build Plan with a dependency graph, branch naming convention, compatibility order and integration owner. Isolated worktrees can reduce workspace collision, but they do not replace API contracts, integration tests or a human decision about partial failure.
+
+### Add the learning loop
+
+At this stage, review corrections should be classified rather than copied directly into prompts.
+
+1. Capture the correction with the affected change.
+2. Decide whether it is local or reusable.
+3. Choose the appropriate context location.
+4. Add an example, test or review rule where possible.
+5. Review the context change as an engineering change.
+6. Run representative tasks against the old and new context.
+7. Version and publish the approved update.
+8. Define how to roll it back.
+
+Security invariants, release controls and authority boundaries should remain human-controlled. Agents can propose improvements to context, but they should not decide that a guardrail is unnecessary because it slows the loop.
+
+### Instrument the system
+
+Capture traces, logs and metrics for the agentic workflow, with privacy and retention controls appropriate to the environment. OpenTelemetry's signal model is a useful reference for separating these kinds of telemetry. Record enough to reconstruct the run without storing secrets or unnecessary personal data.
+
+At a minimum, capture:
+
+- work item and execution identifier;
+- model and tool versions where available;
+- context and skill versions;
+- permissions and environment class;
+- goal transitions and retry reasons;
+- tests and review results;
+- human decisions and intervention time;
+- changes to context; and
+- final release outcome.
+
+## Team responsibilities
+
+| Role | Accountable for | Must not delegate without an explicit decision |
+| --- | --- | --- |
+| Product owner | Intent, scope and customer acceptance | The meaning of the requirement |
+| Staff or senior engineer | Architecture, technical risk and plan approval | Architectural acceptance |
+| Agent coordinator | State, scheduling, permissions and escalation | Gate decisions or release authority |
+| Maker agent | Bounded implementation and local evidence | Its own final approval |
+| Checker or verifier | Independent challenge and evidence | Declaring product value from tests alone |
+| QA or product assurance | Behaviour, regression and exploratory assurance | Independence from the maker |
+| Security owner | Risk boundaries, privileged actions and security findings | Unreviewed exceptions |
+| Release authority | Merge, deployment and rollback decision | Production responsibility |
+
+One person may hold more than one role in a small team, but the workflow should still keep the decisions distinguishable. Separation of duties is a control even when staffing is limited.
+
+## Metrics for the first 90 days
+
+Treat measures as decision aids, not targets that agents can game.
+
+| Metric | Definition | Use |
+| --- | --- | --- |
+| First-Pass Plan Acceptance | Plans accepted without material rework divided by plans reviewed | Tests requirement and context quality |
+| First-Pass Implementation Acceptance | Implementations accepted without material rework divided by implementations reviewed | Tests implementation fit, not model intelligence alone |
+| Human intervention minutes | Human review and correction time per accepted change | Shows whether review capacity is becoming the bottleneck |
+| Agent rework rate | Work items returned for another implementation cycle divided by work items started | Shows where planning, context or execution fails |
+| Repeat error rate | Previously corrected pattern appearing again in later runs | Tests whether context learning works |
+| Escaped defects | Post-release defects attributable to an agent-created change | A safety measure that should not be traded for speed |
+| Review load | Active review minutes and queue age | Shows whether the governance layer can absorb output |
+| Cost per accepted change | Model, infrastructure and human cost for a safely accepted change | Supports an honest economic comparison |
+
+Record the population and risk mix beside each metric. A small pilot with low-risk work cannot establish a general productivity claim.
+
+## Failure patterns to expect
+
+### Delegating ambiguous work
+
+The system produces a coherent implementation of the wrong requirement. Response: improve the acceptance conditions and require a human plan decision before any code changes.
+
+### Treating a green pipeline as acceptance
+
+The tests pass, but the product behaviour or architecture is wrong. Response: keep requirements review, architecture review and QA independent from deterministic checks.
+
+### Review overload
+
+Implementation output grows faster than the team can understand it. Response: reduce work item size, narrow autonomy, improve evidence summaries and pause expansion until review capacity recovers.
+
+### Context drift
+
+Instructions conflict or no longer describe the repository. Response: assign ownership, version context and test changes against representative work.
+
+### Privilege creep
+
+An agent requests access that was not required for the work. Response: deny the request, record the event and review the permission boundary before continuing.
+
+### Test gaming
+
+The agent changes tests, mocks or integration boundaries to satisfy a check without satisfying the requirement. Response: protect test ownership, compare tests with acceptance criteria and add independent requirements verification.
+
+### Irrecoverable execution
+
+The team cannot tell what happened after a timeout or context limit. Response: persist state, handover notes, tool results and next hypotheses before increasing autonomy.
+
+## Rolling back to less autonomy
+
+Rollback is a normal operating capability. It may reduce autonomy without discarding useful code or evidence.
+
+1. Trigger the agreed stop condition.
+2. Pause new autonomous work in the affected boundary.
+3. Preserve the run state, diff, logs, findings and human decisions.
+4. Finish, revert or quarantine in-flight changes under human control.
+5. Move the workflow down one autonomy level, such as from multi-agent execution to one supervised maker or from delegation to in-editor assistance.
+6. Identify whether the cause was requirement quality, context, permissions, model behaviour, tooling or review capacity.
+7. Change one control or practice, then test it on a small work item.
+8. Resume only after the release and review owners agree that the new boundary is understood.
+
+Reducing autonomy is not evidence that the experiment failed. It is evidence that the system has a defined response to risk.
+
+## When not to proceed
+
+Do not start or expand an Agentic Sprint when:
+
+- the requirement has no stable acceptance conditions;
+- the agent needs unrestricted production access;
+- the work can cause irreversible physical, financial or data loss and no appropriate approval path exists;
+- sensitive data cannot be isolated, minimised or protected;
+- the team has no independent verification or QA capacity;
+- reviewers cannot allocate enough time to understand the output;
+- the repository has no reliable build or test path;
+- ownership of context and security controls is unclear; or
+- the organisation is trying to use autonomy to conceal a delivery capacity or accountability problem.
+
+Use a lower-autonomy form of AI assistance, improve the engineering environment, or wait. The model is optional. Safe delivery is not.
+
+## What to read next
+
+The adoption path becomes more precise when paired with the rest of the series:
+
+- [Agentic Sprint Specification v0.1](/specification) defines terms, roles, lifecycle and minimum criteria.
+- [Agentic Sprint Reference Architecture](/reference-architecture) describes system boundaries and integration patterns.
+- [Agentic Sprint Operating Model](/operating-model) describes team practice and decision rights.
+- [Autonomous Loop Integration Specification](/autonomous-loop-integration) describes resumable execution inside the approved boundary.
+- [Agentic Engineering Guardrails and Security Model](/guardrails-and-security) defines non-negotiable controls.
+
+## Document status and limitations
+
+This is version 0.1 of a proposed implementation guide. The time windows are planning intervals, not a guarantee that an organisation can adopt the model in 90 days. The checklists and metrics require adaptation to system risk, regulation, staffing and existing delivery maturity. No observed performance result is implied.

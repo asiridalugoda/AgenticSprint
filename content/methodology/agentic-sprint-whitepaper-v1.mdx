@@ -1,0 +1,508 @@
+---
+title: "Agentic Sprint Whitepaper v1.0"
+description: "A proposed operating model for human-governed software delivery with autonomous execution, independent verification and explicit release authority."
+date: "2026-08-13"
+updated: "2026-08-13"
+type: "research"
+topics: ["Agentic Systems", "Engineering", "AI Governance & Security", "Delivery & Organisations"]
+tags: ["agentic sprint", "operating model", "autonomous software engineering", "verification", "governance", "engineering organisations"]
+featured: false
+pinned: false
+draft: false
+canonical: "/whitepaper"
+image: "/social/whitepaper"
+series: "Agentic Sprint Methodology"
+seriesOrder: 13
+version: "1.0"
+status: "Whitepaper"
+documentId: "D13"
+documentKind: "whitepaper"
+normative: false
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12"]
+claimClasses: ["proposed-methodology", "falsifiable-proposition", "research-agenda", "non-empirical"]
+citation: "Dalugoda, Siri. Agentic Sprint Whitepaper v1.0. Agentic Sprint Methodology, 13 August 2026. https://theagenticsprint.com/whitepaper"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://www.nist.gov/itl/ai-risk-management-framework", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/", "https://git-scm.com/docs/git-worktree.html", "https://slsa.dev/spec/v1.2/provenance", "https://opentelemetry.io/docs/concepts/signals/", "https://helixar.ai/about/labs/hdp/"]
+externalLinks: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://www.nist.gov/itl/ai-risk-management-framework", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/", "https://git-scm.com/docs/git-worktree.html", "https://slsa.dev/spec/v1.2/provenance", "https://opentelemetry.io/docs/concepts/signals/", "https://helixar.ai/about/labs/hdp/"]
+---
+
+## Abstract
+
+The Agentic Sprint is a proposed software delivery operating model. It treats autonomous agents as bounded execution participants inside an engineering system, while people retain authority over intent, architecture, quality acceptance, risk and release.
+
+The model has two related loops. The inner loop may be implemented by an execution protocol such as the [Autonomous Loop integration specification](/autonomous-loop-integration), which decomposes an approved Build Plan into dependency-ordered goals, makes changes, checks them, records evidence and resumes after interruption. The outer loop is the delivery process. It turns a requirement into an approved plan, controls the execution boundary, evaluates the engineering result, obtains product assurance and decides whether the result may be released.
+
+The central principle is simple: **Humans control the gates. Agents run the loops.**
+
+This whitepaper defines the terminology, decision rights, lifecycle, artefacts, verification model, security boundary, context governance, metrics, maturity path and research questions needed to implement or critique the proposal. It is a design document, not an empirical study. It does not claim that current AI systems are reliably autonomous across all professional engineering, that the model has industry consensus or that adopting it produces a guaranteed productivity gain.
+
+## Status and scope
+
+This is version 1.0 of a proposed methodology. It is intended to be readable as a standalone reference and citable as a design proposal. D1 is the root normative source, D4 through D10 are scoped companion specifications, standards and frameworks, and this whitepaper is a non-normative synthesis.
+
+The model is concerned with software delivery work that can be specified, bounded, checked and released through an accountable engineering process. It is not a general theory of artificial intelligence, a replacement for product management, a claim that humans should leave all implementation work to agents or a substitute for domain-specific safety and regulatory controls.
+
+### Relationship to the normative specification
+
+D1, the [Agentic Sprint Specification v0.1](/specification), is the root normative source for this methodology. D4 through D10 provide scoped companion specifications, standards and frameworks that elaborate parts of D1 within their declared scope, and D2, D3, D11 and D12 are informative companions. This whitepaper summarises and explains the series. It introduces no new requirements and cannot narrow, expand or override D1 or its scoped companions. Core Agentic Sprint conformance does not require the Autonomous Loop implementation. Autonomous Loop is an optional execution profile; when selected, its integration boundary is described in [D4](/autonomous-loop-integration). The uppercase terms **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are defined for specifications by [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html); they are not used here to create a second conformance layer.
+
+:::figure whitepaper-system
+The normative specification anchors the scoped companion documents, the informative synthesis and the reusable templates, so a reader can tell which document owns a requirement.
+:::
+
+### Core terms
+
+| Term | Meaning |
+| --- | --- |
+| Agentic Sprint | A human-governed software delivery operating model in which approved requirements become machine-executable plans, autonomous agents perform bounded execution and independent verification, and explicit human decision gates preserve intent, engineering acceptance and release authority. |
+| Autonomous Loop | One possible execution protocol inside an Agentic Sprint. Core conformance does not require this implementation. The optional Autonomous Loop profile decomposes an approved Build Plan into dependency-ordered, independently verifiable goals with persistent state, Maker and Checker separation, resumability, evidence and controlled parallelism. |
+| Build Plan | The reviewable technical proposal that interprets a requirement, defines scope, identifies impact and risks, and maps acceptance conditions to implementation and evidence. |
+| Gate | A decision boundary that an agent cannot cross solely by producing output. The main gates are Human Gate 1 plan approval, Human Gate 2 engineering acceptance and Human Gate 3 release authority. |
+| Maker | The agent or human role that proposes or creates an implementation. |
+| Checker | An independent role or control that challenges the maker's implementation against requirements, architecture, security or quality conditions. |
+| Evidence | A retained artefact that supports a claim about what happened or what was checked, such as a test result, review finding, trace, diff or signed decision. |
+| Context | The versioned information made available to an agent, including requirements, architecture, rules, examples, skills, domain constraints and prior decisions. |
+| Release authority | The accountable human role that decides whether an accepted change may merge, deploy or otherwise affect a release environment. |
+
+## 1. The problem
+
+Software delivery has historically been organised around human execution capacity. A requirement is refined, designed, implemented, reviewed, tested and released through a sequence of human activities. AI coding tools improve parts of that sequence, but the surrounding operating model often remains unchanged.
+
+An agentic system changes the shape of execution. A capable agent can inspect a repository, reason across files, call tools, modify a branch, run tests and continue asynchronously. Several specialised agents can perform parts of a body of work in parallel. This creates a new question for engineering leadership:
+
+> If implementation capacity becomes easier to expand, how should intent, quality and authority be governed?
+
+There are at least five failure conditions to address:
+
+- **Ambiguity amplification:** an agent can turn an incomplete requirement into a large, coherent implementation of the wrong thing.
+- **Review congestion:** implementation output can grow faster than human reviewers can understand it.
+- **Authority drift:** a tool may be able to take an action without proving that the action is within the original human authorisation.
+- **Context loss:** a session can end while the work remains incomplete, making progress difficult to resume or audit.
+- **Automation bias:** passing checks can be mistaken for product correctness, architectural fitness or acceptable risk.
+
+These are delivery-system problems. Prompt quality alone cannot solve them.
+
+## 2. Thesis and design criteria
+
+The thesis of the Agentic Sprint is:
+
+> Autonomous execution can be useful in professional software delivery when it is bounded by approved intent, explicit permissions, independent verification, durable evidence and human decision gates.
+
+The proposal is organised around eight design criteria. D1 establishes the corresponding requirements. The summaries below are explanatory and do not add to or override D1.
+
+### 2.1 Intent is explicit
+
+D1 places an accepted requirement and testable acceptance conditions before implementation planning. Material ambiguity is treated as a reason to pause for clarification rather than an invitation to make assumptions.
+
+### 2.2 Plans precede changes
+
+D1 places a Build Plan before implementation for work covered by an Agentic Sprint. A human engineering role approves the plan or returns it for revision before an implementation agent modifies the target branch or worktree.
+
+### 2.3 Execution is bounded
+
+D1 describes execution in terms of permissions, tools, repositories, data and network access appropriate to the work item. The proposed boundary becomes narrower as risk, irreversibility or uncertainty increases.
+
+### 2.4 Creation and checking are separated
+
+D1 separates the maker from sole responsibility for checking its own result. A meaningful independent check can differ in role, context, implementation path or evidence source.
+
+### 2.5 Completion is evidence-based
+
+D1 treats evidence for each acceptance condition as part of completion. An agent's declaration that work is complete is not, by itself, evidence of completion.
+
+### 2.6 State survives interruption
+
+D1 includes persistent execution state for completed goals, repository state, attempts, failures, next hypotheses and outstanding decisions. A context limit or worker failure is therefore handled as resumable state rather than silent loss.
+
+### 2.7 Release remains accountable
+
+D1 keeps release authority explicit. Its default boundary places production credentials, protected branch bypass and the final merge or deployment decision outside the autonomous execution plane.
+
+### 2.8 Learning is governed
+
+D1 allows human corrections to become shared agent context through review, versioning, testing and rollback. Security invariants and release controls remain human-controlled and are not removed merely to increase execution speed.
+
+## 3. Method and evidence boundary
+
+This paper uses a design methodology rather than a claim of measured effectiveness. It combines a delivery model with controls drawn from established engineering and risk-management guidance, then identifies the assumptions that require testing.
+
+The design is informed by:
+
+- the NIST AI Risk Management Framework, particularly its govern, map, measure and manage functions;
+- the NIST Secure Software Development Framework, which provides practices for integrating secure development into the software lifecycle;
+- GitHub's public documentation on cloud-agent risks, permissions, sandboxing and human review;
+- OWASP's published threat and mitigation work for agentic AI systems;
+- Git worktree documentation for isolated repository working trees;
+- SLSA provenance concepts for describing how build artefacts were produced; and
+- OpenTelemetry's signal model for traces, metrics and logs.
+
+These references support individual design choices. They do not validate the complete Agentic Sprint proposal, and none should be read as endorsing it.
+
+The paper distinguishes four kinds of statement:
+
+| Statement type | Purpose | Example |
+| --- | --- | --- |
+| D1 requirement | Defines what a conforming implementation must do | D1 places plan approval before implementation. |
+| Recommended practice | Suggests a useful but context-dependent approach | A multi-repository change can use isolated worktrees. |
+| Example | Illustrates one possible implementation | A coordinator may store goals in `GOALS.md`. |
+| Open question | Identifies a proposition that needs research or local evidence | How much checker independence is enough? |
+
+## 4. Reference architecture
+
+The architecture separates intake, context, planning, authorised execution, verification, human acceptance, product assurance and release. A learning path crosses the system, but it does not bypass the gates.
+
+:::figure agentic-sprint-architecture
+:::
+
+### Architectural layers
+
+| Layer | Responsibility | Required boundary |
+| --- | --- | --- |
+| Work intake | Holds the requirement, acceptance conditions and priority | A work item cannot silently change meaning during execution |
+| Context assembly | Collects architecture, repository rules, domain facts, security constraints and test entry points | Context versions and source locations are recorded |
+| Planning | Produces a Build Plan with scope, dependencies, impact, risks and verification conditions | No implementation before plan approval |
+| Gate 1 | Evaluates requirement interpretation and technical approach | Human engineering authority decides whether execution may begin |
+| Execution | Decomposes the approved plan and performs bounded work | Maker permissions are task-scoped and revocable |
+| Machine verification | Runs deterministic checks and structured agent checks | A checker cannot erase a required control to obtain a pass |
+| Gate 2 | Evaluates implementation, evidence, deviations and residual risk | Human engineering authority accepts or returns the result |
+| Product assurance | Tests customer or operational behaviour independently | Technical completion is not product acceptance |
+| Gate 3 | Decides whether the change may merge or release | Release authority stays explicit and accountable |
+| Context governance | Reviews reusable corrections and context changes | Context updates are versioned, tested and reversible |
+
+The architecture can be implemented in a monorepo or across multiple repositories. In a multi-repository setting, D1 describes a Build Plan that identifies compatibility order, branch relationships, integration ownership and partial-failure handling.
+
+## 5. The inner and outer loops
+
+The distinction between loops is central to the model.
+
+### 5.1 Inner loop: Autonomous Loop as one implementation
+
+The inner loop is an execution protocol, not a mandatory product component. Autonomous Loop is one implementation, described in [D4](/autonomous-loop-integration). Core Agentic Sprint conformance does not require it. Another protocol may be used when it preserves equivalent state, evidence, recovery and Maker and Checker separation controls.
+
+A typical cycle is:
+
+1. Load the approved context and current state.
+2. Select the next dependency-ready goal.
+3. Establish or execute the verification condition.
+4. Make the smallest useful change.
+5. Run deterministic checks.
+6. Ask an independent checker to inspect the result.
+7. Record evidence, failure state or a rework hypothesis.
+8. Mark the goal complete only when its conditions are satisfied.
+
+The loop can retry a goal, but each retry should leave a trace of what was attempted and why the next attempt differs. A failed run is state. It is not an invitation to start again without understanding the previous attempt.
+
+Autonomous Loop provides the execution discipline. It does not approve the requirement, decide architecture, grant production authority or accept product risk.
+
+### 5.2 Outer loop: Agentic Sprint
+
+The outer loop protects intent and accountability:
+
+1. Define and accept the requirement.
+2. Assemble relevant context.
+3. Produce and review the Build Plan.
+4. Authorise bounded execution.
+5. Evaluate the implementation and evidence.
+6. Perform independent product assurance.
+7. Decide whether to merge or release.
+8. Classify corrections and govern context changes.
+
+The inner loop may run many times while the outer loop remains at one gate. Agents can continue to work within an approved boundary. They cannot infer approval for a new scope, permission, architecture or release decision.
+
+## 6. Decision rights and roles
+
+The model separates execution from authority. A small team may combine roles, but it should not make the decisions indistinguishable.
+
+| Decision | Agent contribution | Human authority |
+| --- | --- | --- |
+| What problem is being solved? | Summarises ambiguity and identifies missing information | Product or domain owner |
+| How should it be built? | Proposes options, impact and a Build Plan | Senior or staff engineer |
+| Has the implementation met the plan? | Runs checks and identifies deviations | Human engineering reviewer |
+| Does the product behaviour satisfy intent? | Generates test cases and evidence | QA or product assurance role |
+| Is the residual risk acceptable? | Surfaces risks and possible mitigations | Named risk or engineering owner |
+| May the change merge or deploy? | Prepares release evidence | Release authority |
+| Should a correction become shared context? | Suggests a rule, example, test or skill change | Context owner and reviewer |
+
+The same individual may hold several human roles in a small organisation. The record should still state which decision was made, under which authority and on what evidence.
+
+## 7. Core artefacts
+
+An Agentic Sprint is a set of artefacts as well as a set of model calls. D1 identifies the following artefact classes for a conforming implementation.
+
+### Requirement record
+
+The requirement record contains the intended outcome, scope, acceptance conditions, exclusions, owner, risk classification and links to relevant product context.
+
+### Build Plan
+
+The Build Plan contains:
+
+- requirement interpretation;
+- in-scope and out-of-scope behaviour;
+- affected repositories, services and components;
+- architecture and dependency impact;
+- data-flow or sequence diagrams where useful;
+- API and database impact;
+- security, privacy and operational considerations;
+- test and verification strategy;
+- rollback or recovery plan;
+- risks and unresolved questions; and
+- traceability from each acceptance condition to implementation and evidence.
+
+### Execution spine
+
+The execution spine is the durable state of the inner loop. It may be represented by files such as `LOOP.md`, `GOALS.md`, `BOARD.md` and `handover.md`, or by an equivalent store. In the D1 model, it makes the current goal, completed evidence, failed attempts, next hypothesis and outstanding human decisions recoverable.
+
+### Evidence bundle
+
+The evidence bundle brings together the diff, test results, review findings, security results, architecture deviations, context versions, tool or model information where available and human decisions. Evidence should be proportionate to risk and contain enough context to be independently understood.
+
+### Decision log
+
+The decision log records gate decisions, conditions, approvers, date, scope and expiry or review triggers. It helps distinguish a human approval from an agent-generated summary.
+
+### Context change record
+
+Each proposed reusable correction identifies the source observation, affected context, reason for the change, test or example added, reviewer, version and rollback path.
+
+## 8. Quality and verification model
+
+Quality is not a single model-generated judgement. It is a stack of checks with different failure modes.
+
+| Check | Main question | Typical owner | Limitation |
+| --- | --- | --- | --- |
+| Deterministic build and tests | Does the code compile and satisfy the encoded checks? | CI system | Tests can omit the requirement or encode the wrong assumption |
+| Requirements verification | Does the implementation trace to each acceptance condition? | Checker agent or engineer | A textual comparison may miss real behaviour |
+| Architecture review | Does the change fit boundaries and long-term design? | Senior engineer or architecture role | Review quality depends on context and system understanding |
+| Security review | Does the change introduce an unacceptable security or privacy risk? | Security role or checker | Automated checks do not understand every trust boundary |
+| Product assurance | Does the feature work for the intended user and operational context? | QA or product assurance | Requires realistic scenarios and domain knowledge |
+| Human acceptance | Is the evidence sufficient and the residual risk acceptable? | Human engineering and release roles | It is accountable judgement, not proof of perfection |
+
+In the D1 model, missing required evidence returns the work to a bounded rework state rather than silently widening scope. For higher-risk changes, the model retains human QA, security review and release approval even when automated checks pass.
+
+The quality model is compatible with secure development practices such as those described by NIST SP 800-218. It does not replace a threat model, a secure coding standard, an incident process or a domain-specific assurance case.
+
+## 9. Governance and security boundaries
+
+The model assumes that an agent is an actor with capabilities, not a trusted employee with unrestricted authority.
+
+### Minimum controls
+
+- **Least privilege:** D1 limits permissions to the task, repository, environment and tools required.
+- **Branch protection:** D1 does not allow agents to bypass protected branch review or merge rules.
+- **Sandboxed execution:** the model places untrusted or experimental work in an isolated environment where appropriate.
+- **Network control:** the model treats outbound and inbound access as explicit, logged and limited.
+- **Secret separation:** D1 excludes secrets that are not required for the approved task.
+- **Production separation:** D1 keeps unrestricted production access outside implementation agents.
+- **Independent approval:** D1 does not assign self-approval or self-release to an agent.
+- **Auditability:** the model retains material tool calls, permissions, state changes and decisions with appropriate privacy controls.
+- **Reversibility:** the model applies a stronger gate to high-impact actions than to reversible code changes.
+- **Failure containment:** the model keeps a run pausable without losing the evidence needed to investigate it.
+
+GitHub's public cloud-agent guidance describes related risks around prompt injection, untrusted code, permissions, network access and human review. OWASP's agentic AI threat work provides a further threat vocabulary. These sources are useful inputs, but any controls need to be applied to the actual tools, data and operating environment.
+
+### Authority is not the same as identity
+
+An authenticated agent identity answers who presented a credential. It does not by itself prove that a particular action is within the human authority that began the work. In multi-agent systems, downstream tools may need evidence of scope, delegation and chain integrity.
+
+The separate [Human Delegation Provenance research](https://helixar.ai/about/labs/hdp/) describes open specification and research work published through Helixar Limited. It is not an adopted IETF standard, and this whitepaper does not require HDP. The broader design point remains relevant: logs describe events, while an authority mechanism must support a reasoned claim about who allowed an action and under what scope.
+
+Build provenance is a related but different concern. SLSA provides a vocabulary for describing how software artefacts were produced. A build provenance record can support release evidence, but it does not replace product acceptance or prove that the original requirement was authorised.
+
+## 10. Context learning and organisational memory
+
+Agents are shaped by the context made available to them. If a team wants the system to improve across work items, it needs a controlled method for turning corrections into durable knowledge.
+
+### Correction classification
+
+| Correction | Default treatment | Review level |
+| --- | --- | --- |
+| A one-off typo or local implementation mistake | Fix the change only | Normal change review |
+| A repeated repository convention | Add a scoped example, rule or test | Repository owner review |
+| A domain invariant | Add to domain context and acceptance guidance | Product and engineering review |
+| A security or privacy invariant | Add to protected policy and verification | Security owner review |
+| A release or authority control | Keep in human-controlled policy | Release or risk owner review |
+
+The context-governance model prefers executable examples and tests over vague prose. A context update records its source, scope and rollback path. Representative tasks are replayed against new context before consequential use.
+
+### Preventing context poisoning
+
+Context poisoning can occur when an incorrect instruction, example or generated summary is accepted as a durable rule. Controls should include:
+
+- named ownership for each context area;
+- version control and code review;
+- provenance for the observation that motivated the update;
+- tests for security and architecture invariants;
+- limited write access to high-impact context;
+- a review queue for proposed changes; and
+- rollback when later evidence shows the rule is wrong or too broad.
+
+The learning loop is a governance process. It is not unsupervised self-modification.
+
+## 11. Economics and capacity
+
+The Agentic Sprint changes which capacity constraint is most visible. Human implementation time may fall for some bounded tasks, while review, architecture, product clarification, QA and release capacity remain finite.
+
+A useful accounting identity is:
+
+```text
+cost per accepted change
+= model and tool cost
+  + execution infrastructure cost
+  + human planning, review, QA and release cost
+  + remediation and incident cost
+```
+
+The identity is a measurement frame, not a result. It prevents a team from calling generated code a saving before counting the human work required to understand, correct and accept it.
+
+The proposal therefore treats decision throughput as a separate capacity measure from coding throughput. If the review queue grows, increasing agent concurrency may reduce delivery quality even when raw activity increases.
+
+Organisations should compare like with like. A safe comparison includes work item risk, scope, required assurance, defects, review time, infrastructure cost and the quality of the released result. Headcount reduction is not a premise of this methodology.
+
+## 12. Metrics framework
+
+The following measures are proposed for local experimentation.
+
+| Measure | Definition | Interpretation |
+| --- | --- | --- |
+| Agentic throughput | Accepted work items in a stated period. Verified goals may be reported separately as an execution measure. | Counts delivered outcomes, not generated attempts |
+| First-Pass Plan Acceptance | Plans accepted without material revision divided by plans reviewed | Indicates requirement and context quality |
+| First-Pass Implementation Acceptance | Implementations accepted without material rework divided by implementations reviewed | Indicates fit to plan and engineering standards |
+| Human intervention minutes | Human planning, review, correction, QA and release time per accepted change | Shows whether the governance layer is becoming a bottleneck |
+| Agent rework rate | Work items returned to implementation divided by work items started | Shows where execution or context fails |
+| Repeat error rate | Previously corrected pattern appearing in later work | Tests whether context governance is effective |
+| Escaped defect rate | Relevant post-release defects attributed to an agent-created change | Quality guardrail, not a speed trade |
+| Review load | Review minutes, queue age and outstanding evidence by risk class | Shows whether output can be responsibly absorbed |
+| Context learning rate | Reusable corrections accepted into tested context over a period | Measures learning activity, not learning value by itself |
+| Cost per accepted change | Total relevant cost divided by safely accepted changes | Supports an honest economic comparison |
+
+D10's measurement approach records the population, time window, risk mix and exclusion rules. A metric can improve while the system gets worse if the team changes what counts as a work item or stops recording difficult cases.
+
+## 13. Maturity model
+
+The model describes a possible progression, not a mandatory destination.
+
+:::figure maturity
+:::
+
+| Level | Description | Evidence required to move forward |
+| --- | --- | --- |
+| 0, human development | People plan, implement, verify and release | Existing delivery baseline |
+| 1, AI assistance | People use models inside their normal workflow | Usage boundaries and review practice |
+| 2, agent delegation | Bounded work items are delegated to coding agents | Branch controls, permissions and human review |
+| 3, human-gated Agentic Sprint | Planning, execution and verification run through explicit gates | Approved plans, evidence bundles and release authority |
+| 4, multi-agent delivery | Specialised agents coordinate across implementation and checking | Role separation, dependency control and review capacity |
+| 5, learning delivery | Corrections become governed, tested context | Context ownership, versioning, replay tests and rollback |
+| 6, high-autonomy engineering | Routine bounded work runs through governed pipelines with humans handling exceptions and risk | Sustained evidence for quality, recovery, authority and review capacity |
+
+An organisation should stop at the level appropriate to its risk profile. A higher level is not inherently better. Some environments should remain at supervised delegation or AI assistance for particular classes of work.
+
+## 14. Risks and limitations
+
+The proposal has material limitations.
+
+### It can formalise the wrong thing
+
+A complete gate structure does not make a requirement correct. Product discovery, domain expertise and human judgement remain necessary.
+
+### It can move the bottleneck
+
+If implementation becomes faster but review does not, the system can produce an unsafe queue. Human capacity must be measured rather than assumed.
+
+### It can create correlated errors
+
+Several agents may share the same model, context or mistaken assumption. Multiple outputs do not automatically constitute independent verification.
+
+### It can spread bad context
+
+A wrong rule can influence future work. Context changes need stronger governance as their scope increases.
+
+### It can obscure responsibility
+
+A chain of agents does not remove the need to name the human authority responsible for acceptance and release.
+
+### It can expose sensitive information
+
+Repository content, prompts, tool results and traces may contain secrets or personal data. Data minimisation, retention and access controls remain necessary.
+
+### It can make recovery harder
+
+Parallel branches, multi-repository changes and retries can complicate diagnosis. Persistent state helps, but it does not replace integration ownership.
+
+### It has uncertain economics
+
+Model cost, infrastructure, review effort, defect cost and task mix change over time. This paper makes no measured productivity or cost claim.
+
+The Agentic Sprint does not claim full autonomy, universal applicability, perfect verification, reduced staffing, regulatory compliance or an industry standard. It is a proposal for a governable delivery experiment.
+
+## 15. Falsifiable propositions and research agenda
+
+The methodology should produce questions that can be tested rather than slogans that can only be repeated.
+
+### Proposition 1: gates and evidence can reduce review waste for bounded work
+
+For a defined class of low or moderate-risk work, a Build Plan gate and structured evidence bundle may reduce human intervention minutes per accepted change over repeated cycles without increasing escaped defects relative to a measured baseline.
+
+Test this with comparable work items, pre-declared quality thresholds, a fixed review window and independent defect tracking. An apparent improvement could instead result from smaller tasks, easier work or changed measurement.
+
+### Proposition 2: governed context learning can reduce repeat errors
+
+When reusable corrections are converted into reviewed context, representative tasks may show a lower repeat error rate than tasks run without the update.
+
+Test this with versioned context, replayable tasks and a holdout set. A lower repeat error rate may reflect task familiarity rather than useful context.
+
+### Proposition 3: review load becomes a leading capacity indicator
+
+As agent execution capacity increases, queue age and human review minutes may predict delivery stress earlier than raw implementation throughput.
+
+Test this with time-series telemetry that separates started, reviewed, accepted and released work. Do not infer stress from volume alone.
+
+### Proposition 4: maker and checker separation helps only when independence is real
+
+Separating role names without separating context, permissions or assumptions may not reduce correlated errors. Stronger separation may improve detection for some failure classes, but it can also increase cost and latency.
+
+Compare checker arrangements with controlled variation in model, context, tools and evidence sources. Record false positives, false negatives and reviewer override rates.
+
+### Proposition 5: persistent state reduces interruption loss
+
+An execution spine that records goals, attempts and next hypotheses may reduce recovery time and duplicated work after worker interruption compared with a session-only workflow.
+
+Test this with injected interruptions, matched tasks and a defined recovery measure. Persistent state can itself become misleading if it is not kept current.
+
+### Open research areas
+
+- How should autonomy risk be classified across code, data, infrastructure and physical effects?
+- What evidence is sufficient for a human to accept a multi-agent implementation without reading every generated token?
+- How can checker independence be measured in practice?
+- Which context changes should be protected like security policy?
+- How should authority and delegation be represented across agents and external tools?
+- What is the correct unit of throughput when work is decomposed into goals?
+- How should product assurance operate when implementation is continuous and parallel?
+- Which metrics remain robust when models, tools and repositories change?
+- How can organisations compare agentic delivery with human delivery without hiding review and remediation work?
+
+## 16. Implementation implications
+
+An organisation testing the model should begin with the [Implementation Guide](/implementation-guide), not with a broad claim of transformation. Establish repository readiness, select a narrow pilot, set a baseline, define permissions and run the three gates on a small set of work.
+
+The supporting documents provide progressively more detail:
+
+- [Agentic Sprint Specification v0.1](/specification) defines the lifecycle and conformance boundary.
+- [Agentic Sprint Reference Architecture](/reference-architecture) describes components, state, identity and deployment boundaries.
+- [Agentic Sprint Operating Model](/operating-model) describes team roles, ceremonies and escalation.
+- [Autonomous Loop Integration Specification](/autonomous-loop-integration) defines the inner execution protocol.
+- [Agentic Engineering Guardrails and Security Model](/guardrails-and-security) defines the control baseline.
+- [Agentic Sprint Quality and Verification Model](/quality-and-verification) defines independent assurance.
+- [Agentic Sprint Metrics Framework](/metrics) defines measurement details.
+
+The first implementation can be small: one repository, one work item class, one maker, one checker, protected branches, deterministic CI, a named reviewer and a retained decision log. The value of the model is tested by whether the boundary remains understandable as the system grows.
+
+## Conclusion
+
+The Agentic Sprint is a proposal to separate engineering judgement from high-volume execution without separating authority from accountability. Agents may plan, build, test, inspect and recover within an approved boundary. People decide what the work means, whether the design is acceptable, whether the evidence is sufficient and whether the result can be released.
+
+An execution protocol such as Autonomous Loop can supply the resumable inner loop. The Agentic Sprint supplies the governed outer loop. Together they describe a delivery system in which execution can scale only as fast as intent, verification and human decision-making can safely absorb it.
+
+## Document status and limitations
+
+Version 1.0 is a proposed whitepaper, not an adopted standard, industry consensus statement or report of measured field results. D1 remains the root normative source, and D4 through D9 remain scoped companion documents subject to it. This whitepaper introduces no additional requirements and cannot override the methodology's normative documents. Implementers must adapt controls, evidence and roles to their systems, data, legal obligations and risk profile. Claims in this paper are design propositions unless explicitly identified as references to external source material.

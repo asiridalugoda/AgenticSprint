@@ -1,0 +1,399 @@
+---
+title: "Agentic Sprint Quality and Verification Model"
+description: "A layered verification model for challenging, accepting and releasing agent-produced software without confusing green checks with proof of correctness."
+date: "2026-08-09"
+updated: "2026-08-09"
+type: "technical"
+topics: ["Agentic Systems", "Engineering", "AI Governance & Security"]
+tags: ["software verification", "quality engineering", "maker checker", "QA", "agent security"]
+featured: false
+pinned: false
+draft: false
+canonical: "/quality-and-verification"
+image: "/social/quality-and-verification"
+series: "Agentic Sprint Methodology"
+seriesOrder: 9
+documentId: "D9"
+documentKind: "model"
+normative: true
+version: "0.1"
+status: "Draft quality model"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D4", "D5", "D6", "D7", "D8"]
+claimClasses: ["methodology", "proposed-model", "quality-assurance"]
+citation: "Dalugoda, Siri. Agentic Sprint Quality and Verification Model. Agentic Sprint Methodology, v0.1, 9 August 2026. https://theagenticsprint.com/quality-and-verification"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://slsa.dev/spec/v1.2/provenance"]
+externalLinks: ["https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations"]
+---
+
+## Abstract
+
+An Agentic Sprint can increase the amount of software an engineering system attempts in parallel. That makes verification more important, not less. An implementation that compiles, passes a generated test suite and receives an agent review may still misunderstand the requirement, violate an architecture boundary or create an unsafe operational path.
+
+This model defines a layered approach to quality and verification for agent-produced software. It separates the maker from the checker, distinguishes deterministic evidence from probabilistic judgement, and places requirements verification, architecture review, security review, QA and release authority at explicit points in the delivery path.
+
+The model is deliberately conservative. It does not assume that a model review is independent merely because it was issued by a different role name. It does not treat passing tests as proof of correctness. It does not remove human acceptance from changes whose risk, uncertainty or reversibility requires accountable judgement.
+
+## Status and scope
+
+| Field | Definition |
+| --- | --- |
+| Document | Agentic Sprint Quality and Verification Model |
+| Version | 0.1 |
+| Status | Draft quality model |
+| Applies to | Agentic Sprint work items, Autonomous Loop goals and their release evidence |
+| Primary concern | Evidence, independence, challenge and residual-risk decisions |
+| Out of scope | A specific test framework, a universal coverage target and a claim of autonomous correctness |
+
+This is a proposed methodology document. It defines a quality system, not a guarantee. Each organisation MUST adapt the required checks to its domain, risk profile, architecture and regulatory obligations.
+
+## Normative language
+
+The key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html) when, and only when, they appear in capitals.
+
+## Requirement identifiers and precedence
+
+This document uses identifiers in the form `D9-QV-###` for its quality and verification controls. The identifiers are local to this document and do not add or replace requirements in D1, the Agentic Sprint Specification v0.1. D1 remains the normative root. This model elaborates D1's verification, quality assurance and release stages. Where this document conflicts with D1, D1 prevails.
+
+| ID | Control |
+| --- | --- |
+| `D9-QV-001` | The Maker MUST NOT be the sole authority that checks or accepts its own implementation. |
+| `D9-QV-002` | Required deterministic checks MUST run before Human Gate 2, and their inputs, environments and results MUST be retained. |
+| `D9-QV-003` | Independent checking MUST record its role, separation, inputs, scope and unresolved findings. |
+| `D9-QV-004` | Human Gate 2 MUST remain an explicit engineering decision and MUST NOT be inferred from a green pipeline or an agent recommendation. |
+| `D9-QV-005` | The QA or product assurance stage MUST remain between Human Gate 2 and Human Gate 3. Human QA MUST be completed for the triggers in this model unless an authorised exception is recorded. |
+| `D9-QV-006` | Residual risk MUST be recorded and accepted by an accountable human authority when evidence is incomplete or a finding is accepted. |
+| `D9-QV-007` | Release or merge authority MUST remain outside the Maker's control and MUST verify the required approvals and risk disposition. |
+
+## 1. Core principle: the maker is not the checker
+
+The agent or process that creates an implementation MUST NOT be the sole authority that determines whether the implementation is correct.
+
+The Maker MAY:
+
+- inspect the approved context and Build Plan;
+- implement bounded goals;
+- add tests and supporting documentation;
+- run approved tools;
+- diagnose failures; and
+- propose evidence of completion.
+
+The Checker MAY:
+
+- inspect the requirement and acceptance criteria;
+- challenge the implementation and its tests;
+- seek counterexamples;
+- review architecture and security implications;
+- request rework; and
+- record independent findings.
+
+The Checker MUST have enough separation from the Maker to create a meaningful chance of finding a different failure. A new prompt in the same context is not automatically independent verification.
+
+The principle applies to agents, humans and automation. A human who wrote the acceptance criteria can still perform a useful review, but the organisation SHOULD introduce another perspective for high-risk changes. A test that was generated and edited by the same implementation agent is useful evidence, but it is not independent assurance by itself.
+
+## 2. What counts as verification
+
+Verification asks whether an artefact satisfies a stated condition. The artefact may be a Build Plan, a code change, a migration, a security boundary, a test or a release package.
+
+The model uses five evidence properties:
+
+| Property | Question |
+| --- | --- |
+| Relevance | Does the evidence address the requirement or risk in question? |
+| Determinism | Can the same check produce a comparable result under defined conditions? |
+| Reproducibility | Can another authorised party repeat the check and inspect the inputs? |
+| Independence | Is the evidence produced by a materially separate role, context, tool or authority? |
+| Traceability | Can the evidence be linked to the requirement, change, environment and decision? |
+
+Evidence is stronger when more of these properties are present. No single property is sufficient. A deterministic check can verify the wrong thing. An independent review can misunderstand the requirement. A reproducible test can encode an incomplete expectation.
+
+## 3. Evidence levels
+
+The following levels help reviewers describe what they have, without implying that the levels are a universal certification scheme.
+
+| Level | Evidence | What it can show | What it cannot show alone |
+| --- | --- | --- | --- |
+| E0 | Agent assertion, log line or unreviewed summary | What the agent says it attempted | That the result is true |
+| E1 | Deterministic command result, such as compilation or lint | A defined machine condition passed in one environment | That the requirement or product behaviour is correct |
+| E2 | Reproducible unit, integration or contract test with retained output | A specified behaviour passed for specified inputs | That untested behaviours, architecture or security are sound |
+| E3 | Independent machine challenge, such as a separate verifier or scanner | A second process found no issue within its check boundary | That the check boundary was complete |
+| E4 | Human engineering or architecture review | Accountable judgement about design, intent and trade-offs | That runtime product behaviour has been fully explored |
+| E5 | Independent QA or product assurance | Behaviour across journeys, risks and exploratory scenarios | That every implementation or operational risk is eliminated |
+| E6 | Post-release monitoring and incident evidence | How the change behaves in the observed environment | A substitute for required pre-release approval |
+
+The levels are cumulative only when the evidence addresses the same requirement. A large quantity of E1 evidence does not automatically become E4 judgement.
+
+## 4. Verification topology
+
+An Agentic Sprint SHOULD use a sequence of challenges rather than a single review event.
+
+:::figure verification-model
+The layered verification model: an approved requirement is traced to a Build Plan, implemented by a Maker, challenged by independent machine checks and specialised reviewers, assessed by human engineering review and QA where triggered, then accepted by release authority with residual risk recorded.
+:::
+
+### 4.1 Requirement verification
+
+Before implementation begins, the planning process MUST identify the acceptance criteria, assumptions, exclusions, dependencies and unresolved questions. Each acceptance criterion SHOULD map to at least one implementation element and one verification method.
+
+The Requirements Checker asks:
+
+- Is the requirement internally consistent?
+- Can each criterion be observed or tested?
+- Are failure and boundary conditions stated?
+- Are permissions, data ownership and side effects clear?
+- Is the requested change small enough to verify independently?
+- Does the Build Plan preserve the intended scope?
+
+If the requirement is incomplete, the correct outcome is a clarification or a rejected Build Plan. Implementation should not be used to hide an unresolved product decision.
+
+### 4.2 Build Plan verification
+
+Human Gate 1 reviews the Build Plan before the Maker receives authority to implement. The plan SHOULD contain:
+
+- requirement interpretation;
+- in-scope and out-of-scope behaviour;
+- affected repositories and components;
+- dependencies and state transitions;
+- data and API impact;
+- security and privacy impact;
+- test and QA strategy;
+- rollback or recovery approach;
+- acceptance-criteria traceability; and
+- unresolved risks and questions.
+
+The Architecture Checker SHOULD compare the plan with current architecture rules and repository facts. Approval of the plan is not approval of the code. It authorises a bounded attempt under stated conditions.
+
+### 4.3 Implementation verification
+
+The Maker implements the approved goals and records evidence as it progresses. The Autonomous Loop SHOULD require a verifiable stopping condition for each goal. A goal is not complete because a model declares it complete. It is complete when the defined condition has evidence and the required checker has no unresolved blocking finding.
+
+The implementation stage SHOULD retain:
+
+- the context version used;
+- the approved plan version;
+- goal and dependency state;
+- changed files or repositories;
+- commands and tool results;
+- tests added or modified;
+- deviations from the plan; and
+- open hypotheses or failed attempts.
+
+### 4.4 Machine verification
+
+Deterministic controls SHOULD run before scarce human attention is requested. Depending on the system, this MAY include:
+
+- compilation or type checking;
+- linting and formatting;
+- unit, integration and contract tests;
+- migration validation;
+- dependency and licence checks;
+- secret scanning;
+- static analysis;
+- architecture tests;
+- API compatibility checks;
+- performance checks; and
+- security scanning.
+
+The machine gate MUST fail when a required control fails. An agent MAY attempt a repair within its scope. It MUST NOT remove a test, lower a threshold, bypass a protected branch or change a security control merely to produce a passing result.
+
+The [NIST Secure Software Development Framework](https://csrc.nist.gov/pubs/sp/800/218/final) provides a useful primary reference for integrating secure development practices into a software lifecycle. It does not define an Agentic Sprint, so the mapping between its practices and local controls should be documented by each organisation.
+
+### 4.5 Independent review
+
+Independent reviewers SHOULD inspect both the implementation and the evidence that claims it is complete. Review roles may include:
+
+| Reviewer | Primary question |
+| --- | --- |
+| Requirements Checker | Does the change satisfy the approved acceptance criteria? |
+| Code Reviewer | Is the implementation understandable, maintainable and consistent with local patterns? |
+| Architecture Reviewer | Does it preserve system boundaries, contracts and intended trade-offs? |
+| Security Reviewer | Does it preserve identity, authorisation, data and trust boundaries? |
+| Test Verifier | Do the tests challenge the important paths, failures and boundaries? |
+| Red Team | Can a plausible misuse, attack or hostile input produce an unacceptable outcome? |
+
+The roles MAY be implemented by separate agents, separate processes or human reviewers. The system MUST record which roles ran, what inputs they saw and which findings remain open.
+
+### 4.6 Human engineering review
+
+Human Gate 2 is the accountable engineering decision that the implementation is technically acceptable within the approved scope. The human reviewer SHOULD receive a compact evidence package rather than a raw stream of agent output.
+
+The package SHOULD include:
+
+- original requirement and acceptance criteria;
+- approved Build Plan;
+- change summary and diff;
+- verification results;
+- independent findings and dispositions;
+- plan deviations;
+- security and architecture notes;
+- unresolved risks; and
+- a clear recommendation from the system.
+
+The recommendation is advisory. Human review remains a decision, not a confirmation click.
+
+### 4.7 QA and product assurance
+
+The QA or product assurance stage MUST occur after Human Gate 2 and before Human Gate 3. QA MUST work from product intent and acceptance criteria, not only from the implementation's test suite. It MAY include functional, exploratory, regression, integration, accessibility, browser, device, data integrity and operational testing.
+
+QA is especially valuable where a technically plausible implementation can still produce a poor customer or operator outcome. It also provides a different perspective from code review because it starts with behaviour and risk rather than code structure.
+
+### 4.8 Release authority
+
+Release or merge authority MUST remain outside the Maker's control. The authority checks that required gates passed, exceptions are recorded and residual risk has an accountable owner. A passing pipeline does not remove the need for the release decision.
+
+## 5. Independence levels
+
+Independence is contextual. The following levels can be used to describe a verification activity:
+
+| Level | Separation | Appropriate use |
+| --- | --- | --- |
+| I0 | Same agent, same run and same context | Cheap self-checking and formatting feedback |
+| I1 | New process or fresh context, but substantially shared instructions and method | A second pass for obvious omissions |
+| I2 | Separate role, context and evidence path, with materially different checking objectives | Requirements, architecture, security and test challenge |
+| I3 | Accountable human or independent QA decision with authority to accept or reject | High-risk acceptance, product assurance and release |
+
+An I2 review can still share the same blind spot as the Maker. A different model does not automatically create independence. Conversely, a human reviewer who uses automated tools can still exercise independent judgement if the decision, evidence and authority are clear.
+
+High-risk work MUST require I2 and I3 evidence. Low-risk, reversible work MAY use a lower level when the organisation has documented the reason and retained the decision.
+
+## 6. Human QA triggers
+
+Human QA or product assurance MUST be completed when a change includes one or more of the following:
+
+- customer-visible behaviour or a critical user journey;
+- authentication, authorisation, tenant isolation or sensitive data;
+- financial, legal, safety or regulated outcomes;
+- destructive, irreversible or hard-to-roll-back actions;
+- database migration, data transformation or concurrency changes;
+- cross-service workflows or external integrations;
+- a new trust boundary, privileged tool or agent capability;
+- accessibility, browser, device or field-operation impact;
+- a novel domain rule or weakly specified requirement;
+- a significant change in monitoring, alerting or operational controls;
+- conflicting evidence or unresolved independent findings; or
+- a residual risk that a responsible engineer cannot accept from machine evidence alone.
+
+If an accountable quality authority approves an exception, the record MUST state the reason, scope, compensating checks, expiry or review date and approving authority before Human Gate 3. The absence of a listed trigger does not prove that human QA is unnecessary. It means the team has a documented basis for its choice of assurance.
+
+## 7. Security review and red teaming
+
+Agentic systems create risks beyond ordinary code defects because agents can interpret instructions, call tools and pass work to other agents. The [OWASP agentic AI threats and mitigations](https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/) material is a useful primary security reference for threat analysis, but local controls must still reflect the actual tools, identities, data and environments in use.
+
+Security review SHOULD examine:
+
+- the authority available to each agent role;
+- tool and network permissions;
+- prompt and context injection paths;
+- secret handling and data exposure;
+- identity and delegation boundaries;
+- validation of agent-produced parameters;
+- audit and provenance evidence;
+- branch, merge and deployment controls;
+- third-party dependencies and tool manifests; and
+- failure behaviour when verification services are unavailable.
+
+Red teaming is not a request for a reviewer to invent dramatic attacks. It is a bounded attempt to demonstrate how an unacceptable outcome could arise, with the relevant preconditions, evidence and mitigation.
+
+## 8. Test gaming and false confidence
+
+An agent can optimise for the visible test suite without satisfying the requirement. This may happen accidentally through an incomplete test, or deliberately through changes that preserve a green pipeline while weakening the intended control.
+
+Common warning signs include:
+
+- tests changed at the same time as the production behaviour without an explained expectation change;
+- assertions weakened or removed;
+- broad mocks replacing meaningful integration checks;
+- error paths excluded from coverage;
+- thresholds lowered to accommodate a failure;
+- a new implementation that bypasses the component named in the requirement;
+- tests that only reproduce the implementation's assumptions; and
+- a review summary that reports pass or fail without showing what was not tested.
+
+Controls SHOULD include:
+
+- acceptance-criteria traceability;
+- review of test diffs as first-class changes;
+- negative and boundary cases;
+- independent test generation or mutation checks;
+- contract and integration evidence where boundaries matter;
+- protected quality thresholds;
+- checks for test deletion and unexplained mock expansion; and
+- a human decision for exceptions.
+
+The system MUST treat a green check as evidence about a defined check, not as a general statement that the product is correct.
+
+## 9. Residual risk acceptance
+
+Not every uncertainty can be removed before release. The system MUST record residual risk when a required check is incomplete, an independent finding is accepted, or the evidence does not cover a meaningful scenario.
+
+Each accepted residual risk SHOULD state:
+
+- the risk and affected behaviour;
+- the evidence available and missing;
+- likelihood and impact using the organisation's chosen scale;
+- mitigation or monitoring;
+- accountable owner;
+- acceptance authority;
+- expiry or review date; and
+- conditions that reopen the decision.
+
+An agent MAY draft the risk record. The accountable human authority MUST accept it. A risk record is not a substitute for a required security, legal or release gate when that gate is mandatory.
+
+## 10. Verification evidence package
+
+Before Human Gate 2, an Agentic Sprint SHOULD produce a single navigable evidence package containing:
+
+1. the requirement and its version;
+2. the approved Build Plan;
+3. the Autonomous Loop goal state;
+4. context versions and relevant retrieval records;
+5. changed repositories, branches and commits;
+6. deterministic check results;
+7. independent review findings;
+8. test and QA evidence;
+9. security and architecture decisions;
+10. plan deviations and rework history;
+11. open residual risks; and
+12. the proposed acceptance decision.
+
+Build and release provenance can be represented using a local evidence model or mapped to an established approach such as [SLSA provenance](https://slsa.dev/spec/v1.2/provenance). The reference is useful for thinking about verifiable build inputs and outputs. It does not make agent decisions trustworthy by itself.
+
+## 11. Failure and rework rules
+
+When a check fails, the system SHOULD preserve the failure as state rather than overwrite it with a later green result. The record should identify:
+
+- which check failed;
+- the input and environment;
+- the attempted diagnosis;
+- the changed artefacts;
+- whether the requirement or test was clarified;
+- the next hypothesis; and
+- the verification required after rework.
+
+The Maker MAY retry within its authority. A retry MUST return through the relevant independent checks. Repeated failure, scope drift or contradictory findings SHOULD escalate to a human engineer before more autonomous work continues.
+
+## 12. Minimum compliance profile
+
+An implementation claiming conformance with this model SHOULD at least provide:
+
+- a named Maker and Checker for each material change;
+- acceptance criteria linked to verification evidence;
+- deterministic checks that agents cannot silently bypass;
+- an independent review path;
+- human engineering acceptance before merge or release;
+- human QA triggers and a documented exception path;
+- residual-risk records;
+- retained failure and rework history; and
+- release evidence that identifies the relevant code, context and approval versions.
+
+High-risk systems SHOULD add separate security review, red teaming, provenance, stronger environment isolation and explicit release authority.
+
+## Limitations
+
+This model cannot establish that a requirement is complete, that a test suite covers every relevant behaviour or that a reviewer has no blind spots. Independence is a property of the whole checking arrangement, not of a label or a model choice.
+
+The model also has a capacity constraint. If agents create work faster than humans can review, the queue becomes a quality risk. Reducing human review to preserve throughput is not an improvement in the quality system. Review capacity, decision latency and residual-risk exposure must be measured alongside implementation throughput.
+
+## Document status
+
+Draft quality model, version 0.1. This document is a proposed component of the Agentic Sprint Methodology and is open to critique, implementation feedback and revision.

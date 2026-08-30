@@ -1,0 +1,359 @@
+---
+title: "Agentic Definition of Ready and Definition of Done"
+description: "A practical conformance model for deciding when an agentic work item may start and what evidence is required before implementation can be considered complete."
+date: "2026-08-06"
+updated: "2026-08-06"
+type: "technical"
+topics: ["Agentic Systems", "Engineering", "Delivery & Organisations"]
+tags: ["definition of ready", "definition of done", "acceptance criteria", "quality", "human gates"]
+featured: false
+pinned: false
+draft: false
+canonical: "/definition-of-ready-and-done"
+image: "/social/definition-of-ready-and-done"
+series: "Agentic Sprint Methodology"
+seriesOrder: 6
+version: "0.1"
+status: "Draft standard"
+documentId: "D6"
+documentKind: "standard"
+normative: true
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D3", "D5"]
+claimClasses: ["normative-methodology", "proposed-standard", "quality-assurance"]
+citation: "Dalugoda, Siri. Agentic Definition of Ready and Definition of Done. Agentic Sprint Methodology, v0.1, 6 August 2026. https://theagenticsprint.com/definition-of-ready-and-done"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations"]
+externalLinks: []
+---
+
+The normal Agile Definition of Ready and Definition of Done are useful starting points, but they do not answer all the questions introduced by autonomous execution. An agent can begin work quickly, produce a plausible change and report success without having understood the requirement, respected the boundary or produced evidence that another person can trust.
+
+This document defines an agentic extension. The **Definition of Ready** controls entry into authorised autonomous work. The **Definition of Done** controls whether a work item has enough implementation, verification and review evidence to move to the next human or product gate.
+
+These definitions do not replace product acceptance, engineering judgement or release authority. They make the evidence required at each boundary explicit.
+
+## Status and language
+
+This is a draft standard for critique and implementation experiments. It is not a claim that agents are reliably autonomous across professional engineering tasks.
+
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **NOT RECOMMENDED**, **MAY** and **OPTIONAL** are to be interpreted as described in [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html) when they appear in all capitals.
+
+Requirements in this standard use the `AS-RD-NNN` namespace. They are companion requirements under D1 and MUST NOT weaken D1 core requirements.
+
+## Why ready and done need an agentic boundary
+
+In a human-led workflow, an engineer can often resolve a missing detail by asking a colleague, inspecting a local system or making a short-lived judgement. An autonomous run may instead encode the wrong assumption into code, tests, documentation and follow-up tasks. The cost of ambiguity is therefore multiplied by execution speed.
+
+Agentic readiness adds three questions to the ordinary delivery checklist:
+
+- Can a machine distinguish success from a plausible but incorrect result?
+- Is the agent authorised to perform the specific work, with bounded tools and context?
+- Is the stopping condition clear enough for the run to pause rather than improvise?
+
+Agentic completion adds three more:
+
+- Is there evidence that the implementation satisfies the approved intent?
+- Has an independent Checker challenged the Maker's output?
+- Have the human QA, acceptance and release boundaries been preserved?
+
+:::figure ready-done-evidence
+An agentic work item enters through requirement clarity, bounded authority, a Build Plan and machine-verifiable acceptance conditions. It exits implementation only after evidence, independent checks and human decisions establish whether it may proceed to QA or release.
+:::
+
+## Definitions
+
+### Agentic Ready
+
+An item is **Agentic Ready** when the required context, authority, scope, risk decision and verification conditions exist for an authorised execution run to begin without guessing about a material part of the outcome.
+
+Agentic Ready is a gate to start implementation. It is not a prediction that the item is easy.
+
+### Agentic Done
+
+An item is **Agentic Done** when the approved implementation scope is complete, the required deterministic and independent checks have passed, deviations are resolved, evidence is recorded and the work is ready for the next explicitly human or product-controlled gate.
+
+Agentic Done is not the same as merged, deployed or accepted by a customer. Those decisions remain separate where the risk model requires them.
+
+### Machine-verifiable acceptance condition
+
+A machine-verifiable acceptance condition is a test, invariant, schema check, policy check, static analysis rule, contract assertion or other repeatable check that can produce a result and identify the version, environment and inputs used.
+
+Not every requirement can be reduced to a machine check. Aesthetic, usability, architectural and product judgements MAY remain human checks, but they MUST be named as such.
+
+### Evidence
+
+Evidence is an inspectable record of what was checked, how it was checked, what result was obtained and what source or revision was under test. A green status without a reproducible result is a signal, not complete evidence.
+
+## Risk tiers
+
+Every work item MUST have a risk tier before it becomes Agentic Ready. A team MAY define a more detailed scale, but the consequence of each tier MUST be clear.
+
+| Tier | Typical characteristics | Minimum entry and exit controls |
+| --- | --- | --- |
+| R0 | Documentation, comments or isolated low-risk tooling with no sensitive data | Named scope, basic checks and human review of the diff |
+| R1 | Ordinary application behaviour with bounded impact and reversible change | Approved Build Plan, automated tests, independent review and human implementation review |
+| R2 | Authentication, authorisation, personal data, financial state, shared platform or material migration | R2 threat and rollback review, stronger evidence, security review and explicit human approval |
+| R3 | Safety-related, destructive, irreversible, production-control or high-impact operation | Named accountable owner, dedicated security or risk review, staged verification and explicit release authority |
+
+Risk is about potential impact, not only code size. A one-line permission change may be R2 or R3. A large documentation change may be R0.
+
+## Agentic Definition of Ready
+
+An item MUST satisfy each applicable entry criterion before an implementation agent receives write authority.
+
+### 1. Intent and ownership (AS-RD-001)
+
+- A source requirement, issue or approved change request exists.
+- The intended user, system or operator outcome is stated.
+- A product or domain owner is identified for questions about intent.
+- An engineering approver is identified for architecture and technical risk.
+- The risk tier is recorded with a rationale.
+
+### 2. Scope and boundaries (AS-RD-002)
+
+- In-scope behaviour is explicit.
+- Non-scope is explicit for adjacent work that an agent might attempt.
+- Repositories, components and interfaces have been identified or the missing discovery work is separately authorised.
+- The permitted branch, worktree or workspace is known.
+- The run has a maximum scope or stopping boundary.
+
+### 3. Context and constraints (AS-RD-003)
+
+- Relevant repository instructions and architecture context are available.
+- Domain terminology and important business rules are defined.
+- Security, privacy, licensing, data residency and operational constraints are known.
+- Required dependencies and environment assumptions are listed.
+- Sensitive context is classified and the agent's context access is appropriate.
+
+### 4. Acceptance and verification (AS-RD-004)
+
+- Each acceptance criterion has an unambiguous interpretation.
+- Each criterion has at least one verification method.
+- Negative cases and important boundary conditions are named.
+- Expected state transitions, errors and side effects are defined where relevant.
+- Human-only judgements are distinguished from machine checks.
+- The plan states what evidence will be recorded.
+
+### 5. Authority and controls (AS-RD-005)
+
+- The Build Plan has passed Human Gate 1, or the work is explicitly classified as outside the governed autonomous path.
+- The agent role, tools, credentials and network boundaries are defined.
+- Production access is not required for Maker execution.
+- Protected branch and merge rules are known.
+- A human reviewer and, where required, an independent security or QA reviewer are assigned.
+
+### 6. Recovery and stop behaviour (AS-RD-006)
+
+- The work can be resumed from recorded state.
+- A failed check causes rework, escalation or pause, not silent completion.
+- Retry limits, time limits or cost limits are defined where appropriate.
+- Irreversible operations have a named human gate before execution.
+
+## Ambiguity threshold
+
+Readiness requires an explicit ambiguity decision. The threshold should be simple enough to apply consistently.
+
+| Ambiguity level | Meaning | Ready decision |
+| --- | --- | --- |
+| A0 | Terms, scope, expected outcomes and failure behaviour are clear | Ready if other criteria pass |
+| A1 | A minor detail is open, but it cannot change architecture, security, user outcome or test interpretation | MAY be ready if the assumption is recorded and owned |
+| A2 | Two or more plausible interpretations could change implementation, risk, data, permission or acceptance | Not ready until resolved by an authorised human |
+
+R2 and R3 work MUST be at A0 for security, authority, data and irreversible-action questions. An A1 assumption MAY remain only if the approving human accepts it as non-blocking and defines when it will be revisited.
+
+The agent MUST stop and surface an A2 ambiguity. It MUST NOT choose whichever interpretation produces the shortest diff.
+
+## Machine-verifiable acceptance conditions
+
+Acceptance conditions SHOULD be written so that a Checker can identify the input, action, expected result and evidence. A useful form is:
+
+```text
+Given: the starting state and permissions
+When: the action or event occurs
+Then: the observable result and state transition
+And: the side effects, audit event or notification
+Must not: prohibited behaviour or invalid transition
+Evidence: test, trace, record or review required
+```
+
+### Strong condition
+
+```text
+Given a scheduled payment owned by the authenticated customer
+When the customer submits a cancellation request with the payment identifier
+Then the API returns 200, the payment state becomes Cancelled and one audit event is written
+Must not allow a Processed payment to become Cancelled
+Evidence: unit, integration and authorisation test results plus audit record
+```
+
+### Weak condition
+
+```text
+Make cancellation work correctly.
+```
+
+The weak version may be a useful product intention, but it is not sufficient as the sole machine-executable stopping condition.
+
+## Stop conditions
+
+The execution system MUST pause, escalate or terminate the run when any applicable stop condition occurs:
+
+- a required acceptance condition is ambiguous;
+- the agent reaches an unauthorised repository, branch, tool or data source;
+- a security, privacy or policy check fails;
+- a deterministic test fails beyond the allowed retry policy;
+- the implementation requires a material deviation from the approved Build Plan;
+- the change exceeds its declared scope;
+- a migration, deletion or other irreversible operation is proposed;
+- context is missing, contradictory or suspected to be poisoned;
+- a dependency or environment assumption cannot be verified;
+- the evidence collector cannot establish what was executed;
+- the agent attempts to modify a test or control solely to make the gate pass;
+- human review capacity or required authority is unavailable.
+
+The run record SHOULD distinguish `blocked`, `failed`, `needs-human-decision` and `complete`. A stopped run is not a done item.
+
+## Agentic Definition of Done
+
+An item MUST satisfy the applicable criteria before the implementation state becomes `done`.
+
+### 1. Scope and plan alignment (AS-RD-007)
+
+- Every in-scope requirement has an implementation location or an explicit accepted exception.
+- Every out-of-scope boundary remains unchanged unless a new approval exists.
+- The final implementation has been compared with the approved Build Plan.
+- Deviations are recorded with rationale and decision owner.
+- No unapproved repository, branch, infrastructure or permission change is included.
+
+### 2. Functional and technical evidence (AS-RD-008)
+
+- Required unit, integration, contract and end-to-end checks have run at the declared versions.
+- Negative cases and important boundaries have evidence.
+- Build, lint, type, static analysis and dependency checks pass where applicable.
+- Database migrations and compatibility checks pass where applicable.
+- Security and privacy checks pass or have a recorded human disposition.
+- The evidence identifies commit, environment, inputs, tool version and result.
+
+### 3. Maker and Checker separation (AS-RD-009)
+
+- The Maker is not the sole source of correctness judgement.
+- An independent Checker, review agent or human has inspected the implementation.
+- The Checker had access to the requirement and relevant constraints, not only the Maker's explanation.
+- Findings are resolved, accepted by an authorised human or carried to the next gate as explicit risk.
+
+### 4. Quality and operations (AS-RD-010)
+
+- Required QA scenarios are complete or have a named human owner and gate.
+- Observability is implemented and does not expose restricted data.
+- Documentation, runbooks, migration notes or support instructions are updated where needed.
+- Rollback or recovery evidence is available for the declared risk tier.
+- Accessibility and supported client checks are complete for user-facing changes.
+
+### 5. Human boundaries (AS-RD-011)
+
+- Human engineering review has occurred for governed implementation.
+- Human product or QA acceptance has occurred where the workflow requires it.
+- Merge and release authority remain outside the Maker and Checker agents.
+- No done state is used to imply production release.
+
+## Completion evidence package
+
+The evidence package SHOULD be small enough to review and complete enough to reproduce the decision. It SHOULD contain:
+
+| Evidence | Why it matters |
+| --- | --- |
+| Requirement and approved plan | Establishes the intended baseline |
+| Commit and changed-file summary | Defines the implementation under review |
+| Test and check results | Shows what was actually executed |
+| Independent review findings | Shows that the Maker was challenged |
+| Security and privacy disposition | Makes risk decisions inspectable |
+| Deviation and unresolved decision log | Prevents silent scope change |
+| QA notes and product evidence | Covers behaviour beyond unit correctness |
+| Rollback or recovery note | Shows how failure would be handled |
+| Human decision record | Identifies who accepted the evidence and under what conditions |
+
+Evidence SHOULD be stored with the work item or linked through durable identifiers. Screenshots without test context, unversioned logs or an agent's natural-language assertion are insufficient by themselves for R2 or R3 work.
+
+## QA and release boundaries
+
+Agentic Done means implementation evidence is complete. It does not collapse the following gates:
+
+1. **Engineering review:** a human checks the implementation, design and evidence.
+2. **QA or product assurance:** independent validation checks the intended behaviour, user journey and regression risk.
+3. **Release authority:** an authorised human or controlled release process decides whether the change may merge, deploy or become available to users.
+
+An organisation MAY combine gates for R0 work when the risk assessment permits it. It MUST NOT combine them merely because an agent reports that all tests passed.
+
+## Examples and non-examples
+
+### Example: ready and done
+
+A ticket adds an idempotent cancellation endpoint. It names the eligible states, caller permissions, audit event, API contract, affected repositories and rollback approach. Unit and integration tests cover eligible, ineligible, repeated and unauthorised requests. The Maker's diff is reviewed by an independent Checker and a human engineer. QA tests the customer flow. The release decision remains separate.
+
+This is a candidate for Agentic Ready and Agentic Done because intent, authority, verification and evidence are explicit.
+
+### Non-example: ready by optimism
+
+The ticket says `improve payment cancellation`, the agent is given broad repository access and no one has decided whether an in-flight payment may be cancelled. The agent starts by changing the state machine and writes tests for the interpretation it chose.
+
+This is not Agentic Ready. The ambiguity changes business behaviour and MUST be resolved before implementation.
+
+### Non-example: done by green CI
+
+The agent modifies an assertion, removes an integration test that is difficult to run and reports a passing pipeline. There is no diff comparison, independent review or explanation of the missing test.
+
+This is not Agentic Done. The evidence shows a green result but not a valid acceptance of the requirement.
+
+## Ready checklist
+
+Before Human Gate 1, the owner SHOULD be able to mark each applicable item:
+
+- [ ] Requirement and intended outcome are identified.
+- [ ] Product, engineering and risk owners are named.
+- [ ] Risk tier and ambiguity level are recorded.
+- [ ] Scope and non-scope are bounded.
+- [ ] Repositories, components and constraints are known.
+- [ ] Machine-verifiable acceptance conditions exist.
+- [ ] Human-only acceptance conditions are named.
+- [ ] Agent authority, tools and context are bounded.
+- [ ] Stop, escalation and recovery behaviour is defined.
+- [ ] Build Plan approval is recorded.
+
+## Done checklist
+
+Before implementation review or QA, the owner SHOULD be able to mark each applicable item:
+
+- [ ] Approved scope is complete and deviations are recorded.
+- [ ] Required tests and deterministic checks have passed.
+- [ ] Independent Checker or reviewer has inspected the change.
+- [ ] Security, privacy and dependency findings have a disposition.
+- [ ] Evidence identifies the revision, environment and tool results.
+- [ ] QA scenarios and regression checks are complete or explicitly gated.
+- [ ] Observability, documentation and rollback notes are present where required.
+- [ ] Human engineering review is recorded.
+- [ ] Merge and release authority remain intact.
+
+## Conformance and exceptions
+
+A work item conforms to this standard when it meets the applicable Ready and Done criteria for its risk tier and retains the evidence of those decisions. The team SHOULD record conformance as a structured status rather than a single unchecked label.
+
+An exception MUST identify:
+
+- the criterion not met;
+- why it cannot be met;
+- the risk introduced;
+- compensating controls;
+- an accountable human approver;
+- an expiry or review condition.
+
+An exception is not a new definition of done. It is a visible decision to proceed with known incompleteness.
+
+## Limitations
+
+These definitions improve the visibility of readiness and completion; they cannot guarantee correctness. Machine-verifiable checks can encode the wrong requirement, independent agents can share the same blind spot and human reviewers can miss important defects. Teams should treat the model as a control structure that supports judgement, not as a replacement for it.
+
+The document does not prescribe a particular Agile framework, test tool or orchestration platform. It also does not make a claim about delivery speed, cost reduction or adoption outcomes.
+
+## Document status and limitations
+
+Draft standard, version 0.1. This document is a proposed methodology component for critique and implementation. It reports no measured conformance or delivery benefit.

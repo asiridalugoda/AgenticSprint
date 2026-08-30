@@ -1,0 +1,395 @@
+---
+title: "Autonomous Loop Integration Specification"
+description: "A specification for using Autonomous Loop as the persistent, resumable execution protocol inside a human-gated Agentic Sprint."
+date: "2026-08-04"
+updated: "2026-08-04"
+type: "technical"
+topics: ["Agentic Systems", "Engineering", "AI Governance & Security"]
+tags: ["Autonomous Loop", "Agentic Sprint", "persistent state", "maker checker", "resumable execution", "worktrees", "verification"]
+featured: false
+pinned: false
+draft: false
+canonical: "/autonomous-loop-integration"
+image: "/social/autonomous-loop-integration"
+series: "Agentic Sprint Methodology"
+seriesOrder: 4
+version: "0.1"
+status: "Optional profile specification"
+documentId: "D4"
+documentKind: "integration-specification"
+normative: true
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D2", "D3"]
+claimClasses: ["normative-requirements", "integration-contract", "implementation-guidance"]
+citation: "Dalugoda, Siri. Autonomous Loop Integration Specification. Agentic Sprint Methodology, v0.1, 4 August 2026. https://theagenticsprint.com/autonomous-loop-integration"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://github.com/asiridalugoda/autonomous-loop", "https://git-scm.com/docs/git-worktree.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://slsa.dev/spec/v1.2/provenance", "https://opentelemetry.io/docs/concepts/signals/"]
+externalLinks: ["https://github.com/asiridalugoda/autonomous-loop"]
+---
+
+## Purpose and boundary
+
+An Agentic Sprint defines how a team governs software delivery. **Autonomous Loop** defines how an approved piece of engineering work is executed repeatedly, with persistent state, bounded goals, independent checking and recoverable failure.
+
+The relationship is therefore:
+
+- the Agentic Sprint is the outer loop for intent, approval, quality acceptance and release authority;
+- Autonomous Loop is the inner loop for goal selection, implementation, checking, recovery and evidence.
+
+> **Humans control the gates. Agents run the loops.**
+
+This document specifies the interface between those loops. It does not claim that the execution protocol makes an agent reliably autonomous across all professional software tasks.
+
+This document defines the optional `AS-AL` conformance profile. Core Agentic Sprint conformance does not require Autonomous Loop. A team MAY use another inner execution protocol and claim core conformance without satisfying this profile. A claim of `AS-AL` conformance requires the profile controls in this document in addition to the D1 core requirements.
+
+## Conformance language
+
+The terms **MUST**, **MUST NOT**, **REQUIRED**, **SHOULD**, **SHOULD NOT** and **MAY** are used as described in [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html) when written in all capitals.
+
+This document uses normative requirements for the integration boundary. Examples of files and records are illustrative schemas. A different storage format MAY be used when it preserves equivalent information and state transitions.
+
+Requirements for the optional profile use the `AS-AL-NNN` namespace. The identifiers are subordinate to D1 and identify the integration controls that a profile implementation claims to satisfy.
+
+## Inner and outer loops
+
+:::figure loop-integration
+The boundary between the Agentic Sprint outer loop and Autonomous Loop inner loop. The outer loop accepts a requirement, approves a Build Plan, accepts the engineering result, conducts QA and controls release. The inner loop converts the approved plan into goals, creates tests where appropriate, implements in bounded workspaces, invokes independent checks, records evidence and resumes after failure.
+:::
+
+### Outer loop responsibilities
+
+The Agentic Sprint outer loop MUST own:
+
+- product intent and acceptance criteria;
+- Build Plan approval;
+- architecture and risk decisions;
+- permission and repository scope;
+- human engineering acceptance;
+- QA and product assurance;
+- release or merge authority;
+- approval of durable security and context changes.
+
+### Inner loop responsibilities
+
+Autonomous Loop MUST own or expose:
+
+- conversion of an approved plan into bounded goals;
+- dependency ordering and goal status;
+- selection of the next authorised goal;
+- Maker workspace and task assignment;
+- test or verification condition tracking;
+- independent Checker invocation;
+- failure recording and retry state;
+- handover and resume state;
+- evidence references for each completed goal;
+- a completion contract that can be assessed by the outer loop.
+
+The inner loop MUST NOT grant itself new product scope, architecture authority, production access or release authority.
+
+## Inputs and integration contract
+
+An integration adapter passes the following minimum input to Autonomous Loop:
+
+| Input | Purpose |
+| --- | --- |
+| Run identity | Correlates all state and evidence |
+| Work-item identity | Links execution to product intent |
+| Approved Plan identity and digest | Proves which plan version is being executed |
+| Acceptance criteria | Defines the intended outcome |
+| Goal decomposition or decomposition constraints | Defines bounded work |
+| Repository and path scope | Limits source changes |
+| Allowed tools and commands | Limits execution capability |
+| Required checkers and quality controls | Defines independent verification |
+| Risk class and escalation rules | Determines additional controls |
+| Human gate status | Confirms that execution is authorised |
+
+The adapter MUST reject an execution request when the plan is missing, the approval is absent or the requested scope does not match the approved plan.
+
+## Converting a Build Plan into goals
+
+The conversion process should make a large plan operational without losing its intent.
+
+### Goal properties
+
+Each goal MUST have:
+
+- a stable identifier within the run;
+- a concise outcome statement;
+- a source acceptance criterion or approved design decision;
+- prerequisites and dependants;
+- an allowed repository and path scope;
+- a verification condition;
+- a risk classification;
+- a completion state;
+- an evidence reference when complete.
+
+A goal SHOULD be small enough to retry or review without redoing unrelated work. If a goal has no clear stopping condition, it SHOULD return to plan review.
+
+### Illustrative goal record
+
+```yaml
+id: G3
+title: Prevent cancelled payments from entering processing
+source_acceptance_criteria:
+  - AC-3
+depends_on:
+  - G1
+  - G2
+repositories:
+  - name: payment-workflow
+    paths:
+      - src/cancellation
+      - test/cancellation
+allowed_tools:
+  - test
+  - lint
+  - build
+verification:
+  required:
+    - cancelled payment is rejected by the processing transition
+    - regression test passes
+risk: high
+state: ready
+```
+
+This record is an example of the information needed by the loop. It is not a claim about a particular Autonomous Loop file format.
+
+## The project spine
+
+Autonomous Loop uses a persistent project spine so that the repository and retained artefacts carry execution state between sessions. The names below are the integration contract for this methodology.
+
+### `LOOP.md`
+
+`LOOP.md` records the operating contract for the current run. It SHOULD include:
+
+- run identity and start time;
+- the approved plan identity;
+- current execution policy;
+- Maker and Checker roles;
+- required gates and quality controls;
+- resume instructions;
+- stop conditions;
+- links to evidence and handovers.
+
+`LOOP.md` MUST NOT be treated as authority to change the outer-loop approval boundary. If the approved plan changes, the loop record MUST point to a new plan decision.
+
+### `GOALS.md`
+
+`GOALS.md` records the goal ladder and its dependencies. Each goal SHOULD have one clear outcome and one or more verification conditions. The file SHOULD distinguish `ready`, `in_progress`, `blocked`, `failed`, `verified`, `accepted` and `cancelled` states, or equivalent states in a structured store.
+
+### `BOARD.md`
+
+`BOARD.md` provides a human-readable view of work state. It SHOULD make visible:
+
+- goal state;
+- current owner or agent role;
+- blocked reason;
+- next action;
+- retry count;
+- evidence status;
+- human decision required.
+
+The board is a view, not the sole source of truth. A system MAY derive it from a structured state store.
+
+### `handover.md`
+
+`handover.md` records what a later session needs to continue safely. It SHOULD state:
+
+- what was completed;
+- what was attempted;
+- current branch or worktree;
+- files changed;
+- checks run and results;
+- known failures;
+- current hypothesis;
+- next authorised action;
+- actions that MUST NOT be taken without human review.
+
+### Audit artefacts
+
+Audit artefacts link actions to evidence. They MAY be JSON, text, CI records or signed records. At minimum, they SHOULD identify the run, goal, actor role, action, time, result and relevant output reference.
+
+`EXPERIMENTS.md` MAY record optimisation experiments, prompt or context experiments and their results. An experiment MUST NOT change a required guardrail without the relevant human approval.
+
+## Execution state machine
+
+The inner loop can use the following states.
+
+| State | Meaning | Required behaviour |
+| --- | --- | --- |
+| `READY` | Dependencies and permissions are available | Select only an authorised goal |
+| `IN_PROGRESS` | A Maker is working | Record workspace and attempt identity |
+| `TESTING` | A verification condition is being prepared or run | Retain test inputs and result |
+| `REVIEWING` | A Checker is evaluating the change | Keep Maker and Checker roles distinct |
+| `FAILED` | An attempt did not satisfy a condition | Record failure and next hypothesis |
+| `BLOCKED` | Progress needs a dependency or decision | Stop unsafe work and escalate where required |
+| `VERIFIED` | Required inner-loop checks have passed | Preserve evidence and await outer-loop review where required |
+| `HANDOVER` | The current session is ending | Write resumable state and next action |
+| `CANCELLED` | The goal will not continue | Preserve the reason and partial evidence |
+
+The loop MUST NOT move directly from `IN_PROGRESS` to `VERIFIED` without the required verification evidence. `VERIFIED` does not mean released.
+
+## Maker and Checker separation
+
+The Maker implements the goal. The Checker asks whether the goal is satisfied and whether the implementation introduces known classes of risk.
+
+The minimum integration requirements are:
+
+- the Maker and Checker roles MUST be identifiable;
+- the Checker MUST receive the target change and verification question;
+- the Maker MUST NOT be able to alter or delete the Checker result silently;
+- a failed Checker result MUST return the goal to a recorded rework or blocked state;
+- the outer loop MUST be able to see unresolved Checker findings.
+
+Where practical, independence SHOULD include separate context, separate session state and read-only access for the Checker. A second agent using the same model and trusting the Maker's summary is not strong independence by itself.
+
+## Red-to-green execution
+
+For specification-driven work, the loop SHOULD begin with a failing or otherwise demonstrably incomplete verification condition. The normal sequence is:
+
+1. Load the approved context and goal.
+2. Identify or create the verification condition.
+3. Confirm that the condition fails or is not yet satisfied where that is meaningful.
+4. Implement the smallest change that addresses the goal.
+5. Run the relevant checks.
+6. Ask an independent Checker to inspect the result.
+7. Record evidence and advance, or record failure and rework.
+
+Red-to-green is not appropriate for every change. Documentation, exploratory investigation and some migration work may need different evidence. The loop MUST state the chosen completion condition rather than pretending every goal has the same test shape.
+
+## Resumability
+
+Resumability means a new session can continue from durable state without relying on the previous model's hidden context.
+
+Before a session ends, the loop SHOULD write a handover when:
+
+- the task reaches a context or time limit;
+- a tool or dependency fails;
+- the worker is being replaced;
+- a human decision is required;
+- the current workspace cannot continue safely.
+
+The handover MUST distinguish facts from hypotheses. It MUST identify the next authorised action and any action that requires a human decision.
+
+A resumed session MUST reload the approved plan identity, current goal state, permissions, recent evidence and handover. It MUST NOT assume that a previous session's narrative is correct without checking the workspace.
+
+## Failure records and retry policy
+
+Every failed attempt MUST record:
+
+- goal and attempt identities;
+- agent role and workspace;
+- action or command attempted;
+- relevant input and output;
+- failure classification;
+- repository state or change reference;
+- next hypothesis;
+- retry count;
+- escalation threshold.
+
+Useful failure classes include requirement ambiguity, context gap, implementation defect, test defect, environment failure, dependency failure, permission denial, policy violation and suspected security issue.
+
+Retries MUST be bounded. A retry SHOULD change the hypothesis, context or implementation. Repeating the same attempt without a changed condition is not a recovery strategy.
+
+When the failure suggests that the approved architecture or scope is wrong, the loop MUST stop and return to the outer plan gate. It MUST NOT edit the plan in place and continue as though approval still covers the new design.
+
+## Worktrees and parallel execution
+
+Independent goals MAY run concurrently when their dependency graph, repository scope and integration contracts permit it. The Coordinator MUST prevent two Makers from writing the same mutable workspace at the same time.
+
+Git worktrees are one useful implementation technique. They provide separate working directories for one repository, but the integration MUST also manage:
+
+- branch naming and ownership;
+- uncommitted changes;
+- dependency and lockfile conflicts;
+- environment and port collisions;
+- generated artefacts;
+- shared test data;
+- merge order;
+- cleanup after success or failure.
+
+Parallel execution MUST stop when a dependency becomes uncertain. The Coordinator SHOULD prefer a small number of clearly isolated concurrent goals over broad parallelism that creates hidden integration risk.
+
+## Integration and merge preparation
+
+When goals in separate workspaces are complete, the integration step assembles the approved change set. It MUST:
+
+- identify all source branches and worktrees;
+- verify that each change belongs to the approved plan;
+- reconcile interface and migration dependencies;
+- rerun required checks after integration;
+- preserve individual goal evidence;
+- surface conflicts and deviations;
+- produce one reviewable change identity for the outer loop.
+
+The integration step MUST NOT merge protected branches or deploy. It prepares evidence for Human Gate 2 and later release authority.
+
+## Completion contract
+
+Autonomous Loop MAY report an execution run as `VERIFIED` only when:
+
+- every required goal is complete or explicitly dispositioned;
+- every required verification condition has evidence;
+- required Checker findings are resolved or accepted by an authorised human;
+- the final change set matches the approved scope or is returned to plan review;
+- failure and retry records are retained;
+- the outer loop receives a review package.
+
+The outer loop alone MAY report the work as engineered, QA accepted, released or closed. Inner-loop completion is not a release decision.
+
+The evidence produced by the inner loop supports the outer-loop decision; it is not proof that the change is correct or safe in every context. Human Gate 2, QA and Human Gate 3 remain separate decisions.
+
+An illustrative completion record might look like this:
+
+```yaml
+run: AS-2026-0007
+plan: plan-14@sha256:example
+state: verified
+goals:
+  required: 4
+  verified: 4
+checkers:
+  required: [requirements, code, security, tests]
+  unresolved: []
+change_set:
+  repositories: [payment-api, customer-portal]
+  references: [pr-118, pr-44]
+human_decision_required: engineering_acceptance
+release_authority: not_granted
+```
+
+The digest and identifiers in this example are illustrative. An implementation SHOULD use immutable references where its storage system supports them.
+
+## Security and evidence requirements
+
+The loop SHOULD align its development controls with the [NIST Secure Software Development Framework](https://csrc.nist.gov/pubs/sp/800/218/final). It SHOULD retain enough build and change provenance to support investigation, with [SLSA provenance](https://slsa.dev/spec/v1.2/provenance) as one possible reference model.
+
+The loop MUST protect secrets and sensitive tool output. It MUST enforce the outer-loop permission boundary. A Maker MUST NOT obtain release credentials as part of normal execution. A Checker MUST NOT be able to suppress findings by editing the source evidence it is reviewing.
+
+If the loop stores prompts or model output, access and retention SHOULD be governed. Durable context SHOULD be reviewed for secrets, untrusted instructions and context poisoning before reuse.
+
+## AS-AL profile conformance
+
+An implementation claiming the optional `AS-AL` profile MUST satisfy the following controls in addition to D1 core conformance:
+
+- [AS-AL-001] It MUST require an approved plan identity.
+- [AS-AL-002] It MUST pass plan scope and repository permissions to the run.
+- [AS-AL-003] It MUST give goals stable identifiers and verification conditions.
+- [AS-AL-004] It MUST preserve `LOOP.md`, `GOALS.md`, `BOARD.md` and `handover.md`, or equivalent records, across session loss.
+- [AS-AL-005] It MUST keep Maker and Checker roles separate and visible.
+- [AS-AL-006] It MUST bound and record retries and failures.
+- [AS-AL-007] It MUST isolate worktrees or equivalent workspaces.
+- [AS-AL-008] It MUST run post-integration checks before Human Gate 2.
+- [AS-AL-009] It MUST distinguish verified from released in its completion contract.
+- [AS-AL-010] It MUST make evidence inspectable without relying on model memory.
+- [AS-AL-011] It MUST route high-risk findings to the required human authority.
+- [AS-AL-012] It MUST prevent context and guardrail changes from being silently self-approved.
+
+## Limitations and open questions
+
+Persistent state does not guarantee accurate state. A handover can contain a wrong hypothesis. Independent agents can share blind spots. Red-to-green checks can verify a narrow condition while missing a product failure. Worktrees reduce workspace collision but do not solve architectural integration.
+
+Future versions should define stronger schemas for goal evidence, model and tool provenance, context versioning, cross-repository change groups and Checker independence. They should also test how much evidence a human can realistically review without creating a new bottleneck.
+
+## Document status
+
+This is an integration specification for the Agentic Sprint Methodology series. It describes a protocol boundary and evidence expectations. It is not a claim that the current Autonomous Loop implementation, or any other implementation, satisfies every requirement without further assessment.

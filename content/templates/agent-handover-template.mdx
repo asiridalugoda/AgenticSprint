@@ -1,0 +1,216 @@
+---
+title: "Agent Handover Template"
+description: "A resumable handover record for preserving agent execution state, evidence, failures and the next safe action."
+date: "2026-08-17"
+updated: "2026-08-17"
+type: "technical"
+topics: ["Agentic Systems", "Engineering", "AI Governance & Security"]
+tags: ["Autonomous Loop", "handover", "resumability", "execution state", "failure recovery"]
+featured: false
+pinned: false
+draft: false
+canonical: "/templates/agent-handover"
+image: "/social/template-agent-handover"
+series: "Agentic Sprint Templates"
+seriesOrder: 4
+version: "0.1"
+status: "Working template"
+documentKind: "Template"
+normative: false
+documentId: "T4"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D4"]
+claimClasses: ["methodology", "template", "authorial"]
+citation: "Dalugoda, Siri. Agent Handover Template. Agentic Sprint Templates, v0.1, 17 August 2026. https://theagenticsprint.com/templates/agent-handover"
+references: ["https://git-scm.com/docs/git-worktree.html", "https://slsa.dev/spec/v1.2/provenance", "https://opentelemetry.io/docs/concepts/signals/"]
+externalLinks: []
+---
+
+Use this template when an agentic execution pauses, fails, reaches a handover point or moves to a new agent or execution environment. It is written for an explicit Autonomous Loop handover, so the execution spine fields are expected. For other Agentic Sprint work, use only the state fields that apply and record the execution protocol as `not-applicable`.
+
+This is an informative working artefact for adapting the Agentic Sprint. It is not an independent normative standard; teams should record their own decisions, controls and approval rules.
+
+The `T4-HO-*` labels below are local template cross-references. They are not methodology requirements and do not override D1 to D10. A handover records execution state and authority; it cannot create approval or release authority.
+
+The handover is a record of state, not a progress story. A receiving agent must be able to distinguish completed work from attempted work, evidence from assumption and a blocker from a next hypothesis. A handover cannot declare a goal complete without evidence that satisfies the goal's verification condition.
+
+## When to use it
+
+- A context limit, API limit, timeout or environment failure interrupts execution.
+- A Maker agent hands work to another Maker or to an independent Checker.
+- A worktree or branch changes execution ownership.
+- The coordinator needs to resume a long-running goal without replaying an undocumented conversation.
+- A failed attempt has produced useful state that must not be lost.
+
+## Ownership and approval
+
+- **Outgoing agent:** records the state and signs or commits the handover where the environment supports it.
+- **Receiving agent:** checks the repository state, evidence and next action before continuing.
+- **Coordinator:** accepts the handover and decides whether retry, re-plan, escalation or closure is appropriate.
+- **Approval boundary:** a handover does not grant new permissions. Any change in scope, repository, branch, tool or authority needs a separate decision.
+- **Required evidence:** goal status, commit or worktree state, commands and results, completed criteria, failed attempts, unresolved risks and next hypothesis.
+- **Completion rule:** the receiver acknowledges the state and can continue or escalate without guessing.
+- **Failure path:** mark `blocked` or `invalid` when state is contradictory, evidence is missing or the repository cannot be safely identified. Do not overwrite the last known good record.
+
+## Lifecycle mapping
+
+| Requirement ID | Handover obligation | Agentic Sprint point |
+| --- | --- | --- |
+| T4-HO-001 | Identify the execution, goal, agent role and authority scope. | Autonomous execution |
+| T4-HO-002 | Separate completed, attempted, failed and unstarted work. | Autonomous execution |
+| T4-HO-003 | Record repository, branch, worktree and working-tree state. | Autonomous execution |
+| T4-HO-004 | Link verification evidence and preserve failure details. | Verification |
+| T4-HO-005 | State one safe next hypothesis and its stop conditions. | Recovery |
+| T4-HO-006 | Record blockers, permissions and escalation needs. | Exception handling |
+| T4-HO-007 | Require receiving-agent acknowledgement without declaring false completion. | Coordinator control |
+
+## State rules
+
+- `completed` means the stated acceptance condition has evidence attached.
+- `attempted` means work was started but the acceptance condition is not yet met.
+- `failed` means an attempt ended with a known failure or contradiction.
+- `blocked` means a safe next action is not available with current authority or information.
+- `ready` means the receiver has verified the handover and may execute the stated next action.
+- `done` is permitted only when the goal evidence is complete and independently checked where required.
+
+## Copyable template
+
+````yaml
+handover_id: [unique handover identifier]
+execution_protocol: "Autonomous Loop"
+execution_id: [run identifier]
+work_item_id: [issue, plan or goal identifier]
+goal_id: [G01]
+handover_version: "0.1"
+status: [in-progress | paused | failed | blocked | ready | done | invalid]
+created_at: [YYYY-MM-DDThh:mm:ssZ]
+created_by: [agent or person]
+receiving_agent: [agent or person]
+coordinator: [name or role]
+
+authority:
+  human_principal: [name or role]
+  approved_plan: [plan id and version]
+  authorised_scope: [exact task, repository and branch]
+  permission_expiry: [time or event]
+  permissions_changed: [yes or no]
+  permission_change_record: [decision id or not-applicable]
+
+goal:
+  statement: [bounded outcome]
+  acceptance_condition: [machine-verifiable or explicitly reviewed condition]
+  dependencies:
+    - "[goal or dependency]"
+  priority: [priority]
+  stop_conditions:
+    - [condition that pauses work]
+
+execution_spine:
+  loop_file: [path to LOOP.md]
+  goals_file: [path to GOALS.md]
+  board_file: [path to BOARD.md]
+  handover_file: [path to handover.md]
+  audit_directory: [path]
+  current_iteration: [number]
+  retry_count: [number]
+  retry_limit: [number]
+
+repository_state:
+  repository: [URL or path]
+  commit: [full or short commit hash]
+  base_commit: [commit hash]
+  branch: [branch name]
+  worktree_path: [path]
+  worktree_status: [clean | modified | conflicted | unavailable]
+  files_changed:
+    - path: [path]
+      status: [added | modified | deleted | renamed]
+      change_summary: [summary]
+  untracked_files:
+    - "[path]"
+  generated_outputs:
+    - "[path]"
+
+progress:
+  completed:
+    - item: [completed item]
+      evidence: [link, commit, test result or artefact]
+      completed_at: [timestamp]
+  attempted_but_incomplete:
+    - item: [item]
+      attempt: [what was tried]
+      result: [result]
+      evidence: [link or output]
+  failed:
+    - item: [item]
+      failure: [specific failure]
+      observed_at: [timestamp]
+      impact: [impact]
+      preserved_state: [path or commit]
+  not_started:
+    - [item]
+
+verification:
+  checks_run:
+    - command_or_check: [check]
+      result: [pass | fail | blocked | not-run]
+      output: [link or short result]
+      run_at: [timestamp]
+  acceptance_criteria:
+    - id: AC-01
+      statement: [criterion]
+      status: [met | unmet | unknown]
+      evidence: [link]
+  independent_checker: [name, role or not-yet-assigned]
+  checker_result: [pass | rework | not-run]
+
+failure_analysis:
+  failure_class: [context | dependency | implementation | test | environment | authority | unknown]
+  what_failed: [specific observation]
+  what_was_not_failed: [known good boundary]
+  attempted_hypotheses:
+    - hypothesis: [hypothesis]
+      action: [action]
+      result: [result]
+      evidence: [link]
+  next_hypothesis: [one safe, testable next hypothesis]
+  falsifier: [what result would disprove it]
+
+blockers:
+  - blocker: [blocker]
+    owner: [role]
+    required_decision: [decision]
+    escalation_path: [path]
+    expires_at: [timestamp or not-applicable]
+
+next_action:
+  action: [one bounded next action]
+  actor: [agent or person]
+  prerequisites:
+    - "[condition]"
+  expected_output: [evidence or state]
+  stop_if:
+    - "[condition]"
+
+integrity_and_acknowledgement:
+  handover_hash_or_commit: [value]
+  audit_record: [link]
+  outgoing_confirmation: [name and timestamp]
+  receiving_review: [pending | accepted | rejected]
+  receiving_notes: [notes]
+  coordinator_decision: [resume | re-plan | escalate | close]
+  coordinator: [name and role]
+  decision_at: [timestamp]
+
+traceability:
+  - requirement_id: T4-HO-001
+    evidence: [link]
+  - requirement_id: T4-HO-004
+    evidence: [link]
+````
+
+## Short example
+
+If a test environment fails after a migration has been applied locally, the handover should say that the migration was attempted, identify the exact commit and database state, link the failure output, and state the next hypothesis. It should not say that the goal is complete because the code compiles.
+
+The Git worktree reference is useful for recording isolated working state. The provenance and telemetry references are adjacent evidence practices. They do not define Autonomous Loop or the Agentic Sprint handover model.

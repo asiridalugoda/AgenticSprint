@@ -1,0 +1,94 @@
+---
+title: "Agentic Sprint Manifesto"
+description: "Ten principles for human-governed software delivery with autonomous agents."
+date: "2026-08-11"
+updated: "2026-08-11"
+type: "concept"
+topics: ["Agentic Systems", "Delivery & Organisations", "AI Governance & Security"]
+tags: ["agentic sprint", "autonomous software engineering", "human gates", "engineering principles"]
+featured: false
+pinned: false
+draft: false
+canonical: "/"
+image: "/social/manifesto"
+series: "Agentic Sprint Methodology"
+seriesOrder: 11
+version: "0.1"
+status: "Manifesto"
+documentId: "D11"
+documentKind: "manifesto"
+normative: false
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D7", "D8", "D9", "D10"]
+claimClasses: ["principle", "proposed-methodology", "non-empirical"]
+citation: "Dalugoda, Siri. Agentic Sprint Manifesto. Agentic Sprint Methodology, v0.1, 11 August 2026. https://theagenticsprint.com/"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework"]
+externalLinks: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework"]
+---
+
+## Why this exists
+
+The Agentic Sprint is a proposed operating model for software delivery. It gives autonomous execution a defined place inside an engineering system while keeping intent, acceptance and release decisions accountable to people.
+
+This manifesto is the short version. The [Specification](/specification), [Reference Architecture](/reference-architecture) and [Implementation Guide](/implementation-guide) provide the detail needed to implement or critique it.
+
+## Principles
+
+### 1. Automate execution, not accountability
+
+Agents may plan, build, test and remediate within an authorised boundary. A system must still identify the human or accountable role that owns the decision to accept risk and release the result.
+
+### 2. Humans control the gates. Agents run the loops.
+
+Agents should handle high-frequency execution loops. Humans should control the gates where intent, architecture, quality acceptance or release authority is decided.
+
+### 3. Intent comes before implementation
+
+An agent should receive a clear requirement, acceptance conditions and relevant context before it changes a repository. Ambiguity is a reason to pause and clarify, not a reason to generate more code.
+
+### 4. The Maker is not the sole Checker
+
+The agent that creates an implementation must not be the only mechanism deciding that the implementation is correct. Independent checks, deterministic controls and human review provide different forms of challenge.
+
+### 5. Evidence precedes completion
+
+A goal is complete when the required evidence exists and has been evaluated. A plausible diff, a successful model response or a green check chosen by the agent is not sufficient by itself.
+
+### 6. Release authority stays accountable
+
+Protected branches and production credentials remain outside the Maker's execution plane. The release decision remains with the authorised release path. By default, a human approves it; any alternative requires a separately designed and approved control model.
+
+### 7. Context is production infrastructure
+
+Architecture rules, repository instructions, domain definitions, security constraints and quality standards shape future software. They should be versioned, reviewed, tested and reversible like other production assets.
+
+### 8. Correction should improve the system
+
+When a human identifies a reusable engineering lesson, the team should decide whether to encode it in a rule, skill, example, test or other context. Fixing one change is useful. Reducing the chance of recurrence is better.
+
+### 9. Autonomy is bounded by risk
+
+The acceptable autonomy level depends on the system, data, reversibility and potential harm. Low-risk, well-bounded work may be delegated further. Privileged, irreversible or poorly understood work requires stronger controls and human involvement.
+
+### 10. Measure accepted outcomes, not raw activity
+
+Agent turns, generated lines and opened pull requests are activity measures. The useful measures are accepted changes, review effort, repeat errors, escaped defects, evidence quality and the cost of achieving a safe outcome.
+
+## A compact test
+
+Before adopting an agentic workflow, ask:
+
+- Is the intended outcome explicit?
+- Is the work bounded and reversible enough for the proposed autonomy level?
+- Does a human approve the plan before implementation?
+- Can an independent checker challenge the maker?
+- Is there evidence for each acceptance condition?
+- Can the system stop, recover and explain what happened?
+- Does release authority remain clear?
+- Can a correction become reviewed organisational knowledge?
+
+If the answer to several of these questions is no, the system is not ready for more autonomy. Improve the delivery environment first, or keep the work at a lower level of delegation.
+
+## Document status and limitations
+
+This is a proposed manifesto for the Agentic Sprint methodology. D1 remains the normative specification. This manifesto introduces no additional requirements and cannot override D1. It is not a claim of industry consensus, a safety certification or evidence that current AI systems can reliably perform all professional engineering work without supervision. The principles are intended to guide more detailed specifications, pilots and critique.

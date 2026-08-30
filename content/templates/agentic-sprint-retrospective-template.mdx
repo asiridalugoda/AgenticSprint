@@ -1,0 +1,228 @@
+---
+title: "Agentic Sprint Retrospective Template"
+description: "A reusable retrospective record for examining flow, human intervention, quality, guardrails and durable learning after agentic delivery work."
+date: "2026-08-22"
+updated: "2026-08-22"
+type: "technical"
+topics: ["Delivery & Organisations", "Agentic Systems", "Engineering"]
+tags: ["retrospective", "human intervention", "agent learning", "delivery metrics", "continuous improvement"]
+featured: false
+pinned: false
+draft: false
+canonical: "/templates/retrospective"
+image: "/social/template-retrospective"
+series: "Agentic Sprint Templates"
+seriesOrder: 9
+version: "0.1"
+status: "Working template"
+documentKind: "Template"
+normative: false
+documentId: "T9"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D8", "D10"]
+claimClasses: ["methodology", "template", "authorial"]
+citation: "Dalugoda, Siri. Agentic Sprint Retrospective Template. Agentic Sprint Templates, v0.1, 22 August 2026. https://theagenticsprint.com/templates/retrospective"
+references: ["https://agilemanifesto.org/", "https://opentelemetry.io/docs/concepts/signals/", "https://csrc.nist.gov/pubs/sp/800/218/final"]
+externalLinks: []
+---
+
+Use this template after a completed delivery cycle, a meaningful work batch or a material failure. The retrospective examines how the delivery system behaved, not just whether the feature shipped. It is a place to identify repeatable corrections, guardrail gaps and improvements to the context in which agents operate.
+
+This is an informative working artefact for adapting the Agentic Sprint. It is not an independent normative standard; teams should record their own decisions, controls and approval rules.
+
+The `T9-RETRO-*` labels below are local template cross-references. They are not methodology requirements and do not override D1 to D10. A retrospective can propose a Context Change, but a separate governed review must approve, evaluate, version and release it.
+
+Do not turn the record into a performance scorecard or a blame exercise. Metrics should be reported only when their measurement method and data are available. An empty value is more credible than an invented result.
+
+## When to use it
+
+- A work item or batch has passed QA and reached a release decision.
+- An interruption, defect, security event or repeated review correction reveals system learning.
+- The team wants to compare human decision load with machine execution load.
+- A context, skill, guardrail or verification change may be warranted.
+
+## Ownership and approval
+
+- **Retrospective owner:** delivery lead or team facilitator.
+- **Participants:** Product, engineering, QA, security, operations and agent coordination roles relevant to the work.
+- **Context owner:** reviews proposed durable changes to skills, architecture context or guardrails.
+- **Approval boundary:** a retrospective can propose an action or Context Change. It cannot publish a new rule, weaken a control or accept release risk by itself.
+- **Required evidence:** work-flow timestamps, review and QA records, failure traces, intervention notes, quality outcomes and action owners.
+- **Completion rule:** the team records observed facts, uncertainties, selected actions, owners, due dates and evidence expectations.
+- **Failure path:** mark data as unavailable, open an investigation or schedule a follow-up. Do not infer causation from a small or incomplete sample.
+
+## Lifecycle mapping
+
+| Requirement ID | Retrospective obligation | Agentic Sprint point |
+| --- | --- | --- |
+| T9-RETRO-001 | Define the scope, participants, work set and evidence period. | Learning loop |
+| T9-RETRO-002 | Describe flow, human intervention, failure, rework and quality outcomes. | Learning loop |
+| T9-RETRO-003 | Review guardrails, permissions, context and independent verification. | Learning loop |
+| T9-RETRO-004 | Separate observed facts, interpretations, hypotheses and missing data. | Evidence discipline |
+| T9-RETRO-005 | Identify reusable corrections and assess whether a Context Change is warranted. | Organisational learning |
+| T9-RETRO-006 | Assign actions with owners, dates, evidence and rollback or review conditions. | Improvement cycle |
+
+## Discussion prompts
+
+- Where did work wait, and was the wait caused by implementation, review, QA, authority or context?
+- Which human interventions protected quality, and which were avoidable rework?
+- Did any agent repeat a correction that should already have been durable context?
+- Did any control create useful friction or unnecessary friction?
+- What evidence supports the conclusion, and what remains unknown?
+- Would a proposed context change prevent a repeat error without broadening authority?
+- Which action is reversible, and how will its effect be evaluated?
+
+## Metric definitions
+
+Use the team's agreed measurement window and data source. Do not publish a value until the denominator, inclusion rules and timestamp source are recorded.
+
+| Metric | Suggested calculation | Minimum data needed |
+| --- | --- | --- |
+| Agentic throughput | accepted work items / period | accepted item records and period |
+| Human intervention minutes | recorded human review, correction and decision minutes | time records with activity type |
+| First-Pass Plan Acceptance | plans accepted without material revision / plans reviewed | plan decisions and revision classification |
+| First-Pass Implementation Acceptance | implementations accepted without material rework / implementations reviewed | review and rework records |
+| Rework rate | work items returned for implementation rework / work items reviewed | review dispositions |
+| Repeat error rate | repeated known error observations / applicable observations | correction catalogue and review findings |
+| Escaped defect rate | production defects attributed to the change / accepted changes | defect attribution and release records |
+| Context learning rate | approved reusable Context Changes / eligible correction observations | correction and Context Change records |
+
+These are measurement proposals, not evidence of performance. Interpret trends only after the team has checked data quality and possible gaming effects.
+
+## Copyable template
+
+````markdown
+## Agentic Sprint Retrospective: [retro-id]
+
+### 1. Record
+
+- retro_id: [unique identifier]
+- retro_version: [0.1]
+- sprint_or_batch_id: [identifier]
+- period_start: [YYYY-MM-DD]
+- period_end: [YYYY-MM-DD]
+- retrospective_date: [YYYY-MM-DD]
+- facilitator: [name and role]
+- participants:
+  - "[name and role]"
+- work_items_in_scope:
+  - "[issue or plan]"
+- data_status: [complete | partial | unavailable]
+- confidentiality_notes: [handling rules]
+
+### 2. Outcome and flow
+
+- intended_outcome: [what the work set aimed to achieve]
+- delivered_outcome: [what was accepted]
+- not_delivered: [what remains incomplete]
+- release_decision: [released | held | cancelled | not-applicable]
+
+| Stage | Started | Ended | Waiting time | Evidence | Observation |
+| --- | --- | --- | --- | --- | --- |
+| Requirement intake | [time] | [time] | [duration] | [link] | [observation] |
+| Build Plan | [time] | [time] | [duration] | [link] | [observation] |
+| Human Gate 1 | [time] | [time] | [duration] | [link] | [observation] |
+| Autonomous execution | [time] | [time] | [duration] | [link] | [observation] |
+| Engineering review | [time] | [time] | [duration] | [link] | [observation] |
+| QA | [time] | [time] | [duration] | [link] | [observation] |
+| Release decision | [time] | [time] | [duration] | [link] | [observation] |
+
+### 3. Human intervention
+
+| Intervention ID | Stage | Trigger | Human action | Minutes | Protected outcome | Avoidable or necessary | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| HI-01 | [stage] | [trigger] | [action] | [minutes or unknown] | [outcome] | [avoidable | necessary | unknown] | [link] |
+
+**Interpretation:**
+[Separate observed intervention from an explanation of why it occurred.]
+
+### 4. Failure and rework
+
+| Event ID | Failure class | What happened | Detection | Recovery | Rework | Repeat of known issue | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| F-01 | [context | dependency | implementation | test | environment | authority | other] | [observation] | [signal] | [action] | [work] | [yes | no | unknown] | [link] |
+
+### 5. Quality and assurance
+
+- review_record: [link]
+- qa_record: [link]
+- escaped_defects: [count or unknown, with evidence]
+- unresolved_risks:
+  - "[risk and owner]"
+- independent_checker_used: [yes | no | exception, with evidence]
+- evidence_gaps:
+  - "[gap and consequence]"
+
+### 6. Guardrails and authority
+
+| Control | Worked as intended | Friction or gap | Evidence | Action needed |
+| --- | --- | --- | --- | --- |
+| least-privilege permissions | [yes | no | unknown] | [observation] | [link] | [action] |
+| branch and merge protection | [yes | no | unknown] | [observation] | [link] | [action] |
+| sandbox and network limits | [yes | no | unknown] | [observation] | [link] | [action] |
+| independent review | [yes | no | unknown] | [observation] | [link] | [action] |
+| deterministic quality gates | [yes | no | unknown] | [observation] | [link] | [action] |
+| human release authority | [yes | no | unknown] | [observation] | [link] | [action] |
+
+### 7. Context and reusable corrections
+
+| Correction ID | Human correction or observation | Applicable scope | Reusable lesson | Existing context | Repeat seen | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| COR-01 | [correction] | [scope] | [lesson] | [path or none] | [yes | no | unknown] | [link] |
+
+### 8. Context Change proposals
+
+| Change ID | Proposed change | Target skill, rule or document | Risk of change | Review owner | Evaluation required | Proposed version | Rollback version | Decision |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CC-01 | [proposal] | [target] | [risk] | [owner] | [evaluation] | [version] | [last known good version] | [proposed | approved | rejected | deferred] |
+
+No Context Change is active until it has a separate version, review, evaluation, approval and rollback path.
+
+### 9. Measurements
+
+| Metric | Definition and denominator | Value | Data source | Data quality | Interpretation limit |
+| --- | --- | --- | --- | --- | --- |
+| Human intervention minutes | [definition] | [value or not-measured] | [source] | [complete | partial | unknown] | [limit] |
+| First-Pass Plan Acceptance | [definition] | [value or not-measured] | [source] | [quality] | [limit] |
+| Rework rate | [definition] | [value or not-measured] | [source] | [quality] | [limit] |
+| Escaped defect rate | [definition] | [value or not-measured] | [source] | [quality] | [limit] |
+| Context learning rate | [definition] | [value or not-measured] | [source] | [quality] | [limit] |
+
+### 10. Actions
+
+| Action ID | Action | Reason | Owner | Due date | Evidence of completion | Success check | Rollback or review condition | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ACT-01 | [action] | [reason] | [owner] | [date] | [link] | [check] | [condition] | [open | done | cancelled] |
+
+### 11. Summary
+
+**Observed facts:**
+- [fact with evidence]
+
+**Interpretations:**
+- [interpretation and supporting evidence]
+
+**Hypotheses to test:**
+- [hypothesis, test and owner]
+
+**What we will keep:**
+- [practice]
+
+**What we will change:**
+- [practice and action id]
+
+### 12. Traceability
+
+| Requirement ID | Evidence | Status |
+| --- | --- | --- |
+| T9-RETRO-001 | [link] | [met | open] |
+| T9-RETRO-002 | [link] | [met | open] |
+| T9-RETRO-005 | [link] | [met | open] |
+| T9-RETRO-006 | [link] | [met | open] |
+````
+
+## Completion check
+
+The retrospective is complete when a reader can separate what happened from what the team thinks it means, see the evidence limitations, and identify the next accountable actions. A proposed context improvement remains a proposal until it passes the separate Context Change process.
+
+The Agile Manifesto and OpenTelemetry references provide adjacent principles for iterative delivery and operational signals. NIST provides related secure development practice. None of these sources defines the Agentic Sprint retrospective or its metrics.

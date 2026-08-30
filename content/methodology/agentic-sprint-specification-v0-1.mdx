@@ -1,0 +1,340 @@
+---
+title: "Agentic Sprint Specification v0.1"
+description: "A formal specification for human-governed software delivery with bounded autonomous execution, independent verification and explicit release authority."
+date: "2026-08-01"
+updated: "2026-08-01"
+type: "technical"
+topics: ["Agentic Systems", "Engineering", "Delivery & Organisations", "AI Governance & Security"]
+tags: ["Agentic Sprint", "software delivery", "human gates", "autonomous execution", "engineering governance", "specification"]
+featured: false
+pinned: false
+draft: false
+canonical: "/specification"
+image: "/social/specification"
+series: "Agentic Sprint Methodology"
+seriesOrder: 1
+version: "0.1"
+status: "Draft specification"
+documentId: "D1"
+documentKind: "specification"
+normative: true
+owner: "Siri Dalugoda"
+dependsOn: []
+claimClasses: ["methodology-definition", "normative-requirements", "implementation-guidance"]
+citation: "Dalugoda, Siri. Agentic Sprint Specification v0.1. Agentic Sprint Methodology, 1 August 2026. https://theagenticsprint.com/specification"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"]
+externalLinks: []
+---
+
+## Status and intent
+
+This document defines **Agentic Sprint** as a human-governed software delivery operating model. It is the first draft of a methodology intended to be implemented, tested, criticised and revised.
+
+The model is built around one boundary:
+
+> **Humans control the gates. Agents run the loops.**
+
+An Agentic Sprint is a delivery cycle in which an approved requirement is converted into a machine-executable plan, bounded agents perform implementation and verification work, and humans retain authority over intent, architecture, quality acceptance and release.
+
+This specification does not claim that current AI systems are reliably autonomous across all professional engineering work. It defines controls for using agent execution where the work is sufficiently bounded, observable and reviewable.
+
+## Conformance language
+
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **NOT RECOMMENDED**, **MAY** and **OPTIONAL** in this document are to be interpreted as described in [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html) when, and only when, they appear in all capitals.
+
+Normative requirements define the minimum behaviour of a conforming implementation. Recommended practices improve reliability but are not required for a claim of minimum conformance. Examples are illustrative. Open questions are deliberately left unresolved.
+
+## Requirement identifiers
+
+Core conformance requirements use the `AS-CORE-NNN` namespace. The identifiers are stable references for implementation, review and later revisions. A later version MAY clarify or replace a requirement, but it MUST NOT silently change the meaning of an existing identifier.
+
+Companion documents use their own namespace and remain subordinate to this specification. A companion requirement MAY add controls for its declared scope, but it MUST NOT weaken or silently replace a core requirement.
+
+## Scope
+
+This specification applies to software delivery work where agents can inspect or change source code, configuration, tests, documentation or other engineering artefacts. It covers the delivery control plane from an accepted work item through release authority and learning.
+
+| In scope | Out of scope |
+| --- | --- |
+| Requirements intake and readiness | Selecting a particular model vendor |
+| Build Plan creation and approval | Replacing product or engineering judgement |
+| Bounded implementation by agents | Unreviewed autonomous production deployment |
+| Independent machine and human verification | A claim that agent output is correct because tests pass |
+| Persistent execution state and evidence | A universal organisation design prescription |
+| Permission, sandbox and branch boundaries | A new software development life cycle taxonomy |
+| Quality, release and learning gates | A guarantee of lower cost or higher throughput |
+
+An organisation MAY implement only part of the model. It MUST describe which controls are present and which are absent rather than implying full conformance.
+
+### Conformance profiles
+
+Core Agentic Sprint conformance does not require Autonomous Loop or any other named execution protocol. An implementation MAY use a different protocol if it preserves the core gates, authority boundaries, verification and evidence requirements defined here.
+
+The optional `AS-AL` profile adds requirements for integrating Autonomous Loop as the inner execution protocol. Those profile requirements are defined in the [Autonomous Loop Integration Specification](/autonomous-loop-integration). A team MAY claim core conformance without claiming the `AS-AL` profile.
+
+## Core concepts
+
+### Agentic Sprint
+
+An **Agentic Sprint** is a governed execution window for one or more bounded work items. The work enters with approved intent, moves through explicit decision gates, and exits only when the required quality and release conditions have been met or the work has been stopped with a recorded reason.
+
+### Build Plan
+
+A **Build Plan** is the implementation proposal produced before agent-authored code is written. It records requirement interpretation, scope, affected systems, architecture, dependencies, security implications, test strategy, risks, rollback and acceptance-criteria traceability.
+
+### Execution run
+
+An **execution run** is the persistent record of one attempt to progress an approved plan. It contains the selected goals, actions, state transitions, failures, evidence and handovers. A run MAY span multiple model sessions or machines.
+
+### Human gate
+
+A **human gate** is a decision boundary that an authorised person must pass explicitly. A status update, automated label or agent statement is not a human gate.
+
+The minimum model has three gates:
+
+1. Build Plan approval before implementation.
+2. Engineering implementation acceptance after machine verification.
+3. Release or merge authority after product and quality assurance.
+
+An organisation MAY add gates for security, privacy, architecture, data migration or other risk classes.
+
+### Maker and Checker
+
+The **Maker** creates or changes an implementation. A **Checker** independently evaluates whether the work satisfies a defined condition. The Maker MUST NOT be the sole authority for checking its own work.
+
+Independence is a control property, not merely a title. It does not require a different model vendor or model family for every check. The relevant question is whether the Checker has a meaningful opportunity to detect the Maker's error.
+
+| Independence level | Practical meaning | Suitable use |
+| --- | --- | --- |
+| Mechanical | A deterministic check runs separately from the Maker's decision, such as compilation, schema validation or a test command | Baseline checks for every applicable change |
+| Contextual | A Checker receives the requirement, constraints and change independently rather than relying only on the Maker's summary | Requirements, architecture and test review |
+| Permission-based | The Checker cannot modify the implementation under review or suppress its own findings | Changes that need an auditable review boundary |
+| Human or functional | An authorised human, QA function or security function assesses the outcome from a distinct responsibility | High-risk, user-facing, security-sensitive or irreversible work |
+
+A low-risk change may use one agent service in separate Maker and Checker sessions when the task context, permissions and evidence are meaningfully separated. Higher-risk work should add human or functional independence. A second agent that receives only the Maker's conclusion is not strong independence.
+
+### Evidence
+
+**Evidence** is an attributable record that a condition was evaluated. Examples include test output, review findings, a static analysis result, an architecture decision, a QA report or a human approval record. A log that does not identify the condition, actor, time and result is weak evidence.
+
+Evidence supports a decision; it is not proof that software is correct, safe or fit for every context. Tests and reviews can be incomplete or can encode the wrong assumption.
+
+### Agent context
+
+**Agent context** includes repository instructions, architecture records, skills, domain rules, examples, quality criteria and other material supplied to an agent. Context is part of the execution environment and MUST be version controlled when it can change delivery behaviour.
+
+## Roles and authority
+
+The following roles describe responsibilities, not necessarily separate people or software identities.
+
+| Role | May do | MUST remain accountable for |
+| --- | --- | --- |
+| Product authority | Define intent, priority and acceptance criteria | The problem being solved and the acceptable outcome |
+| Plan approver | Review and approve a Build Plan | Scope, architectural direction and risk before implementation |
+| Coordinator | Create runs, assign goals and manage state | Correct routing and enforcement of run controls |
+| Maker | Inspect approved context and change an isolated workspace | Producing traceable implementation work, not acceptance |
+| Checker | Review, test or challenge the Maker output | Reporting findings without self-approval |
+| Senior or Staff Engineer | Evaluate design, code and technical risk | Engineering acceptance and material deviations |
+| Quality authority | Perform product, exploratory and regression assurance | Whether the delivered behaviour satisfies product quality |
+| Security authority | Assess security-sensitive work and exceptions | Acceptance of security risk or refusal of release |
+| Release authority | Merge, deploy or authorise a release | The production decision |
+| Context steward | Review durable changes to skills and instructions | The integrity and rollback of shared agent context |
+
+One person MAY hold several roles in a low-risk environment. The system MUST still preserve the required decision boundaries. For high-risk work, plan approval, implementation acceptance, security acceptance and release SHOULD be held by distinct authorised people or groups.
+
+## Lifecycle
+
+:::figure methodology-lifecycle
+The Agentic Sprint lifecycle. A work item passes through readiness, Build Plan creation, human plan approval, bounded execution, independent verification, engineering acceptance, QA and release authority. A separate learning path records reusable corrections after review.
+:::
+
+### 0. Readiness
+
+Before an item can enter an Agentic Sprint:
+
+- the intent and acceptance criteria MUST be recorded;
+- the responsible product authority MUST be known;
+- affected repositories or systems MUST be identified where reasonably possible;
+- the risk class and required approval roles MUST be assigned;
+- the agent execution boundary MUST be defined;
+- required context and tooling MUST be available;
+- prohibited actions MUST be explicit for the work item.
+
+If these conditions are not met, the item MUST remain outside autonomous execution or be assigned a preparation task. An agent MAY help identify missing information, but it MUST NOT silently invent acceptance criteria.
+
+### 1. Build Plan
+
+The planning agent assembles the requirement, repository context, architecture records, standards, existing patterns and test information. It produces a Build Plan with enough detail for a human to assess the intended change before implementation.
+
+At minimum, the plan MUST contain:
+
+- requirement interpretation;
+- scope and non-scope;
+- affected repositories, services and components;
+- proposed design and important alternatives;
+- dependency and sequencing information;
+- API, data and migration impact;
+- security, privacy and operational impact;
+- test and verification strategy;
+- failure and rollback approach;
+- acceptance-criteria traceability;
+- unresolved questions and assumptions.
+
+### 2. Human Gate 1: plan approval
+
+An authorised engineer MUST approve, reject or request changes to the Build Plan. Approval MUST be attributable and MUST identify the version of the plan that was approved.
+
+Human Gate 1 approves the interpreted intent and proposed plan. It does not approve the implementation, merge, production deployment or any scope that is absent from the reviewed plan.
+
+Approval authorises the stated scope. It does not authorise unrestricted repository access, production access or future changes that were not considered.
+
+If the plan changes materially after approval, the run MUST return to plan review. Minor editorial corrections MAY be recorded without reopening the gate if the organisation has a documented rule for doing so.
+
+### 3. Bounded execution
+
+The approved plan is decomposed into dependency-ordered goals. Agents MAY implement goals in parallel when their workspaces, interfaces and dependencies are isolated. The execution environment MUST enforce the permissions and repositories defined for the run.
+
+Every goal MUST have a completion condition. Where practical, that condition SHOULD be machine-verifiable. A goal MUST NOT be marked complete solely because an agent reports success.
+
+### 4. Independent verification
+
+The implementation MUST pass deterministic engineering controls that apply to the repository and risk class. These MAY include compilation, linting, unit tests, integration tests, contract tests, dependency checks, secret scanning, architecture checks and migration validation.
+
+Independent reviewers SHOULD evaluate requirements, architecture, security and test adequacy separately where the risk justifies it. Findings MUST be linked to the affected goal or acceptance criterion.
+
+### 5. Human Gate 2: engineering acceptance
+
+An authorised engineer reviews the approved plan, the implementation, deviations and evidence. The reviewer MUST be able to identify:
+
+- what changed;
+- why it changed;
+- which requirements it addresses;
+- which checks ran and their results;
+- which risks remain;
+- which parts differ from the approved plan.
+
+The engineer MAY accept, reject, request rework or escalate. Acceptance MUST NOT be inferred from a passing CI status.
+
+Human Gate 2 is engineering acceptance. It is distinct from QA product assurance and from Human Gate 3 release authority.
+
+### 6. Quality assurance
+
+Quality assurance evaluates behaviour against product intent and acceptance criteria. It SHOULD be independent of the implementation agent and SHOULD include exploratory or negative testing where automated checks cannot establish product behaviour.
+
+QA is an independent product-assurance activity. Its independence is functional: it does not require a separate vendor or model, but it does require a distinct question, evidence path and decision responsibility from the Maker's own checks.
+
+QA MAY return work for implementation rework. A rework cycle MUST preserve the earlier evidence and record what changed after the finding.
+
+### 7. Human Gate 3: release authority
+
+Merge or release MUST require the authorised release path for the environment. Agents MUST NOT merge or deploy to protected production paths unless the organisation has explicitly designed and approved a separate control model.
+
+Human Gate 3 retains merge and release authority. An agent's completion state, test result or review summary cannot replace that decision.
+
+The release decision MUST include the final implementation identity, relevant approvals, quality result, unresolved risk disposition and rollback information.
+
+### 8. Learning
+
+Human corrections SHOULD be reviewed for reuse. A correction that represents a general engineering rule MAY become a versioned skill, architecture instruction, test, example or review rule. Context changes MUST be reviewed, attributable and reversible.
+
+## State model
+
+The following states define the minimum delivery progression.
+
+| State | Meaning | Valid next states |
+| --- | --- | --- |
+| `READY` | The item has passed readiness checks | `PLANNING`, `BLOCKED` |
+| `PLANNING` | A Build Plan is being assembled | `PLAN_REVIEW`, `BLOCKED`, `CANCELLED` |
+| `PLAN_REVIEW` | A human decision is required | `APPROVED`, `PLANNING`, `REJECTED` |
+| `APPROVED` | A specific plan version is authorised | `EXECUTING`, `CANCELLED` |
+| `EXECUTING` | One or more goals are being worked | `VERIFYING`, `REWORK`, `BLOCKED`, `CANCELLED` |
+| `VERIFYING` | Automated and independent checks are running | `ENGINEERING_REVIEW`, `REWORK`, `BLOCKED` |
+| `REWORK` | A recorded finding requires another attempt | `EXECUTING`, `PLAN_REVIEW`, `BLOCKED`, `CANCELLED` |
+| `ENGINEERING_REVIEW` | A human engineer is assessing the implementation | `QA`, `REWORK`, `PLAN_REVIEW`, `BLOCKED` |
+| `QA` | Product and quality assurance are running | `RELEASE_REVIEW`, `REWORK`, `BLOCKED` |
+| `RELEASE_REVIEW` | Release authority is deciding | `RELEASED`, `REWORK`, `CANCELLED` |
+| `RELEASED` | The approved change entered its target environment | `LEARNING`, `CLOSED` |
+| `LEARNING` | Reusable corrections and outcomes are being assessed | `CLOSED`, `REWORK` |
+| `BLOCKED` | Progress cannot continue safely or technically | `PLANNING`, `EXECUTING`, `CANCELLED` |
+| `CANCELLED` | The run has stopped without release | `CLOSED` |
+| `CLOSED` | The run has a complete record | None |
+
+Implementations MAY use different storage or names, but they MUST preserve equivalent state meaning and transition evidence.
+
+## Required artefacts
+
+| Artefact | Created by | Required purpose |
+| --- | --- | --- |
+| Work item | Product authority | Records intent, scope and acceptance criteria |
+| Context manifest | Coordinator | Identifies instructions, versions, tools and permissions used |
+| Build Plan | Planning agent | Proposes the implementation before code changes |
+| Plan decision | Human plan approver | Authorises or rejects a specific plan version |
+| Goal ledger | Coordinator or execution protocol | Lists dependency-ordered, verifiable goals |
+| Change set | Maker agent | Identifies source, configuration, tests and documentation changes |
+| Verification record | Checkers and automation | Records checks, inputs, outputs and findings |
+| Review record | Human engineer | Records acceptance, rejection, rework or escalation |
+| QA record | Quality authority | Records product and regression assurance |
+| Release record | Release authority | Records the production or merge decision |
+| Learning proposal | Reviewer or context steward | Proposes durable context or process improvement |
+
+Evidence SHOULD be stored with or immutably linked to the run. A reference to a mutable dashboard without a retained result is insufficient for long-term auditability.
+
+## Minimum compliance criteria
+
+An implementation claiming **Agentic Sprint v0.1 core conformance** MUST satisfy all of the following:
+
+- [AS-CORE-001] A human-approved requirement exists before implementation begins.
+- [AS-CORE-002] A versioned Build Plan exists before agent-authored code is changed.
+- [AS-CORE-003] The plan identifies scope, affected systems, risks, tests and acceptance traceability.
+- [AS-CORE-004] Agent permissions are bounded to the approved execution scope.
+- [AS-CORE-005] Agent-created changes are isolated from protected release branches.
+- [AS-CORE-006] The Maker is not the sole Checker of its output.
+- [AS-CORE-007] Deterministic engineering controls run before human implementation acceptance.
+- [AS-CORE-008] A human engineer explicitly accepts or rejects the implementation.
+- [AS-CORE-009] Product or QA assurance is performed for the work's risk class.
+- [AS-CORE-010] Release authority is explicit and separate from an agent's completion claim.
+- [AS-CORE-011] Failures and rework preserve an attributable record.
+- [AS-CORE-012] The final record identifies the versions of the plan, context and change set.
+
+An organisation claiming a higher conformance profile SHOULD publish the additional controls, risk classes and evidence requirements that it uses.
+
+## Failure and exception handling
+
+Failure is a normal state transition, not an instruction to hide evidence. When a goal fails, the run MUST record the failed condition, attempted action, current workspace state, relevant output, next hypothesis and owner of the next decision.
+
+The system MUST stop or escalate when:
+
+- the work leaves the approved scope;
+- an agent requests a permission it was not granted;
+- a security or privacy boundary is uncertain;
+- acceptance criteria conflict;
+- evidence is missing or cannot be reproduced;
+- a protected branch or production boundary would be crossed;
+- repeated rework indicates a plan or requirement problem;
+- a human approval has expired or no longer matches the change.
+
+An exception MAY allow a different path only when an authorised human records the reason, risk, compensating controls, expiry and affected scope. An exception MUST NOT be used to turn an agent completion claim into release authority.
+
+## Conformance statement
+
+A team implementing this specification SHOULD publish a short statement in the following form:
+
+> This implementation conforms to Agentic Sprint Specification v0.1 for the declared work classes [classes]. It implements the required readiness, Build Plan, verification, human acceptance, QA and release controls. The following requirements are not implemented or are conditional: [list]. Evidence is retained at [location].
+
+This statement is intentionally bounded. Conformance describes process controls. It does not certify the correctness, safety or business value of any particular software change.
+
+## Exclusions and open questions
+
+This draft does not define a universal agent identity protocol, a cryptographic delegation format, a model evaluation benchmark or a specific orchestration product. It does not settle how much independence a Checker requires when multiple agents share a model or context source. It also does not prescribe one staffing ratio, sprint duration or economic outcome.
+
+Questions for future versions include:
+
+- How should conformance be assessed across regulated environments?
+- What evidence is sufficient when a check is probabilistic or exploratory?
+- How should a plan approval be revalidated after context or dependency changes?
+- Which metrics best expose review overload without rewarding unsafe speed?
+- How should independent human review be designed when implementation volume becomes very high?
+
+## Document status
+
+This is a draft specification. It is a methodology proposal for critique and implementation experiments, not an adopted industry standard. Future revisions should record changes to terminology, requirements and conformance criteria.

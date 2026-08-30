@@ -1,0 +1,223 @@
+---
+title: "Jira Story Template"
+description: "A reusable work-item record that gives an agentic delivery system clear intent, acceptance conditions, constraints and readiness evidence."
+date: "2026-08-20"
+updated: "2026-08-20"
+type: "technical"
+topics: ["Delivery & Organisations", "Agentic Systems"]
+tags: ["Jira", "user stories", "Definition of Ready", "acceptance criteria", "work intake"]
+featured: false
+pinned: false
+draft: false
+canonical: "/templates/jira-story"
+image: "/social/template-jira-story"
+series: "Agentic Sprint Templates"
+seriesOrder: 7
+version: "0.1"
+status: "Working template"
+documentKind: "Template"
+normative: false
+documentId: "T7"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D6"]
+claimClasses: ["methodology", "template", "authorial"]
+citation: "Dalugoda, Siri. Jira Story Template. Agentic Sprint Templates, v0.1, 20 August 2026. https://theagenticsprint.com/templates/jira-story"
+references: ["https://www.atlassian.com/agile/project-management/user-stories", "https://csrc.nist.gov/pubs/sp/800/218/final"]
+externalLinks: []
+---
+
+Use this template at work intake, before a Jira issue or equivalent work item can trigger planning. It is designed to make product intent legible to people and machines without reducing the work to a technical task list.
+
+This is an informative working artefact for adapting the Agentic Sprint. It is not an independent normative standard; teams should record their own decisions, controls and approval rules.
+
+The `T7-JIRA-*` labels below are local template cross-references. They are not methodology requirements and do not override D1 to D10. A `ready_for_agent` value permits planning only; it never permits implementation, merge or release.
+
+The Product Owner owns the outcome and acceptance conditions. Engineering confirms feasibility and dependencies. The work item is ready for an agent only when the human owner has accepted the intent, the risk tier is known and the machine-verifiable conditions are sufficiently precise.
+
+## When to use it
+
+- A product change, defect, risk reduction or technical improvement is entering the delivery queue.
+- An issue may be assigned to an agentic delivery system.
+- Several repositories, teams or operational dependencies are involved.
+- The team needs to distinguish a clear requirement from a request for discovery.
+
+If the desired outcome is not known, create a discovery item instead of allowing implementation work to start on an ambiguous story.
+
+## Ownership and approval
+
+- **Product owner:** owns user value, intent, acceptance and exclusions.
+- **Engineering owner:** confirms technical context, dependencies and delivery risk.
+- **Readiness reviewer:** records the Definition of Ready decision.
+- **Approval boundary:** `ready_for_agent: true` grants planning permission only. It does not approve implementation, merge or release.
+- **Required evidence:** source of intent, acceptance criteria, exclusions, risk tier, dependencies, observability and readiness checklist.
+- **Completion rule:** every required field is present, acceptance criteria are observable and the readiness reviewer records a decision.
+- **Failure path:** return the item to the product or engineering owner with named questions. Keep the status `needs-information` until the questions are answered.
+
+## Lifecycle mapping
+
+| Requirement ID | Story obligation | Agentic Sprint point |
+| --- | --- | --- |
+| T7-JIRA-001 | State the intended outcome, user value and source of authority. | Requirement intake |
+| T7-JIRA-002 | Define acceptance criteria that can be observed and verified. | Requirement intake |
+| T7-JIRA-003 | State exclusions, assumptions, constraints and risk tier. | Context assembly |
+| T7-JIRA-004 | Identify dependencies, data, security and operational effects. | Definition of Ready |
+| T7-JIRA-005 | Provide machine-verifiable conditions and evidence expectations. | Definition of Ready |
+| T7-JIRA-006 | Record the human readiness decision and its scope. | Agent trigger |
+
+## Writing prompts
+
+- What problem exists for which user or operator?
+- What will be observably different when this is complete?
+- What must not change?
+- What would make the request unsafe to implement without further approval?
+- Which acceptance criteria can be checked deterministically, and which require human or exploratory judgement?
+- How will a failed or partial operation be observed and recovered?
+
+## Copyable template
+
+````yaml
+story_id: [JIRA-123]
+story_version: "0.1"
+status: [draft | needs-information | ready-for-planning | in-progress | ready-for-review | done | cancelled]
+created_at: [YYYY-MM-DD]
+updated_at: [YYYY-MM-DD]
+product_owner: [name and role]
+engineering_owner: [name and role]
+readiness_reviewer: [name and role]
+
+intent:
+  as_a: [user, operator or system actor]
+  i_want: [capability or change]
+  so_that: [user or business outcome]
+  source: [customer evidence, decision, incident, regulation, research or other]
+  problem_statement: >-
+    [Describe the current problem and its consequence.]
+  desired_outcome: >-
+    [Describe the observable future state.]
+
+acceptance_criteria:
+  - id: AC-01
+    statement: [observable criterion]
+    priority: [must | should | could]
+    verification: [unit | integration | contract | UI | exploratory | operational review]
+    evidence_required: [test result, screenshot, trace, approval or other]
+  - id: AC-02
+    statement: [observable criterion]
+    priority: [must | should | could]
+    verification: [verification type]
+    evidence_required: [evidence]
+
+negative_and_boundary_cases:
+  - case: [invalid, duplicate, expired, unauthorised or unavailable condition]
+    expected_behaviour: [safe outcome]
+    evidence_required: [evidence]
+
+scope:
+  included:
+    - [capability or component]
+  excluded:
+    - [related item that is not included]
+  assumptions:
+    - [assumption and validation owner]
+  constraints:
+    - [security, privacy, compatibility, performance, policy or delivery constraint]
+
+risk_and_impact:
+  risk_tier: [low | moderate | high | critical]
+  impact_areas: [security, privacy, data, financial, operational, regulatory, customer or other]
+  irreversibility: [reversible | partially-reversible | irreversible]
+  human_approval_points:
+    - [plan approval, risk acceptance, QA acceptance or release authority]
+  affected_users_or_tenants: [description]
+
+dependencies:
+  upstream:
+    - id: [dependency]
+      owner: [owner]
+      required_state: [state]
+      evidence: [link]
+  downstream:
+    - [consumer, report, process or service]
+  related_work:
+    - "[issue or decision]"
+
+technical_context:
+  repositories:
+    - "[repository]"
+  components:
+    - "[component]"
+  architecture_context: [path and version]
+  known_patterns:
+    - "[pattern]"
+  prohibited_patterns:
+    - "[pattern]"
+  data_classification: [public | internal | confidential | restricted]
+  interface_changes: [none or description]
+  migration_changes: [none or description]
+
+security_and_privacy:
+  principals:
+    - "[principal]"
+  required_permissions:
+    - "[least-privilege permission]"
+  trust_boundaries:
+    - "[boundary]"
+  sensitive_data: [none or description]
+  threats_to_assess:
+    - "[threat]"
+  security_assessment: [link or required]
+
+observability_and_operations:
+  logs: [events, fields and redaction]
+  metrics: [metric and expected signal]
+  traces: [span or correlation requirement]
+  alerts: [alert or none]
+  runbook: [link or required]
+  rollback_or_recovery: [description]
+
+machine_verifiable_conditions:
+  - id: MVC-01
+    condition: [condition that a tool can check]
+    command_or_query: [command, query or test]
+    expected_result: [result]
+    evidence_location: [path or link]
+  - id: MVC-02
+    condition: [condition]
+    command_or_query: [command, query or test]
+    expected_result: [result]
+    evidence_location: [path or link]
+
+definition_of_ready:
+  checklist:
+    - [ ] intent and user value are clear
+    - [ ] acceptance criteria are observable
+    - [ ] exclusions are recorded
+    - [ ] dependencies have owners and required states
+    - [ ] risk tier and affected data are recorded
+    - [ ] architecture context is identified
+    - [ ] machine-verifiable conditions are defined
+    - [ ] security and operational questions have owners
+    - [ ] human planning authority is named
+  decision: [not-ready | ready-for-planning]
+  decision_scope: [what the decision permits]
+  decision_evidence: [link]
+  decision_at: [timestamp]
+
+agent_trigger:
+  ready_for_agent: [true | false]
+  trigger_event: [status change, assignment or webhook]
+  permitted_next_step: [planning only]
+  forbidden_next_steps: [implementation, merge, release or other]
+
+traceability:
+  - requirement_id: T7-JIRA-001
+    evidence: [link]
+  - requirement_id: T7-JIRA-005
+    evidence: [link]
+````
+
+## Short example
+
+Instead of writing “add cancellation”, a useful criterion says: “A scheduled payment with no processing timestamp changes to `Cancelled`; a payment with a processing timestamp is rejected; repeating the same request returns the same safe outcome; an audit event is recorded.” The story should still identify the product owner, permissions, failure evidence and release implications.
+
+The Atlassian reference gives general user-story guidance and NIST provides adjacent secure development practice. Neither source defines Agentic Sprint readiness or authorises an agent to implement a story.

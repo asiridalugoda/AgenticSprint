@@ -1,0 +1,452 @@
+---
+title: "Build Plan Standard"
+description: "A reusable standard for producing, reviewing and approving the plan required before agentic implementation begins."
+date: "2026-08-05"
+updated: "2026-08-05"
+type: "technical"
+topics: ["Agentic Systems", "Engineering", "Delivery & Organisations"]
+tags: ["build plans", "human gates", "architecture", "verification", "software delivery"]
+featured: false
+pinned: false
+draft: false
+canonical: "/build-plan-standard"
+image: "/social/build-plan-standard"
+series: "Agentic Sprint Methodology"
+seriesOrder: 5
+version: "0.1"
+status: "Draft standard"
+documentId: "D5"
+documentKind: "standard"
+normative: true
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D2", "D3", "D4"]
+claimClasses: ["normative-methodology", "proposed-standard", "implementation-guidance"]
+citation: "Dalugoda, Siri. Build Plan Standard. Agentic Sprint Methodology, v0.1, 5 August 2026. https://theagenticsprint.com/build-plan-standard"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations"]
+externalLinks: []
+---
+
+This document defines the minimum content and review process for a Build Plan in an Agentic Sprint. A Build Plan is the artefact that connects an approved product requirement to an authorised implementation effort. It is reviewed at Human Gate 1. A Maker MUST NOT begin implementation for a governed work item until a human approver records a decision on the plan.
+
+The standard is deliberately tool-neutral. A team MAY store a Build Plan in a pull request, issue, document repository or delivery system, provided the record is durable, versioned and accessible to the people and agents that need it.
+
+## Status and language
+
+This is a draft standard for critique and implementation experiments. It is not an industry standard, a claim about current agent capability or evidence that the operating model improves delivery outcomes in every environment.
+
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **NOT RECOMMENDED**, **MAY** and **OPTIONAL** in this document are to be interpreted as described in [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html) when, and only when, they appear in all capitals.
+
+Requirements in this standard use the `AS-BP-NNN` namespace. They are companion requirements under D1 and MUST NOT weaken D1 core requirements.
+
+## Purpose
+
+A work item is ready for autonomous execution only when a human can answer four questions:
+
+- What outcome is required?
+- What is the proposed boundary of the change?
+- How will the team detect an incorrect or incomplete result?
+- Which decisions remain with a human before implementation or release?
+
+The Build Plan makes those answers explicit. It is not a prompt for a coding agent and it is not a substitute for product discovery. It is an engineering decision record that makes the proposed work inspectable before code changes begin.
+
+The plan SHOULD be detailed enough for an engineer who did not write it to challenge the design, identify material omissions and approve a bounded implementation. It SHOULD be concise enough to review without reconstructing the entire system from scratch.
+
+## Conformance model
+
+A conforming Build Plan has all of the following properties:
+
+- [AS-BP-001] It identifies the source requirement and its acceptance criteria.
+- [AS-BP-002] It names the responsible human approver and the intended risk tier.
+- [AS-BP-003] It separates included work from explicit non-scope.
+- [AS-BP-004] It identifies affected repositories, components, interfaces and data.
+- [AS-BP-005] It explains the proposed design and at least the material alternatives considered.
+- [AS-BP-006] It defines verification conditions that can be tested or inspected.
+- [AS-BP-007] It records security, privacy, dependency, migration and rollback considerations.
+- [AS-BP-008] It maps each acceptance criterion to implementation evidence and a test or review.
+- [AS-BP-009] It records approval, rejection or revision with an immutable history.
+
+An agent MAY prepare a first draft. A human with appropriate technical authority MUST approve the plan before the implementation state changes from `planned` to `authorised`.
+
+:::figure build-plan-gate
+The Build Plan moves a requirement through context assembly, design and evidence planning before a human approval gate authorises bounded autonomous implementation. Rejected plans return to a versioned revision state.
+:::
+
+## Required record
+
+The following metadata SHOULD appear at the top of the record:
+
+| Field | Requirement |
+| --- | --- |
+| Plan identifier | MUST be stable across revisions, for example `BP-2026-014`. |
+| Requirement reference | MUST link to the source issue, brief or approved change request. |
+| Version | MUST increment when the substance of the plan changes. |
+| Author | MUST identify the agent, person or team that prepared the revision. |
+| Risk tier | MUST use the delivery team's declared risk scale. |
+| Affected scope | MUST name repositories, services, applications or infrastructure in scope. |
+| Approval state | MUST be `draft`, `needs-revision`, `approved` or `rejected`. |
+| Decision record | MUST capture approver, timestamp, decision and rationale. |
+
+The record SHOULD also include links to relevant architecture context, repository instructions, previous decisions, threat models and test environments. Links are evidence of context, not evidence that the linked material was actually considered. The plan should state which sources were used.
+
+## Requirement interpretation
+
+The plan MUST restate the requirement in precise engineering language. It MUST preserve the intent of the source requirement while making assumptions visible.
+
+At minimum, include:
+
+- the user, system or operator affected;
+- the desired outcome;
+- the triggering event;
+- the relevant preconditions;
+- success conditions;
+- failure and rejection behaviour;
+- permission or tenancy constraints;
+- timing, consistency or availability expectations where material;
+- terms that have more than one plausible interpretation.
+
+The author SHOULD quote or link the source acceptance criteria, then explain any interpretation that is not obvious from the source. If the plan cannot distinguish between two materially different behaviours, the plan MUST record an unresolved decision rather than silently selecting one.
+
+### Example
+
+Requirement: a customer may cancel a scheduled payment before processing.
+
+Interpretation:
+
+- `Scheduled` is eligible for cancellation.
+- `Processing` and `Processed` are not eligible unless a separate reversal flow exists.
+- a successful cancellation creates one audit event;
+- a repeated request is idempotent and does not create duplicate side effects;
+- only an authorised customer or permitted operator may request the change.
+
+The example is illustrative. It does not define a payment domain or imply that the same state model applies elsewhere.
+
+## Scope and non-scope
+
+The plan MUST define the boundary of the work in terms that an implementation agent can use to stop. It MUST contain two separate lists.
+
+### In scope
+
+List the behaviours, components, interfaces, data changes, tests, documentation and operational changes that are required for the stated outcome.
+
+### Explicitly out of scope
+
+List adjacent work that a capable agent might reasonably attempt but that is not authorised. Examples include a broad data migration, a redesign of an unrelated UI, a new permission model, a change to production infrastructure or a refactoring that is not needed for the outcome.
+
+An item that is merely forgotten is not non-scope. If an omission could change the risk or acceptance decision, it belongs under unresolved decisions or risks.
+
+## Affected repositories and components
+
+The plan MUST identify the actual change surface. It SHOULD distinguish confirmed impact from an agent's hypothesis.
+
+For each repository or deployable unit, record:
+
+- repository name and revision inspected;
+- branch or worktree strategy;
+- service, application, package or module;
+- entry points and public interfaces;
+- owners or reviewers required;
+- expected files or component boundaries, where known;
+- test suites and build commands;
+- whether the repository is read-only context or an authorised change target.
+
+The list MAY include repositories that require no changes but MUST be inspected to validate a contract or dependency. That distinction prevents an agent from treating every inspected repository as an implementation target.
+
+## Constraints
+
+The plan MUST state constraints that affect design or verification. Relevant constraints may include:
+
+- supported runtime, language and framework versions;
+- backwards compatibility and versioning rules;
+- latency, throughput, availability or cost limits;
+- data residency and retention requirements;
+- privacy, financial, safety or regulatory obligations;
+- approved libraries, platform services or infrastructure;
+- deployment windows and migration sequencing;
+- accessibility and supported client environments;
+- repository instructions and architecture invariants;
+- limits on agent tools, credentials, network access or execution time.
+
+Constraints SHOULD be separated into hard constraints and preferences. A preference MUST NOT be presented as a blocking invariant.
+
+## Architecture and alternatives
+
+The plan MUST explain the proposed design at the level needed for a safe implementation. It SHOULD include:
+
+- the components involved and their responsibilities;
+- trust boundaries and data ownership;
+- state changes and invariants;
+- synchronous and asynchronous interactions;
+- error handling and retry behaviour;
+- compatibility with existing patterns;
+- operational and support implications.
+
+The author MUST record material alternatives that were considered. For each alternative, state why it was rejected or deferred. A short table is usually enough:
+
+| Option | Benefit | Cost or risk | Decision |
+| --- | --- | --- | --- |
+| Extend the existing application service | Reuses domain rules and observability | Requires a coordinated API change | Proposed |
+| Add logic at the controller boundary | Small initial diff | Risks bypassing shared rules | Rejected |
+| Introduce a new service | Strong isolation | Adds deployment and operational complexity | Deferred |
+
+The plan MUST NOT treat an agent's first design as the only available design. A human reviewer needs enough information to assess whether the chosen boundary is proportionate to the requirement.
+
+## Sequence and data flow
+
+The plan SHOULD include a sequence diagram for material interactions and a data-flow description for information that crosses components. Use a diagram or structured table rather than a paragraph containing a long chain of arrows.
+
+The sequence MUST identify:
+
+- the initiating actor;
+- each system or agent that handles the request;
+- authorisation checks;
+- writes and side effects;
+- retries, timeouts and idempotency keys;
+- the response or terminal state.
+
+The data-flow description MUST state where sensitive, financial, personal or security-relevant data enters, moves, is transformed, is logged and is deleted or retained. If the flow is not yet known, the plan MUST mark that uncertainty as blocking for the relevant risk tier.
+
+## API and database impact
+
+The plan MUST explicitly state whether an API or database is affected, even when the answer is no.
+
+For an API change, include:
+
+- endpoint, event or contract;
+- request and response shape;
+- authentication and authorisation behaviour;
+- validation and error responses;
+- idempotency and concurrency expectations;
+- compatibility and versioning approach;
+- contract tests and consumer impact.
+
+For a database change, include:
+
+- schema, table or collection impact;
+- new, changed or removed fields;
+- constraints, indexes and data invariants;
+- migration and rollback strategy;
+- backfill volume and performance considerations;
+- read and write compatibility during rollout;
+- retention, privacy and access implications.
+
+If there is no impact, write `No API impact` or `No database impact` and explain how that conclusion was checked.
+
+## Security and privacy
+
+The plan MUST describe the security boundary of the change. At minimum, cover:
+
+- identity and authentication;
+- authorisation and least privilege;
+- tenant or account isolation;
+- secrets and credentials;
+- input validation and output handling;
+- sensitive data exposure and logging;
+- dependency and supply-chain risk;
+- abuse cases and privilege escalation;
+- security tests and review ownership.
+
+The plan MUST distinguish authentication, which establishes who or what is presenting a credential, from authority, which determines what action is permitted in context. A valid identity does not by itself authorise every operation.
+
+For agent-authored work, also record the agent role, tools, repository permissions, network permissions and human approvals required. A Build Plan does not grant production authority. Production access and release decisions remain governed by the delivery system's security model.
+
+Security planning SHOULD align with the secure development practices in [NIST SP 800-218](https://csrc.nist.gov/pubs/sp/800/218/final) and the risk-management framing in the [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework), adapted to the actual system and risk tier.
+
+## Dependencies
+
+The plan MUST identify dependencies that can block, change or invalidate the implementation. Include:
+
+- internal services and contracts;
+- external providers and SDKs;
+- libraries, versions and licences;
+- feature flags and configuration;
+- migrations or shared infrastructure;
+- test data and environment readiness;
+- decisions owned by another team;
+- timing or sequencing dependencies.
+
+Each dependency SHOULD have an owner, a required-by point and a fallback or escalation path. An unverified dependency MUST NOT be described as available merely because a package, endpoint or issue exists.
+
+## Migration and rollback
+
+The plan MUST describe how the change is introduced and how it can be reversed safely. Where relevant, include:
+
+- expand and contract sequence;
+- feature flag or dark-launch behaviour;
+- data backfill and reconciliation;
+- compatibility between old and new versions;
+- rollback trigger and decision owner;
+- code rollback, data rollback and operational rollback;
+- treatment of partially completed work;
+- monitoring required during and after migration.
+
+If rollback is not technically possible, the plan MUST say so and define compensating controls, recovery procedures and the human authority required to proceed.
+
+## Test strategy
+
+The plan MUST map the requirement to a layered verification strategy. It SHOULD include only tests that answer a clear risk or acceptance question.
+
+| Layer | Question answered | Evidence expected |
+| --- | --- | --- |
+| Unit | Does the local rule behave correctly at boundaries? | Test result and changed test source |
+| Integration | Do the collaborating components honour the contract? | Environment, test result and logs |
+| Contract | Are producer and consumer assumptions compatible? | Contract result and version |
+| End to end | Does the user or operator outcome work across the system? | Scenario result and test data reference |
+| Security | Can an unauthorised or malformed action cross the boundary? | Finding or clean result from the defined checks |
+| Exploratory or QA | Does behaviour make sense beyond encoded cases? | Human test notes and evidence |
+
+The plan MUST identify negative cases, boundary conditions, concurrency, retries and failure recovery where they affect correctness. It MUST state which checks are deterministic and which require human judgement.
+
+## Observability
+
+The plan MUST specify how the team will know whether the change works after implementation. Include, where applicable:
+
+- structured events and correlation identifiers;
+- metrics and expected direction or thresholds;
+- logs, redaction and retention;
+- traces across service boundaries;
+- dashboards or queries used for review;
+- alerts and on-call ownership;
+- audit evidence for sensitive decisions.
+
+Observability is not an invitation to log secrets or personal data. The plan SHOULD specify the minimum useful evidence and its retention boundary.
+
+## Risks
+
+The plan MUST maintain a risk register. A useful record contains:
+
+| Risk | Likelihood | Impact | Control | Owner | Residual uncertainty |
+| --- | --- | --- | --- | --- | --- |
+| A downstream consumer assumes the old state transition | Medium | High | Contract test and compatibility period | Named owner | Consumer inventory incomplete |
+
+Risks SHOULD be tied to an observable condition or decision. Generic statements such as `there may be bugs` do not help a reviewer decide whether the plan is safe to approve.
+
+The plan MUST call out risks caused by the agentic process itself, such as:
+
+- incomplete repository discovery;
+- incorrect interpretation of domain terms;
+- a Maker changing tests to hide a failure;
+- parallel branches diverging from the approved design;
+- sensitive context entering an external model;
+- a Maker retrying beyond the intended scope;
+- review volume exceeding human capacity.
+
+## Acceptance-criteria traceability
+
+Every source acceptance criterion MUST map to an implementation element and one or more verification activities. The traceability table is part of the approval evidence.
+
+| Criterion | Implementation location | Verification | Evidence required | Owner |
+| --- | --- | --- | --- | --- |
+| Future scheduled items can be cancelled | Payment domain and API | Unit, integration and API contract tests | Test run and review result | Engineering |
+| Cancellation is recorded | Audit event handler | Integration test and audit inspection | Event record in test environment | QA |
+
+The plan MUST also list important non-functional requirements that are not expressed as user-facing acceptance criteria. A criterion without a verification method is incomplete.
+
+## Unresolved decisions
+
+The plan MUST contain an explicit list of unresolved decisions. Each item should include:
+
+- the question;
+- why it matters;
+- options known so far;
+- the decision owner;
+- the latest safe decision point;
+- the state that is blocking, non-blocking or accepted as risk.
+
+An agent MUST NOT convert an unresolved blocking decision into an assumption without recording the change and obtaining the required approval. A human MAY approve a plan with non-blocking uncertainty if the approval record states the accepted risk and the condition for revisiting it.
+
+## Approval, rejection and revision
+
+Human Gate 1 is a decision, not a passive acknowledgement.
+
+### Approval
+
+An approver MAY approve when the plan is sufficiently clear for the stated risk tier, the scope is bounded, the verification conditions are credible and the remaining uncertainty is explicitly accepted. Approval MUST identify the plan version. A later material change invalidates that approval until the changed version is reviewed.
+
+### Rejection
+
+An approver SHOULD reject the plan when any of the following applies:
+
+- the requirement is materially ambiguous;
+- the affected boundary is unknown;
+- security or privacy impact is not assessed;
+- the proposed design violates a known architecture invariant;
+- acceptance criteria cannot be verified;
+- the implementation scope exceeds the authority granted;
+- rollback or recovery is missing for a material irreversible change;
+- the reviewer lacks the authority or evidence required for the risk tier.
+
+Rejection MUST include a reason that a later author can act on. `Try again` is not sufficient evidence.
+
+### Revision
+
+Revision creates a new version linked to the prior record. The author MUST summarise what changed, why it changed and whether the affected risk, scope, dependencies or acceptance mapping changed. The previous version MUST remain readable. An agent MAY prepare the revision, but a human MUST decide whether the new version is approved.
+
+Recommended state transitions are:
+
+| Current state | Event | Next state |
+| --- | --- | --- |
+| `draft` | Submitted for review | `in-review` |
+| `in-review` | Material omission found | `needs-revision` |
+| `in-review` | Sufficient and authorised | `approved` |
+| `in-review` | Unsafe or invalid proposal | `rejected` |
+| `needs-revision` | New version submitted | `in-review` |
+| `approved` | Material scope or design change | `needs-revision` |
+
+## Approval record
+
+The final section of a Build Plan MUST contain a decision record. A minimal form is:
+
+| Field | Value |
+| --- | --- |
+| Decision | `approved`, `rejected` or `needs-revision` |
+| Plan version | The exact version reviewed |
+| Approver | Human name or accountable role |
+| Date and time | Timestamp with timezone |
+| Conditions | Constraints attached to the decision |
+| Rationale | Concise explanation of the decision |
+| Follow-up | Open actions, owners and due points |
+
+An approval authorises only the scope and permissions described in that version. It does not approve a merge, production deployment or change to security controls.
+
+## Minimal reusable template
+
+The following outline is intentionally plain so it can be adapted to an issue, document or repository file.
+
+```text
+Plan ID and version:
+Requirement reference:
+Risk tier:
+Author and date:
+
+Requirement interpretation:
+In scope:
+Explicitly out of scope:
+Affected repositories and components:
+Constraints:
+Proposed architecture:
+Alternatives considered:
+Sequence and data flow:
+API impact:
+Database impact:
+Security and privacy:
+Dependencies:
+Migration and rollback:
+Test strategy:
+Observability:
+Risks and controls:
+Acceptance-criteria traceability:
+Unresolved decisions:
+
+Approval record:
+Revision history:
+```
+
+## Limitations
+
+This standard cannot make an incomplete requirement complete, determine whether a design is correct or replace a human who understands the system's risk. A well-formed plan can still contain a false assumption. Implementation agents can also diverge from the approved plan, which is why plan comparison, independent verification and human implementation review remain separate controls.
+
+The standard does not prescribe a particular model, orchestrator, issue tracker or diagram format. It also does not grant an agent authority to access production systems or release software.
+
+## Document status and limitations
+
+Draft standard, version 0.1. This document is a proposed methodology component for critique, implementation and revision. It reports no measured adoption or delivery benefit.

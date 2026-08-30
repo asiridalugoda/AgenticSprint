@@ -1,0 +1,204 @@
+---
+title: "Review Evidence Template"
+description: "A structured independent Checker record for testing implementation claims before Human Gate 2."
+date: "2026-08-18"
+updated: "2026-08-18"
+type: "technical"
+topics: ["Agentic Systems", "Engineering"]
+tags: ["maker checker", "code review", "verification evidence", "human gate 2", "residual risk"]
+featured: false
+pinned: false
+draft: false
+canonical: "/templates/review-evidence"
+image: "/social/template-review-evidence"
+series: "Agentic Sprint Templates"
+seriesOrder: 5
+version: "0.1"
+status: "Working template"
+documentKind: "Template"
+normative: false
+documentId: "T5"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D9"]
+claimClasses: ["methodology", "template", "authorial"]
+citation: "Dalugoda, Siri. Review Evidence Template. Agentic Sprint Templates, v0.1, 18 August 2026. https://theagenticsprint.com/templates/review-evidence"
+references: ["https://docs.github.com/en/copilot/how-tos/use-copilot-agents/review-copilot-output", "https://csrc.nist.gov/pubs/sp/800/218/final"]
+externalLinks: []
+---
+
+Use this template after a Maker agent has produced an implementation and the deterministic checks have run. The record belongs to an independent Checker. The Checker should use the requirement, approved Build Plan, architecture context and verification outputs, but should not rely only on the Maker's explanation.
+
+This is an informative working artefact for adapting the Agentic Sprint. It is not an independent normative standard; teams should record their own decisions, controls and approval rules.
+
+The `T5-REV-*` labels below are local template cross-references. They are not methodology requirements and do not override D1 to D10. This record supplies independent checking evidence for Human Gate 2; it does not itself make the Gate 2 decision or authorise release.
+
+The review is evidence for Human Gate 2. It is not a release decision and it is not a claim that the software is free from defects. A pass means the stated review scope has no unresolved blocking finding at the time of review.
+
+## When to use it
+
+- A pull request or change set is ready for independent review.
+- A machine review swarm has completed its checks.
+- A security, architecture or requirements review needs a durable record.
+- A human engineer needs a compact, auditable review package.
+
+## Independence rule
+
+The Maker is not the Checker. The Checker must be a different agent instance, person or review function with separate decision authority. If organisational constraints make that impossible, record the exception and require a human reviewer to compensate for the conflict.
+
+## Ownership and approval
+
+- **Checker:** performs and records the review.
+- **Review owner:** ensures the Checker is independent and the scope is adequate.
+- **Human decision owner:** accepts, rejects or requests rework at Human Gate 2.
+- **Approval boundary:** this record recommends `accept`, `rework` or `blocked`; it does not approve merge or release.
+- **Required evidence:** reviewed commit, requirements, plan version, checks, findings, deviations, residual risk and disposition.
+- **Completion rule:** every in-scope criterion has a finding status and evidence, with no unowned blocking finding.
+- **Failure path:** return the change to the Maker or escalate to the human decision owner. Preserve the original review when rework begins.
+
+## Lifecycle mapping
+
+| Requirement ID | Review obligation | Agentic Sprint point |
+| --- | --- | --- |
+| T5-REV-001 | Identify the change, scope, reviewer and independence basis. | Machine review |
+| T5-REV-002 | Compare the implementation with approved intent and plan. | Human Gate 2 preparation |
+| T5-REV-003 | Record evidence for requirements, architecture, quality and security checks. | Verification |
+| T5-REV-004 | Separate findings, observations, assumptions and residual risk. | Verification |
+| T5-REV-005 | Record deviations and whether they were approved. | Human Gate 2 |
+| T5-REV-006 | Provide a clear disposition and owner for every unresolved item. | Human Gate 2 |
+
+## Review prompts
+
+- What did the implementation change that the plan did not predict?
+- Which acceptance criteria were verified independently?
+- What evidence would be missing if the test suite were wrong?
+- Did the change introduce a new boundary, permission or data exposure?
+- Are negative cases and failure paths covered?
+- Which findings block acceptance, and who has authority to accept residual risk?
+
+## Copyable template
+
+````markdown
+## Independent Review Record: [review-id]
+
+### 1. Review identity
+
+- review_id: [unique identifier]
+- review_version: [0.1]
+- work_item_id: [issue or story]
+- plan_id: [approved Build Plan and version]
+- change_id: [pull request, commit or release candidate]
+- reviewed_repository: [URL]
+- reviewed_commit: [full commit hash]
+- review_status: [draft | in-review | rework | blocked | recommended-accept | closed]
+- checker: [name or agent identifier]
+- checker_role: [Code Reviewer | Requirements Verifier | Security Reviewer | other]
+- maker: [name or agent identifier]
+- independence_basis: [different person, instance, permissions, context or exception]
+- review_owner: [name and role]
+- review_started_at: [timestamp]
+- review_completed_at: [timestamp]
+
+### 2. Review scope
+
+**Included:**
+- [repository, path, service or behaviour]
+
+**Excluded:**
+- [explicitly excluded area and reason]
+
+**Sources reviewed:**
+- requirement: [link]
+- approved_plan: [link]
+- architecture_context: [link and version]
+- change_set: [link]
+- verification_bundle: [link]
+- security_assessment: [link or not-applicable]
+
+### 3. Automated evidence
+
+| Check | Version or command | Result | Evidence | Reviewed by |
+| --- | --- | --- | --- | --- |
+| Build or compile | [command] | [pass | fail] | [link] | [name] |
+| Unit tests | [command] | [pass | fail] | [link] | [name] |
+| Integration or contract tests | [command] | [pass | fail | not-run] | [link] | [name] |
+| Static analysis | [command] | [pass | fail | not-run] | [link] | [name] |
+| Dependency or secret scan | [command] | [pass | fail | not-run] | [link] | [name] |
+
+**Evidence limitation:**
+[State what these checks do not establish.]
+
+### 4. Requirements review
+
+| Criterion ID | Requirement | Implementation evidence | Independent check | Status | Finding |
+| --- | --- | --- | --- | --- | --- |
+| AC-01 | [criterion] | [path or commit] | [test, inspection or scenario] | [met | unmet | unknown] | [finding id or none] |
+
+### 5. Architecture and design review
+
+| Check | Observation | Evidence | Status |
+| --- | --- | --- | --- |
+| Boundary ownership | [observation] | [link] | [pass | fail | unknown] |
+| Invariants | [observation] | [link] | [pass | fail | unknown] |
+| Interface compatibility | [observation] | [link] | [pass | fail | unknown] |
+| Failure handling | [observation] | [link] | [pass | fail | unknown] |
+| Observability | [observation] | [link] | [pass | fail | unknown] |
+
+### 6. Findings
+
+| Finding ID | Severity | Category | Location | Observation | Required action | Owner | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| RV-01 | [info | low | moderate | high | critical] | [category] | [path] | [specific finding] | [action] | [owner] | [open | fixed | accepted | deferred] |
+
+**Finding categories:**
+
+- correctness
+- requirement mismatch
+- architecture
+- security
+- privacy
+- reliability
+- maintainability
+- test gap
+- evidence gap
+- operational readiness
+
+### 7. Deviations and assumptions
+
+| Deviation ID | Approved plan statement | Actual change | Reason | Approval or escalation | Status |
+| --- | --- | --- | --- | --- | --- |
+| DEV-01 | [statement] | [change] | [reason] | [decision link] | [accepted | open | rejected] |
+
+**Unverified assumptions:**
+- [assumption, consequence and owner]
+
+### 8. Residual risk
+
+| Risk | Likelihood | Impact | Existing control | Remaining uncertainty | Risk owner | Acceptance decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| [risk] | [low | moderate | high] | [low | moderate | high] | [control] | [uncertainty] | [owner] | [open | accepted | rejected] |
+
+### 9. Disposition
+
+- recommendation: [accept for Human Gate 2 | rework | blocked]
+- blocking_findings:
+  - "[finding-id]"
+- required_rework: [work required before another review]
+- human_decision_owner: [name and role]
+- human_gate_2_decision: [pending | accepted | rejected | rework]
+- decision_evidence: [link]
+- decision_at: [timestamp]
+
+### 10. Traceability
+
+| Requirement ID | Evidence | Reviewer note |
+| --- | --- | --- |
+| T5-REV-001 | [link] | [note] |
+| T5-REV-003 | [link] | [note] |
+| T5-REV-006 | [link] | [note] |
+````
+
+## Completion check
+
+Close the review only after all findings are fixed, explicitly accepted by the correct human role or carried into an agreed rework record. A passing automated check may support a review, but it does not replace independent judgement or product assurance.
+
+The GitHub reference describes review of agent output. The secure software development reference provides adjacent practice. Neither source defines this review record or the Agentic Sprint gates.

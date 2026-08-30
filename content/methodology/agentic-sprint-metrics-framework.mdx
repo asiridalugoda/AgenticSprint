@@ -1,0 +1,424 @@
+---
+title: "Agentic Sprint Metrics Framework"
+description: "A balanced measurement framework for agentic delivery that connects flow, quality, economics, learning and safety without reducing engineering to velocity."
+date: "2026-08-10"
+updated: "2026-08-10"
+type: "technical"
+topics: ["Agentic Systems", "Delivery & Organisations", "Engineering"]
+tags: ["engineering metrics", "agentic delivery", "quality measurement", "human intervention", "software economics"]
+featured: false
+pinned: false
+draft: false
+canonical: "/metrics"
+image: "/social/metrics"
+series: "Agentic Sprint Methodology"
+seriesOrder: 10
+documentId: "D10"
+documentKind: "framework"
+normative: true
+version: "0.1"
+status: "Draft metrics framework"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D3", "D6", "D8", "D9"]
+claimClasses: ["methodology", "measurement-framework", "operational-metrics"]
+citation: "Dalugoda, Siri. Agentic Sprint Metrics Framework. Agentic Sprint Methodology, v0.1, 10 August 2026. https://theagenticsprint.com/metrics"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework", "https://opentelemetry.io/docs/concepts/signals/", "https://slsa.dev/spec/v1.2/provenance"]
+externalLinks: ["https://opentelemetry.io/docs/concepts/signals/", "https://slsa.dev/spec/v1.2/provenance"]
+---
+
+## Abstract
+
+An Agentic Sprint changes where software work is performed and where delivery risk accumulates. Agents may plan, implement, test, review and recover in parallel. Humans still own intent, architecture, acceptance and release. A useful measurement system must therefore describe more than how many work items were completed.
+
+This framework defines a balanced set of metrics for agentic delivery. It covers flow, quality, economics, learning and safety. Each metric has a formula, unit, collection boundary, interpretation, gaming risk and recommended use. The framework also defines a measurement unit, event contract, cohort rules and a balanced scorecard so that an organisation can compare changes over time without turning a single number into a target that damages the system.
+
+The framework is deliberately cautious about autonomy claims. A lower review time may indicate better context and clearer work. It may also indicate skipped gates or superficial review. Every capacity indicator must therefore be read alongside quality and safety indicators.
+
+## Status and scope
+
+| Field | Definition |
+| --- | --- |
+| Document | Agentic Sprint Metrics Framework |
+| Version | 0.1 |
+| Status | Draft metrics framework |
+| Applies to | Agentic Sprint work items, Autonomous Loop executions and their human gates |
+| Primary concern | Comparable, balanced and abuse-resistant delivery measurement |
+| Out of scope | A universal productivity target, model benchmark or financial accounting standard |
+
+This is a proposed measurement framework. It does not claim that the metrics predict engineering value, prove software quality or demonstrate that an organisation is ready for high autonomy.
+
+## Normative language
+
+The key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html) when, and only when, they appear in capitals.
+
+## Requirement identifiers and precedence
+
+This document uses identifiers in the form `D10-MF-###` for measurement-framework controls. Metric definitions use the same prefix with an `M` marker, such as `D10-MF-M01`. These identifiers are local to this document and do not add or replace requirements in D1, the Agentic Sprint Specification v0.1. D1 remains the normative root. This framework elaborates measurement and evidence practices within D1's lifecycle. Where this document conflicts with D1, D1 prevails.
+
+| ID | Control |
+| --- | --- |
+| `D10-MF-001` | An organisation MUST define metrics over accepted outcomes and MUST NOT treat generated activity as accepted delivery by itself. |
+| `D10-MF-002` | Every rate MUST publish its numerator, denominator, unit and collection boundary. |
+| `D10-MF-003` | Events used for comparison MUST be linked to stable work, execution, goal, change and decision identifiers. |
+| `D10-MF-004` | Flow and economic measures MUST be interpreted with quality, gate-coverage, residual-risk and review evidence. |
+| `D10-MF-005` | Changes to definitions, collection rules, tools, gates or release policy MUST be versioned and disclosed. |
+| `D10-MF-006` | A metric implementation MUST define its formula, unit, collection boundary, interpretation and gaming risk before reporting results. |
+| `D10-MF-007` | This framework MUST NOT be used to invent baselines, targets, benefits or measurements that have not been collected and evidenced. |
+
+## 1. Measurement principles
+
+An organisation using this framework SHOULD follow six principles.
+
+### 1.1 Measure accepted outcomes, not generated activity
+
+Generated lines of code, agent turns, token counts and pull requests are activity measures. They can help explain cost or load, but they are not accepted software outcomes. Throughput SHOULD be based on work that passed the required engineering and release decisions.
+
+### 1.2 Keep denominators visible
+
+Every rate MUST publish its numerator and denominator. A rate without its denominator can conceal a small sample, a changing work mix or an excluded failure class.
+
+### 1.3 Preserve the work item identity
+
+Events MUST be linkable to a stable work item, execution, goal, repository change and release decision. Repositories MAY use Jira keys, issue identifiers or another stable identifier.
+
+### 1.4 Segment before comparing
+
+Metrics SHOULD be segmented by work type, risk class, repository, agent topology, product area and review path where those differences affect interpretation. Comparing a migration with a documentation change as one cohort can create a misleading result.
+
+### 1.5 Pair speed with safety
+
+Flow and economic measures MUST be read alongside escaped defects, gate coverage, residual risk and review evidence. No single velocity measure SHOULD be used as a standalone performance target for an individual or team.
+
+### 1.6 Record method changes
+
+Changes to event definitions, timers, inclusion rules, agent tools, quality gates or release policy MUST be recorded. A time series is not comparable when its measurement method silently changes.
+
+:::figure metrics-framework
+Flow, quality, economics, learning and safety are observed as peer dimensions that feed a human engineering review, rather than being collapsed into a single score.
+:::
+
+## 2. Measurement unit and event contract
+
+The default unit is an **accepted work item**. An accepted work item is a bounded change, document or engineering outcome that has passed its required gates and received the relevant acceptance decision. A work item MAY contain multiple Autonomous Loop goals and multiple repositories.
+
+The framework distinguishes four related units:
+
+| Unit | Meaning |
+| --- | --- |
+| Work item | The product or engineering outcome requested by a human authority |
+| Execution | One agentic attempt to progress the work item, including retries and handovers |
+| Goal | A dependency-ordered, independently verifiable outcome inside an execution |
+| Change | A code, configuration, documentation or infrastructure modification proposed by an execution |
+
+For **Cost per Accepted Change**, an accepted change is an accepted work item that includes a code, configuration or infrastructure modification. Pure documentation outcomes are outside this metric unless the reporting method explicitly includes them.
+
+An implementation SHOULD emit structured events for:
+
+- work item created, clarified, approved or rejected;
+- Build Plan submitted, revised and accepted;
+- execution started, paused, resumed and completed;
+- goal started, passed, failed, blocked and reworked;
+- deterministic check started and completed;
+- independent review opened, finding raised and finding resolved;
+- human intervention started and ended;
+- QA started and completed;
+- release or merge accepted, rejected or rolled back; and
+- defect discovered, attributed, fixed and verified.
+
+Each event SHOULD include a timestamp, work item identifier, execution identifier, repository or product scope, actor role, context version, tool or agent version where relevant, environment, outcome and a link to evidence. [OpenTelemetry's signal model](https://opentelemetry.io/docs/concepts/signals/) provides a useful vocabulary for implementing logs, metrics and traces, but it does not define these delivery metrics.
+
+## 3. Metric definitions
+
+The definitions below are intentionally explicit. An organisation MAY adapt a definition, but the local variation MUST be named and applied consistently.
+
+If a denominator is zero, the metric MUST be reported as not applicable for that cohort rather than as zero. Small samples, incomplete cohorts and excluded work MUST be reported beside the result.
+
+### Flow measures
+
+### D10-MF-M01: Agentic Throughput
+
+**Definition:** the number of accepted work items completed during a defined observation period.
+
+- **Formula:** accepted work items completed in the observation period / one observation period.
+- **Numerator:** accepted work items whose required release or acceptance decision occurred within the period.
+- **Denominator:** one observation period, normally a week or a sprint window.
+- **Unit:** accepted work items per period.
+- **Collection boundary:** Include work items whose required release or acceptance decision occurred within the declared period. Exclude items that were only opened, marked complete by an agent, cancelled before acceptance or still awaiting a required decision at period end.
+- **Interpretation:** describes completed outcome flow. It does not describe complexity, value or quality by itself.
+- **Gaming risk:** splitting work into artificially small items, closing items before acceptance or excluding blocked work.
+- **Recommended use:** pair with work-item size, escaped defects, review load and gate coverage. Report a distribution by work type where possible.
+
+Agentic Throughput SHOULD NOT count a pull request merely because it was opened or because an agent declared its own goal complete.
+
+### D10-MF-M02: Review Load
+
+**Definition:** the human review demand created by agentic work.
+
+- **Formula:** logged human review minutes for the cohort / accepted work items in the cohort. Queue depth and queue age are companion measures, not components of this ratio.
+- **Numerator:** human minutes spent reviewing plans, implementation, evidence, exceptions and release decisions.
+- **Denominator:** accepted work items in the same cohort and period.
+- **Unit:** human minutes per accepted work item. Report queue depth as work items and queue age as elapsed time.
+- **Collection boundary:** Include attributable review activity from Build Plan submission through the required release or acceptance decision, including rework review and security review. Exclude product discovery, general training and unassociated administrative time. Report incomplete items and waiting time separately so that the ratio is not mistaken for queue load.
+- **Interpretation:** shows whether implementation capacity is creating a decision bottleneck.
+- **Gaming risk:** stopping the review timer early, counting only active reading and excluding waiting, rework or security review.
+- **Recommended use:** report median and upper-percentile review time, queue age and reviewer concurrency. Compare with first-pass acceptance and escaped defects.
+
+Review Load is not the same as Human Intervention Minutes. Review Load describes demand on the review layer. Human Intervention Minutes includes safety-relevant interventions across the execution and gate process.
+
+### Quality measures
+
+### D10-MF-M03: First-Pass Plan Acceptance
+
+**Definition:** the proportion of Build Plans accepted at Human Gate 1 without material revision.
+
+- **Formula:** first-submission Build Plans accepted without material revision / Build Plans submitted to Human Gate 1.
+- **Numerator:** Build Plans accepted on their first submission without a material change to scope, architecture, dependency analysis, security approach or test strategy.
+- **Denominator:** Build Plans submitted to Human Gate 1 during the observation period.
+- **Unit:** percentage.
+- **Collection boundary:** Include the first submitted version of each Build Plan that reaches Human Gate 1 during the period. Exclude drafts never submitted, cancelled work before submission and editorial changes that do not alter the plan's meaning. Use the same material-revision rule for every cohort.
+- **Interpretation:** indicates how often planning context and requirement interpretation were adequate on the first attempt.
+- **Gaming risk:** treating a superficial approval as acceptance, classifying a material correction as a minor comment or keeping requirements vague.
+- **Recommended use:** inspect rejection reasons and pair with escaped defects, rework and requirement clarification rate. A high rate is not desirable if reviewers are not challenging plans.
+
+### D10-MF-M04: First-Pass Implementation Acceptance
+
+**Definition:** the proportion of implementations accepted at Human Gate 2 without material rework after entering implementation review.
+
+- **Formula:** implementations accepted at the first Human Gate 2 submission without material rework / implementations that reached Human Gate 2.
+- **Numerator:** implementations accepted on their first submission to the human engineering review without a return to the Maker for a material code, test, architecture, security or evidence correction.
+- **Denominator:** implementations that reached Human Gate 2 during the observation period.
+- **Unit:** percentage.
+- **Collection boundary:** Include the first implementation package for each execution that reaches Human Gate 2 during the period. Exclude executions cancelled before review and packages that have not yet received a Gate 2 decision. A material rework return remains a first-pass failure even if the later version is accepted.
+- **Interpretation:** indicates the quality of the plan, context, implementation and machine checks as a combined system.
+- **Gaming risk:** accepting small changes while moving difficult items out of the cohort, downgrading material findings or avoiding human review.
+- **Recommended use:** segment by risk and work type, then read with review time, rework rate, defects and residual risk.
+
+### D10-MF-M05: Rework Rate
+
+**Definition:** the proportion of work items that require at least one material implementation cycle after a failed check or review finding.
+
+- **Formula:** work items with one or more material rework cycles / work items entering implementation.
+- **Numerator:** work items with one or more material rework cycles after implementation began.
+- **Denominator:** work items entering implementation during the observation period.
+- **Unit:** percentage of work items.
+- **Collection boundary:** Include work items that entered implementation during the period and follow them until accepted, cancelled or the cohort is closed. Report incomplete work separately. Include rework caused by implementation, tests, architecture, security, evidence or a clarified requirement, and exclude purely editorial edits under the declared materiality rule.
+- **Interpretation:** describes how often the initial implementation path did not satisfy its required checks or review.
+- **Gaming risk:** labelling a correction as a new work item, excluding failed attempts, or counting only code changes and not plan or test rework.
+- **Recommended use:** retain the reason category for each rework event, such as requirement, architecture, security, test, environment or implementation.
+
+### D10-MF-M06: Repeat Error Rate
+
+**Definition:** the rate at which a previously recorded and still-active correction recurs in a later eligible execution.
+
+- **Formula:** eligible executions in which the classified error recurs / eligible executions exposed to the active correction.
+- **Numerator:** eligible executions in which the same classified error pattern recurs after the relevant correction or context item was made available.
+- **Denominator:** eligible executions that could reasonably have been affected by the active correction, based on its declared scope and retrieval conditions.
+- **Unit:** percentage of eligible executions.
+- **Collection boundary:** Include executions started after the correction or context item became active and within its declared scope. Exclude executions where the item was not retrievable, was explicitly out of scope or where the recurrence classification has not yet been reviewed.
+- **Interpretation:** indicates whether context, skills, review rules or training have reduced recurrence of known errors.
+- **Gaming risk:** changing the classification or scope so an occurrence is no longer considered the same error, or failing to record corrections.
+- **Recommended use:** report by correction class and context version. A lower rate may reflect fewer observations, so pair it with review sampling and correction capture.
+
+### D10-MF-M07: Escaped Defects
+
+**Definition:** defects attributable to an accepted agentic change that are discovered after the relevant pre-release gates.
+
+- **Formula:** escaped defect count; when normalised, confirmed escaped defects / accepted work items released in the same cohort.
+- **Numerator:** confirmed defects discovered after release, or after the defined acceptance boundary for a non-production artefact, and attributed in the defect record to the work item.
+- **Denominator:** accepted work items released in the same cohort when a rate is reported.
+- **Unit:** defect count and defects per accepted work item.
+- **Collection boundary:** Include confirmed defects first detected after the declared pre-release acceptance boundary and attributed to a released work item. Exclude duplicate reports of the same defect, unconfirmed reports and defects discovered before that boundary. State the observation window for post-release discovery.
+- **Interpretation:** describes failures that the available verification system did not prevent or detect before acceptance.
+- **Gaming risk:** delaying attribution, classifying defects as unrelated incidents, excluding low-severity defects or changing the release boundary.
+- **Recommended use:** report severity, detection time, affected surface, cause category and whether an existing check could have detected the defect.
+
+Escaped Defects SHOULD remain visible even when the defect is fixed quickly. Fix speed is useful, but it does not erase the fact that the verification model missed the condition.
+
+### D10-MF-M08: Autonomous Test Recovery Rate
+
+**Definition:** the proportion of eligible deterministic test failures that an agent resolves without a human code change and that subsequently pass independent verification.
+
+- **Formula:** eligible failures resolved by an agent and independently verified / eligible failures assigned to an autonomous recovery attempt.
+- **Numerator:** eligible failures diagnosed and resolved by an agent, with the proposed repair independently verified and no bypass of the test or quality gate.
+- **Denominator:** deterministic test failures explicitly assigned to an autonomous recovery attempt during the observation period.
+- **Unit:** percentage of eligible failures.
+- **Collection boundary:** Include deterministic test failures assigned to an autonomous recovery attempt during the period, including retries until resolution or escalation. Exclude flaky failures not confirmed by the declared policy, failures resolved by a human code change and attempts that disable or weaken the check.
+- **Interpretation:** describes recovery capacity inside the Autonomous Loop. It is not a measure of whether the original implementation was correct.
+- **Gaming risk:** disabling tests, weakening assertions, changing thresholds, retrying until a flaky result passes or excluding failures that are difficult to diagnose.
+- **Recommended use:** report by failure cause, test layer, retry count and human escalation. A high rate with rising escaped defects is a warning sign.
+
+### Economic measures
+
+### D10-MF-M09: Cost per Accepted Change
+
+**Definition:** the total attributable cost required to produce an accepted change during a defined period.
+
+- **Formula:** attributable machine, infrastructure and human cost for accepted changes / number of accepted changes in the same cohort and period.
+- **Numerator:** model and tool usage, compute, orchestration, environment, storage, verification service and attributable human time costs for the accepted change. The organisation MUST document which costs are included.
+- **Denominator:** accepted changes in the same cohort and period.
+- **Unit:** local currency per accepted change.
+- **Collection boundary:** Include costs incurred from Build Plan creation through the acceptance decision for the declared change, including failed attempts, rework, verification and attributable shared infrastructure. Exclude costs that cannot be allocated under the documented method, but report the exclusion. Do not include post-release defect cost unless it is explicitly added as a separate cost measure.
+- **Interpretation:** describes the economic cost of reaching acceptance, not merely the cost of generating a patch.
+- **Gaming risk:** excluding human review, shared infrastructure, failed attempts, security tooling or the cost of escaped defects.
+- **Recommended use:** report a range or distribution by work type and risk class. Track cost with quality and review load rather than pursuing the lowest value in isolation.
+
+Human time can be costed using a documented internal rate, an external rate or reported separately. The important requirement is consistency and visibility. A low machine bill with high human rework is not necessarily efficient.
+
+### Learning measures
+
+### D10-MF-M10: Context Learning Rate
+
+**Definition:** the rate at which qualifying corrections become approved, evaluated durable context.
+
+- **Formula:** qualifying corrections released as approved durable context / qualifying corrections captured in the correction cohort.
+- **Numerator:** corrections that meet the promotion criteria, are approved by the relevant owner, pass the required evaluation and are released to a declared scope.
+- **Denominator:** qualifying corrections captured during the observation period. If an approval conversion rate is also reported, it MUST be labelled as a separate measure with its own denominator.
+- **Unit:** percentage of qualifying corrections, plus count of released context items per period.
+- **Collection boundary:** Include corrections captured in the declared cohort after they have reached a terminal promotion decision, such as released, rejected or invalidated. Exclude unclassified suggestions, corrections outside the context-governance scope and open proposals from the rate until their outcome is known. Report cohort age and censoring rules.
+- **Interpretation:** describes whether the delivery system is converting useful human knowledge into governed reusable context.
+- **Gaming risk:** promoting trivial wording changes, counting unreviewed suggestions, rewarding context volume or treating every correction as a general rule.
+- **Recommended use:** report with invalidation rate, stale-item rate, repeat error rate and the scope of each release. More context is not automatically better.
+
+The [Agent Learning and Context Governance Standard](/context-governance) defines the classification, approval, evaluation and rollback controls assumed by this metric.
+
+### Safety and authority measures
+
+### D10-MF-M11: Human Intervention Minutes
+
+**Definition:** the human time spent making, correcting or approving decisions that preserve the required authority and quality boundaries of an agentic execution.
+
+- **Formula:** qualifying human intervention minutes for the cohort / accepted work items in the cohort.
+- **Numerator:** minutes spent on requirement clarification, Build Plan approval, architecture or security decisions, review corrections, residual-risk acceptance, QA decisions, release authority and escalations. The organisation MUST publish its event inclusion rules.
+- **Denominator:** accepted work items in the same cohort and period.
+- **Unit:** human minutes per accepted work item. Report total minutes and median or upper-percentile values as well.
+- **Collection boundary:** Include attributable human decision and intervention time from readiness clarification through release authority and recorded post-release escalation for the work item. Exclude general management, training and unrelated meetings. Do not infer time from a click or status change when a logged interval is unavailable.
+- **Interpretation:** indicates the amount of accountable human judgement required by the system. A decrease can mean improved context or reduced scrutiny.
+- **Gaming risk:** treating a gate as a click, excluding asynchronous review, under-recording interruptions or removing a gate to lower the number.
+- **Recommended use:** interpret alongside gate coverage, escaped defects, residual risk and review load. Do not set a universal target that pressures people to approve quickly.
+
+Human Intervention Minutes is intentionally not a pure productivity metric. In a high-risk change, meaningful human intervention may be evidence of a functioning control.
+
+### D10-MF-M12: Human Gate Coverage
+
+**Definition:** the proportion of accepted changes for which every required human gate was completed by an authorised human decision-maker.
+
+- **Formula:** accepted changes with complete evidence for every required human gate / accepted changes requiring one or more human gates.
+- **Numerator:** accepted changes with complete evidence for all gates required by their declared risk class.
+- **Denominator:** accepted changes whose risk class requires one or more human gates.
+- **Unit:** percentage.
+- **Collection boundary:** Include accepted work items in the declared period and evaluate the gate requirements attached to the risk classification at intake. Exclude cancelled items and do not recalculate the denominator after a missing gate is discovered. A gate counts only when its authorised human decision and evidence are retained.
+- **Interpretation:** indicates whether the delivery system preserved its decision boundaries.
+- **Gaming risk:** lowering the risk class, marking automated output as human approval or redefining a gate after the fact.
+- **Recommended use:** treat any unexplained reduction as a safety incident or control exception, not as an efficiency gain.
+
+### D10-MF-M13: Residual Risk Closure Rate
+
+**Definition:** the proportion of accepted residual risks that are closed, mitigated or reaccepted before their review date.
+
+- **Formula:** residual-risk records closed, mitigated or explicitly reaccepted by their due date / residual-risk records due for review in the period.
+- **Numerator:** residual-risk records closed, mitigated or explicitly reaccepted by the accountable authority by their declared review date.
+- **Denominator:** residual-risk records reaching their review date during that period.
+- **Unit:** percentage.
+- **Collection boundary:** Include residual-risk records linked to accepted work items whose declared review date falls within the period. Count a record only when the accountable authority records closure, mitigation evidence or explicit reacceptance by the due date. Exclude records with no due date from the rate and report them separately.
+- **Interpretation:** indicates whether known uncertainty is being managed after an acceptance decision.
+- **Gaming risk:** closing records without evidence, extending dates indefinitely or avoiding risk registration.
+- **Recommended use:** report overdue count and severity alongside the rate. A high closure rate can still be unsafe if the initial register is incomplete.
+
+## 4. A balanced scorecard
+
+The scorecard below is a minimum reporting shape. It is not a list of targets.
+
+| Dimension | Primary measures | Required companion measures | Question to ask |
+| --- | --- | --- | --- |
+| Flow | Agentic Throughput, Review Load | Rework Rate, Human Gate Coverage | Is accepted work moving without hiding decision queues? |
+| Quality | First-Pass Plan Acceptance, First-Pass Implementation Acceptance | Escaped Defects, Repeat Error Rate, QA findings | Is the system producing acceptable outcomes, not only passing checks? |
+| Economics | Cost per Accepted Change | Human Intervention Minutes, rework and defect cost | What does acceptance actually cost? |
+| Learning | Context Learning Rate | Invalidation rate, stale-item rate, Repeat Error Rate | Is the system retaining useful lessons without accumulating noise? |
+| Safety | Human Intervention Minutes, Human Gate Coverage | Residual Risk Closure Rate, security findings, release exceptions | Are humans still exercising the authority the model requires? |
+
+The balanced scorecard SHOULD be reviewed at work-item, team and period level. The period view shows trends. The work-item view explains the causes. A period summary without evidence links is not enough for a meaningful engineering decision.
+
+The scorecard also names companion indicators such as QA findings, security findings, release exceptions, invalidation rate and stale-item rate. These are not fully standardised metrics in version 0.1. If an organisation reports one, it MUST define its formula, unit, collection boundary, interpretation and gaming risk under `D10-MF-006` rather than treating the label as a shared definition.
+
+## 5. Data quality and comparability
+
+Metrics are only as credible as the events that support them. A measurement implementation SHOULD provide:
+
+- immutable event identifiers;
+- consistent timestamps and time zones;
+- a documented work-item and change relationship;
+- explicit start and stop rules for human time;
+- a versioned risk classification;
+- a record of excluded and cancelled work;
+- attribution rules for defects and rework;
+- context and agent version identifiers;
+- annotations for outages, migrations and policy changes; and
+- access controls that prevent individual metric editing without an audit trail.
+
+The organisation SHOULD preserve raw events separately from derived dashboards. If a definition changes, historical results SHOULD be recalculated or clearly marked as belonging to a different method version.
+
+Sampling is acceptable when full capture is too expensive, but the sample method MUST be stated. Human review quality, context correctness and defect attribution may require manual sampling even when execution telemetry is complete.
+
+## 6. Avoiding velocity-only optimisation
+
+Velocity-only optimisation creates predictable pressure:
+
+- split work into smaller units;
+- lower review depth;
+- avoid complex or risky work;
+- close items before product assurance;
+- suppress defects or residual risks;
+- increase agent retries without learning from failure; or
+- remove controls that reduce measured throughput.
+
+The framework should be used as a set of counterweights. An increase in Agentic Throughput is only positive when Human Gate Coverage remains complete, Escaped Defects do not rise unacceptably, review evidence remains credible and residual risk remains managed.
+
+Likewise, a fall in Human Intervention Minutes deserves investigation. It may show that the context is improving. It may show that work is better specified. It may also show that reviewers are overloaded, that the timer is incomplete or that a gate has become ceremonial.
+
+No metric SHOULD be assigned as an individual quota. Metrics are most useful for system diagnosis, design decisions and learning conversations.
+
+## 7. Illustrative interpretation
+
+Consider a hypothetical period in which accepted work items increase while Review Load per item falls. That is not enough to conclude that the system improved.
+
+The next questions should be:
+
+- Did Human Gate Coverage remain complete?
+- Did First-Pass Implementation Acceptance improve or were difficult items excluded?
+- Did Escaped Defects or residual-risk exceptions change?
+- Did the mix shift toward smaller, lower-risk work?
+- Did human reviewers spend less time because plans were clearer, or because reviews became shallower?
+- Did Context Learning Rate produce useful, evaluated changes or simply more context?
+
+The example is a measurement exercise, not a reported result. It illustrates why the framework requires related measures and evidence links.
+
+## 8. Minimum implementation profile
+
+An initial implementation SHOULD include:
+
+- a stable work-item and execution identifier;
+- event records for gates, checks, review, QA and release;
+- Agentic Throughput;
+- Review Load;
+- First-Pass Plan Acceptance;
+- First-Pass Implementation Acceptance;
+- Rework Rate;
+- Escaped Defects;
+- Cost per Accepted Change or a documented temporary proxy;
+- Human Intervention Minutes;
+- Human Gate Coverage; and
+- a method for recording context promotions and invalidations.
+
+The remaining measures can be added as the organisation develops reliable event capture. It is better to publish a smaller set with clear definitions than a large dashboard built from ambiguous signals.
+
+## Limitations
+
+Metrics can describe a delivery system, but they cannot replace engineering judgement. Work-item complexity, product value, system criticality and human reasoning do not fit perfectly into a dashboard.
+
+Attribution is also difficult. A defect may result from a requirement, architecture, implementation, dependency, environment or interaction between them. The framework requires a recorded attribution decision, not a pretence that the cause is always obvious.
+
+Comparisons across teams can create harm when tooling, risk and work mix differ. The safest use is local trend analysis with explicit cohorts, followed by qualitative review of the evidence.
+
+## Document status
+
+Draft metrics framework, version 0.1. This document is a proposed component of the Agentic Sprint Methodology and is open to critique, implementation feedback and revision.

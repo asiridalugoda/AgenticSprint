@@ -1,0 +1,193 @@
+---
+title: "QA Evidence Template"
+description: "A reusable independent product-assurance record for validating behaviour, journeys, regression risk and unresolved quality concerns."
+date: "2026-08-21"
+updated: "2026-08-21"
+type: "technical"
+topics: ["Engineering", "Delivery & Organisations"]
+tags: ["QA", "product assurance", "regression", "accessibility", "acceptance evidence"]
+featured: false
+pinned: false
+draft: false
+canonical: "/templates/qa-evidence"
+image: "/social/template-qa-evidence"
+series: "Agentic Sprint Templates"
+seriesOrder: 8
+version: "0.1"
+status: "Working template"
+documentKind: "Template"
+normative: false
+documentId: "T8"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D9"]
+claimClasses: ["methodology", "template", "authorial"]
+citation: "Dalugoda, Siri. QA Evidence Template. Agentic Sprint Templates, v0.1, 21 August 2026. https://theagenticsprint.com/templates/qa-evidence"
+references: ["https://www.w3.org/TR/WCAG22/", "https://csrc.nist.gov/pubs/sp/800/218/final"]
+externalLinks: []
+---
+
+Use this template after engineering review and before release authority is exercised. QA is independent product assurance. It checks whether the change behaves as intended in realistic use, including negative cases and interactions that may not be covered by the implementation agent's tests.
+
+This is an informative working artefact for adapting the Agentic Sprint. It is not an independent normative standard; teams should record their own decisions, controls and approval rules.
+
+The `T8-QA-*` labels below are local template cross-references. They are not methodology requirements and do not override D1 to D10. QA supplies independent product assurance between Human Gate 2 and Human Gate 3. It recommends a path; it does not grant release authority.
+
+QA evidence supports a quality decision. It does not prove that no defect exists. Record the environment, data, coverage limits and unresolved risk so the release authority can make an informed decision.
+
+## When to use it
+
+- A feature or fix has passed Human Gate 2 and needs product assurance.
+- A change affects a customer journey, business rule, integration or operational workflow.
+- A release candidate requires exploratory, regression or accessibility evidence.
+- A risk owner needs to understand what was tested and what remains uncertain.
+
+## Ownership and approval
+
+- **QA owner:** designs and performs independent assurance.
+- **Product owner:** confirms that acceptance criteria represent the intended outcome.
+- **Release authority:** decides whether the quality evidence is sufficient for release.
+- **Approval boundary:** QA may recommend `proceed-to-human-gate-3`, `rework` or `block`; QA does not grant production authority or accept release risk on behalf of the release authority.
+- **Required evidence:** tested build, environment, data set, scenario results, defects, accessibility observations, regression scope and unresolved risk.
+- **Completion rule:** all must-have criteria and agreed scenarios have a recorded result. Every failed or unrun must-have scenario has an owner and a decision from the appropriate human authority.
+- **Failure path:** return the change for rework, block release or record a time-bound risk acceptance. Never hide a failed scenario by deleting it.
+
+## Lifecycle mapping
+
+| Requirement ID | QA obligation | Agentic Sprint point |
+| --- | --- | --- |
+| T8-QA-001 | Identify the tested change, build, environment and data. | QA preparation |
+| T8-QA-002 | Trace product acceptance criteria to independent scenarios. | QA |
+| T8-QA-003 | Exercise positive, negative, boundary, regression and exploratory cases. | QA |
+| T8-QA-004 | Record accessibility, operational and cross-feature observations. | QA |
+| T8-QA-005 | Record defects, evidence and residual uncertainty without false completion. | QA |
+| T8-QA-006 | Provide a quality recommendation and human decision boundary. | Human Gate 3 preparation |
+
+## QA prompts
+
+- Does the behaviour satisfy the user's outcome, not only the implementation plan?
+- What happens when input is invalid, repeated, late, missing or unauthorised?
+- What existing workflows could this change disturb?
+- Can a user with relevant accessibility needs complete the journey?
+- What evidence is environment-specific?
+- Which scenarios were not run, and what risk does that create?
+
+## Copyable template
+
+````markdown
+## QA Evidence Record: [qa-id] [work item]
+
+### 1. Record
+
+- qa_id: [unique identifier]
+- qa_version: [0.1]
+- work_item_id: [issue or story]
+- plan_id: [approved plan and version]
+- review_id: [engineering review record]
+- release_candidate: [build, commit or version]
+- qa_status: [planned | in-progress | blocked | rework | recommended-accept | closed]
+- qa_owner: [name and role]
+- product_owner: [name and role]
+- release_authority: [name and role]
+- started_at: [timestamp]
+- completed_at: [timestamp]
+
+### 2. Environment and data
+
+- environment: [test, staging or other]
+- build: [version and commit]
+- configuration_snapshot: [link or identifier]
+- browser_and_devices: [list]
+- services_and_dependencies: [versions and availability]
+- test_data_source: [synthetic, masked or approved source]
+- data_reset_method: [method]
+- known_environment_limits: [limits]
+- evidence_retention: [location and rule]
+
+### 3. Acceptance traceability
+
+| Criterion ID | Product criterion | QA scenario IDs | Result | Evidence | Defect IDs |
+| --- | --- | --- | --- | --- | --- |
+| AC-01 | [criterion] | [QA-01] | [pass | fail | blocked | not-run] | [link] | [ids or none] |
+
+### 4. Scenario catalogue
+
+| Scenario ID | Type | Preconditions | Steps or input | Expected result | Actual result | Result | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| QA-01 | [positive | negative | boundary | regression | exploratory | recovery] | [precondition] | [steps] | [expected] | [actual] | [pass | fail | blocked | not-run] | [link] |
+
+**Required scenario types:**
+
+- [ ] primary user journey
+- [ ] invalid or unauthorised input
+- [ ] duplicate, retry or idempotency case
+- [ ] boundary value or empty state
+- [ ] dependency failure or degraded mode
+- [ ] cross-feature regression
+- [ ] recovery or rollback behaviour
+- [ ] exploratory session
+
+### 5. Regression assessment
+
+| Area | Reason selected | Coverage or scenario | Result | Evidence | Remaining risk |
+| --- | --- | --- | --- | --- | --- |
+| [area] | [impact path] | [scenario] | [result] | [link] | [risk] |
+
+### 6. Accessibility and usability
+
+| Journey or component | Check | Result | Observation | Evidence | Follow-up owner |
+| --- | --- | --- | --- | --- | --- |
+| [journey] | [keyboard, focus, labels, contrast, error message, screen reader or other] | [pass | fail | not-assessed] | [observation] | [link] | [owner] |
+
+**Accessibility scope:**
+- standard_or_target: [WCAG version, product standard or other]
+- assistive_technology: [tested or not-tested]
+- known_limitations: [limitations]
+
+### 7. Defects and quality risks
+
+| Defect or risk ID | Severity | Scenario | Description | Reproduction evidence | Owner | Disposition |
+| --- | --- | --- | --- | --- | --- | --- |
+| QA-DEF-01 | [low | moderate | high | critical] | [QA id] | [description] | [link] | [owner] | [open | fixed | accepted | deferred] |
+
+### 8. Operational and data assurance
+
+- audit_events: [observed, not-observed or not-applicable]
+- error_handling: [observed behaviour]
+- observability_signals: [logs, metrics, traces and alerts checked]
+- data_integrity: [checks and result]
+- migration_or_backfill: [checks and result]
+- support_or_runbook_impact: [impact]
+
+### 9. Unresolved uncertainty
+
+| Uncertainty | Why it remains | Possible consequence | Mitigation | Owner | Review date |
+| --- | --- | --- | --- | --- | --- |
+| [uncertainty] | [reason] | [consequence] | [mitigation] | [owner] | [date] |
+
+### 10. QA decision
+
+- recommendation: [accept | accept-with-risk | rework | block | needs-information]
+- must_fix_items:
+  - "[id]"
+- risks_referred_to_authority:
+  - "[risk-id]"
+- risk_acceptor: [name and role]
+- human_gate_3_decision: [pending | approved | rejected]
+- decision_evidence: [link]
+- decision_at: [timestamp]
+
+### 11. Traceability
+
+| Requirement ID | Evidence | Status |
+| --- | --- | --- |
+| T8-QA-001 | [link] | [met | open] |
+| T8-QA-002 | [link] | [met | open] |
+| T8-QA-005 | [link] | [met | open] |
+| T8-QA-006 | [link] | [met | open] |
+````
+
+## Completion check
+
+Close the record only when the named QA owner has recorded results for the agreed scope and every failed or unrun must-have scenario has an owner and decision. Product assurance remains separate from the agent that implemented the change.
+
+The WCAG reference supplies an accessibility standard that may be selected by a team. NIST supplies adjacent secure development practice. Neither source defines the Agentic Sprint QA model or its release gates.

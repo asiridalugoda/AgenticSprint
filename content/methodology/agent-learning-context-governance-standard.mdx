@@ -1,0 +1,421 @@
+---
+title: "Agent Learning and Context Governance Standard"
+description: "A governance standard for turning human review corrections into durable, tested and reversible agent context."
+date: "2026-08-08"
+updated: "2026-08-08"
+type: "research"
+topics: ["Agentic Systems", "AI Governance & Security", "Engineering"]
+tags: ["agent context", "agent learning", "context governance", "software delivery", "AI security"]
+featured: false
+pinned: false
+draft: false
+canonical: "/context-governance"
+image: "/social/context-governance"
+series: "Agentic Sprint Methodology"
+seriesOrder: 8
+documentId: "D8"
+documentKind: "standard"
+normative: true
+version: "0.1"
+status: "Draft standard"
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D3", "D4", "D7"]
+claimClasses: ["methodology", "proposed-control", "governance"]
+citation: "Dalugoda, Siri. Agent Learning and Context Governance Standard. Agentic Sprint Methodology, v0.1, 8 August 2026. https://theagenticsprint.com/context-governance"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://www.nist.gov/itl/ai-risk-management-framework", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://github.com/addyosmani/agent-skills/issues/398", "https://opentelemetry.io/docs/concepts/signals/"]
+externalLinks: ["https://github.com/addyosmani/agent-skills/issues/398"]
+---
+
+## Abstract
+
+An Agentic Sprint depends on more than capable models. It depends on the quality of the context that agents receive before they plan, implement, review and recover from failure.
+
+Human review is one of the richest sources of that context. A reviewer may correct a service boundary, reject an unsafe permission, identify a domain exception or explain why a test is misleading. The correction is useful for the current work item. Some corrections are also useful for future work.
+
+This standard defines how an engineering organisation can decide which corrections become durable agent knowledge, how that knowledge is classified, who may approve it, how it is evaluated, and how it is invalidated when the system changes. It treats context as a governed engineering asset rather than an informal prompt collection.
+
+The standard does not propose model training. In this document, **agent learning** means the controlled improvement of external context, skills, examples, rules and retrieval records that shape future agent runs.
+
+## Status and scope
+
+| Field | Definition |
+| --- | --- |
+| Document | Agent Learning and Context Governance Standard |
+| Version | 0.1 |
+| Status | Draft standard |
+| Applies to | Agentic Sprint delivery systems and the Autonomous Loop execution layer |
+| Primary concern | Durable context, its authority, lifecycle and safety |
+| Out of scope | Model training, vendor selection, general knowledge management and product policy not used by agents |
+
+This is a proposed methodology document. It is intended to be implementable and critiqueable. It does not claim that an organisation following it will obtain reliable autonomy, lower cost or higher delivery throughput.
+
+## Normative language
+
+The key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html) when, and only when, they appear in capitals.
+
+## Requirement identifiers and precedence
+
+This document uses identifiers in the form `D8-CG-###` for its context-governance controls. The identifiers are local to this document and do not add or replace requirements in D1, the Agentic Sprint Specification v0.1. D1 remains the normative root. Where this document conflicts with D1, D1 prevails.
+
+| ID | Control |
+| --- | --- |
+| `D8-CG-001` | The delivery system MUST keep episodic handover, the historical experiment ledger, current-state repository memory, normative architecture rules and reusable agent skills distinguishable by type, scope and authority. |
+| `D8-CG-002` | A reusable correction MUST be classified before it is promoted into durable context. |
+| `D8-CG-003` | A durable context item MUST identify its statement or procedure, scope, source, evidence, owner, approval status, version, freshness information and limitations. |
+| `D8-CG-004` | A promotion into durable context MUST have supporting evidence, human review, an evaluation result, a versioned release, a staged rollout and a recorded rollback and invalidation path. |
+| `D8-CG-005` | Agent-generated material MUST remain untrusted until reviewed. An agent MUST NOT publish normative context, widen authority or approve its own promotion. |
+| `D8-CG-006` | Context retrieval MUST preserve item provenance, scope and version so that an execution can be reconstructed and conflicts can be investigated. |
+| `D8-CG-007` | Stale, contradictory or unsafe context MUST be quarantined or invalidated without erasing the audit history of the decision. |
+
+## 1. The governing idea
+
+Human correction is evidence of a mismatch between an agent output and the organisation's current expectation. It is not automatically a new rule.
+
+The system MUST preserve the distinction between:
+
+- an observation about one execution;
+- an explanation of why that execution failed;
+- a reusable engineering pattern;
+- a binding architectural or security constraint;
+- an example that helps an agent recognise a pattern; and
+- an instruction that is no longer current.
+
+The promotion of a correction into durable context MUST be deliberate. Agents MAY propose a promotion. They MUST NOT unilaterally publish a normative architecture rule, security invariant, permission rule, release condition or context change that can widen their authority.
+
+The practical principle is:
+
+> **A correction may teach the system, but only governed evidence may change the system's memory.**
+
+## 2. Context layers and their authority
+
+The delivery system MUST maintain separate stores, or at least separate namespaces, for different kinds of context. Mixing all material into one retrieval index makes it difficult to know what an agent is allowed to trust.
+
+| Context layer | Purpose | Typical lifetime | Authority | Example |
+| --- | --- | --- | --- | --- |
+| Episodic handover | Continue an active execution after interruption | One work item or execution | Operational record, not a general rule | The last goal passed, the failing test and the next hypothesis |
+| Historical experiment ledger | Preserve hypotheses, attempts and outcomes | Long-lived history | Evidence only, not an instruction | A rejected migration approach and the reason it was rejected |
+| Current-state repository memory | Describe validated facts about the current codebase | Until invalidated | Informative, subject to source and freshness checks | Service ownership, an API contract or a repository map |
+| Normative architecture rules | State constraints that implementations MUST follow | Until superseded or withdrawn | Binding within an explicit scope | Controllers MUST access persistence through an application service |
+| Reusable agent skills | Define repeatable procedures and checks | Versioned and reviewed | Procedural guidance, bounded by higher authority | A checklist for adding an endpoint and its contract tests |
+
+These layers are related but not interchangeable.
+
+An episodic handover tells the next agent what happened in one run. It MUST NOT silently become a repository rule. An experiment ledger records what was tried. It MUST NOT be retrieved as a current design decision without an explicit status. Repository memory describes the current system, but it SHOULD link to an authoritative source such as code, an accepted architecture decision or a maintained contract. Normative rules constrain behaviour and therefore require stronger approval. Skills combine procedures and checks, but they MUST NOT override security, release or architecture authority.
+
+## 3. Definitions
+
+### 3.1 Correction
+
+A **correction** is a human or independently verified observation that an agent output, plan, test, context item or decision needs to change.
+
+### 3.2 Context item
+
+A **context item** is a versioned unit of information that may be retrieved for an agent run. It has a type, scope, owner, source, status and review history.
+
+### 3.3 Promotion
+
+**Promotion** is the act of moving a correction or observation from an execution record into a durable context layer.
+
+### 3.4 Normative context
+
+**Normative context** is a rule or constraint that an agent is expected to follow. It requires an accountable owner and a reviewable approval record.
+
+### 3.5 Context poisoning
+
+**Context poisoning** is the introduction of false, malicious, unsafe, irrelevant or stale information into a context layer in a way that can influence later agent behaviour.
+
+### 3.6 Context release
+
+A **context release** is a reviewed set of additions, changes, invalidations or removals made available to future executions.
+
+## 4. Classifying a correction
+
+Every reusable correction MUST be assigned one primary classification before promotion. A correction MAY have more than one label, but one owner MUST decide which lifecycle and authority apply.
+
+| Class | Meaning | Default destination | Promotion threshold |
+| --- | --- | --- | --- |
+| Local defect | The immediate implementation is wrong, but the lesson is not known to generalise | Handover and review evidence | No durable promotion required |
+| Reusable procedure | A repeatable way to perform a task or check | Agent skill | Evidence from a completed task and a bounded procedure |
+| Repository fact | A current fact about code, interfaces or operations | Current-state repository memory | An authoritative source and freshness owner |
+| Recurring pattern | The same mistake or decision appears in multiple relevant tasks | Skill, example or repository memory | Repeated evidence or an explicit architecture decision |
+| Normative constraint | A rule that protects architecture, security, compliance or release quality | Normative architecture or security context | Human owner, rationale, scope, test and approval |
+| Historical evidence | An attempt, failure, experiment or alternative that informs judgement | Experiment ledger | Reproducible record or credible execution evidence |
+| Stale or unsafe item | A context item that is no longer accurate or could create harm | Quarantine or invalidation register | Immediate restriction from normal retrieval |
+
+The classification prevents a single frustrated review comment from becoming an organisation-wide rule. It also prevents valuable operational knowledge from disappearing when an execution is closed.
+
+## 5. Minimum context record
+
+Every item in a durable context layer MUST have enough metadata for a later reviewer to answer five questions:
+
+1. What does this item say?
+2. Where does it apply?
+3. Why should an agent trust it?
+4. Who is accountable for it?
+5. When should it be reviewed or withdrawn?
+
+A repository MAY use YAML, JSON, Markdown frontmatter or another structured format. The representation SHOULD support fields equivalent to the following:
+
+```yaml
+context_id: "architecture-service-boundaries-001"
+kind: "normative-rule"
+statement: "Controllers must not access persistence directly."
+scope:
+  repositories: ["payment-api"]
+  paths: ["src/controllers/**"]
+  environments: ["development", "ci"]
+source:
+  type: "human-review"
+  work_items: ["TM-248"]
+  evidence: ["review/evidence/TM-248.json"]
+authority:
+  owner: "engineering-architecture"
+  approver: "staff-engineer"
+status: "active"
+version: "1.2.0"
+effective_from: "2026-08-08"
+review_after: "2026-11-08"
+supersedes: "architecture-service-boundaries-000"
+evaluation:
+  checks: ["architecture-test:service-boundaries"]
+  last_result: "pass"
+```
+
+The example is illustrative. It does not prescribe a particular repository layout or approval role.
+
+At minimum, a context item MUST include:
+
+- a stable identifier;
+- its classification;
+- the statement or procedure in plain language;
+- scope, including the repositories, paths, products or environments affected;
+- source and supporting evidence;
+- an accountable owner;
+- approval status;
+- version and change history;
+- freshness or review information; and
+- known limitations, exceptions or superseded items.
+
+## 6. The promotion lifecycle
+
+The lifecycle below separates capture from authority. It is compatible with an Autonomous Loop handover, a pull request review or a separate context repository.
+
+:::figure context-governance-loop
+The governed context loop: capture a correction, classify it, attach evidence, propose a durable context change, review and evaluate it, release it to a bounded scope, observe future use, then revise or invalidate it when evidence changes.
+:::
+
+### 6.1 Capture
+
+The execution system MUST record meaningful corrections with the work item, execution identifier, affected artefact and reviewer identity. The record SHOULD include the original output, the corrected outcome and the reason for the correction.
+
+A correction that is not recorded cannot be evaluated later. A correction record SHOULD avoid copying secrets, personal information or untrusted prompt content into a durable store.
+
+### 6.2 Classify
+
+The reviewer, Agent Coordinator or delegated context owner classifies the correction. An agent MAY suggest a classification and related context destinations, but the suggestion MUST remain visibly separate from the approved classification.
+
+### 6.3 Propose
+
+The proposal SHOULD state:
+
+- the lesson or procedure in one precise sentence;
+- the context layer it would enter;
+- the scope in which it is valid;
+- the evidence supporting it;
+- counterexamples or known exceptions;
+- the expected effect on future agent behaviour;
+- the evaluation that will detect regressions; and
+- the owner and review date.
+
+### 6.4 Review and approve
+
+A context change MUST be reviewed according to its authority. A local skill can have a repository owner. A cross-repository architecture rule requires an architecture owner. A security or release constraint requires the relevant security or release authority.
+
+The approver MUST be able to inspect the evidence without relying on the proposing agent's summary alone. Normative changes MUST be reviewable as code or an equivalent controlled change. The approval record SHOULD explain why the scope is no broader than necessary.
+
+### 6.5 Evaluate
+
+Before a context release becomes broadly available, the organisation MUST evaluate it against representative tasks and retain the result. Tests MAY include:
+
+- retrieval tests that confirm the right context is included;
+- conflict tests that confirm higher-authority rules win;
+- behaviour tests that check the intended implementation pattern;
+- negative tests that ensure prohibited actions remain prohibited;
+- stale-context tests after a repository or API change; and
+- adversarial tests that place misleading instructions near the retrieval boundary.
+
+An evaluation SHOULD test both usefulness and harm. A context item that improves one example while causing unsafe behaviour in another MUST NOT be released broadly until the risk is resolved or accepted by the accountable human authority.
+
+### 6.6 Release gradually
+
+Context changes MUST be released to the smallest useful scope first. A repository, team or pilot workstream MAY act as a canary. The release MUST identify the scope, the context version and the agent executions included in the rollout.
+
+Security invariants, permission boundaries and release conditions MUST remain human-controlled. An agent MUST NOT expand their scope as a side effect of a context release.
+
+### 6.7 Observe and revise
+
+The organisation MUST record whether the context is retrieved, followed, ignored, contradicted or associated with later defects where that information is available. A context item SHOULD be revised when evidence shows that it is ambiguous, too broad, too narrow or stale.
+
+An item that is stale, contradictory or unsafe MUST be quarantined or invalidated until it has been revalidated. The invalidation record MUST identify the reason, scope, affected executions and required remediation.
+
+Invalidation is a normal lifecycle operation. It is not an admission that the original owner acted improperly. Systems change, and current context must change with them.
+
+## 7. Roles and decision rights
+
+| Role | Responsibility | May propose context | May approve normative context |
+| --- | --- | --- | --- |
+| Maker agent | Implement the approved goal and record evidence | Yes, through an explicit proposal | No |
+| Checker agent | Challenge output and identify reusable lessons | Yes | No |
+| Human reviewer | Correct the work and explain the reason | Yes | Within delegated scope |
+| Agent Coordinator | Maintain execution and context workflow | Yes | No by default |
+| Repository owner | Maintain scoped facts and skills | Yes | Scoped repository items |
+| Architecture owner | Approve architecture constraints and exceptions | Yes | Architecture rules |
+| Security owner | Approve security invariants and security-related context | Yes | Security context |
+| Context steward | Maintain schemas, release records, evaluations and invalidations | Yes | Only where explicitly delegated |
+
+Separation of duties SHOULD be preserved for high-impact context. The person who proposes a security rule SHOULD NOT be the only person who approves it. The agent that produced a correction MUST NOT be treated as the authority that promotes its own correction.
+
+## 8. Versioning, rollout and rollback
+
+Context MUST be version controlled. A change SHOULD have a readable diff, a rationale, an owner, an approval record and an evaluation result.
+
+The organisation SHOULD use semantic or equivalent versioning appropriate to the context type:
+
+- a wording clarification that does not alter behaviour can be a patch change;
+- a new procedure or narrower rule can be a minor change;
+- a changed constraint, retrieval contract or interpretation is a major change within its scope.
+
+The exact numbering scheme is less important than being able to identify what an execution saw and what changed afterwards.
+
+Rollout MUST support:
+
+- pinning a work item to a known context version;
+- comparing a candidate version with the current version;
+- disabling a problematic item without deleting its audit history;
+- reverting to a previous approved version; and
+- recording which future executions used the rollback.
+
+A rollback SHOULD be treated as a context event with its own reason and owner. Deleting the bad item without preserving why it was withdrawn makes later review harder and can allow the same mistake to be reintroduced.
+
+## 9. Retrieval and conflict handling
+
+Context assembly SHOULD be explicit. For each execution, the system should be able to show:
+
+- the context sources considered;
+- the items actually retrieved;
+- the authority and scope of each item;
+- the item versions;
+- conflicts detected;
+- items withheld because they were stale or untrusted; and
+- the final context package supplied to each agent role.
+
+When context conflicts, the system SHOULD apply a documented precedence order. A practical default is:
+
+1. active, scoped security and release constraints that the plan cannot waive;
+2. explicit human approval for the current work item;
+3. active architecture rules;
+4. current repository facts from authoritative sources;
+5. approved reusable skills;
+6. historical experiments and examples; and
+7. unverified agent suggestions.
+
+This ordering is a starting point, not a universal policy. An organisation MUST document its own precedence rules, especially where product policy, legal constraints or regulated controls are involved.
+
+Retrieval systems SHOULD prefer small, relevant context packages over indiscriminate inclusion. More context is not automatically better. Each item should earn its place through scope, authority and relevance.
+
+## 10. Context poisoning and unsafe self-modification
+
+Context is part of the execution boundary. A poisoned instruction can influence many later tasks, even if every individual run appears to be working normally.
+
+The following controls are required for a safe baseline:
+
+- Agents MUST NOT publish normative context directly.
+- Agent-generated text MUST be treated as untrusted until reviewed and classified.
+- Secrets, access tokens, personal information and raw customer data MUST NOT be promoted into reusable context.
+- Context changes MUST pass the same review path as other production-affecting engineering changes.
+- Security, permissions, branch protection and release rules MUST have human-owned approval.
+- Retrieved context MUST retain provenance so reviewers can identify its source.
+- Stale, contradictory or suspicious items MUST be quarantined from normal retrieval.
+- The system SHOULD test context changes against prompt-injection and instruction-conflict cases.
+- A context change MUST NOT silently rewrite the audit history that justified an earlier decision.
+
+An agent MAY update an episodic handover within a bounded execution if the system records the update and does not treat it as a normative rule. Even then, the next agent SHOULD be able to distinguish an agent hypothesis from a verified fact.
+
+## 11. Staleness and invalidation
+
+Every current-state item and normative item MUST have a review date or an explicit event that triggers review. Review triggers MAY include:
+
+- a schema or API change;
+- an architecture decision;
+- a security incident;
+- a repeated exception;
+- a test failure associated with the item;
+- a change in dependency or platform behaviour;
+- a change in product or regulatory requirements; or
+- a context retrieval evaluation that shows poor relevance.
+
+Stale does not mean false. It means the system no longer has enough evidence to treat the item as current without review. A stale item MUST be marked visibly and excluded from normative retrieval until revalidated.
+
+When an item is superseded, the system SHOULD retain a link to its replacement and a reason for the change. When an item is invalidated because it is unsafe, the system MUST record the risk, affected executions and any remediation required.
+
+## 12. Evidence and observability
+
+Context governance needs observable events, not only files in a repository. A context system SHOULD emit structured records for:
+
+- correction captured;
+- classification proposed;
+- promotion approved or rejected;
+- context item retrieved;
+- conflict detected;
+- evaluation run and result;
+- context version released;
+- item quarantined or invalidated;
+- rollback performed; and
+- future execution affected by the item.
+
+These events can use logs, metrics and traces. [OpenTelemetry's signal model](https://opentelemetry.io/docs/concepts/signals/) provides a useful vocabulary for separating those kinds of telemetry, but it does not prescribe this governance model.
+
+At minimum, an execution record SHOULD allow an investigator to answer:
+
+1. Which context version did the agent receive?
+2. Which item influenced the disputed decision?
+3. Who approved that item and within what scope?
+4. Which evaluation supported its release?
+5. Were similar corrections repeated afterwards?
+
+Useful governance measures include promotion volume, approval time, context retrieval rate, stale-item rate, invalidation rate, repeat-error rate and the percentage of normative items with passing evaluations. These indicators must be read with quality and safety evidence. A high promotion rate may indicate learning, or it may indicate poor classification and context accumulation.
+
+## 13. Implementation checklist
+
+An initial implementation SHOULD provide the following:
+
+- separate storage or namespaces for handovers, experiments, repository memory, rules and skills;
+- a correction record linked to work item and review evidence;
+- a classification workflow with a named owner;
+- structured context metadata and version history;
+- human approval for normative context;
+- retrieval logs and context version pinning;
+- evaluation tasks for important context changes;
+- quarantine and rollback mechanisms;
+- scheduled freshness review;
+- secret and personal-data checks;
+- an audit trail for release and invalidation; and
+- reporting that connects context changes to later execution outcomes.
+
+An organisation can begin with a small repository-scoped skill and a single architecture rule. It should establish the lifecycle before adding a large catalogue of context.
+
+## 14. Related work and boundaries
+
+The discussion in [Addy Osmani's agent-skills repository issue 398](https://github.com/addyosmani/agent-skills/issues/398) is relevant to the practical question of repository-level memory and how agent skills may retain useful project knowledge. Federico Bartoli opened issue 398. Siri Dalugoda contributed evidence and design critique in the discussion; the issue is not a proposal authored by Siri. It is cited here as related public discussion, not as evidence that this standard is part of that repository and not as a claim that the issue establishes a settled design.
+
+This standard also aligns with the broader risk-management direction of the [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework), particularly the need to govern, measure and manage system risks. It does not replace an organisation's AI risk framework, software security practice or access-control system.
+
+## Limitations
+
+This standard cannot prove that a context item is correct. It can make the item's source, scope, approval and evaluation visible. It cannot remove ambiguity from a requirement, detect every prompt injection, or guarantee that an agent will follow a retrieved rule.
+
+The model also introduces costs. Context requires ownership, review time, testing and maintenance. If an organisation promotes every correction, retrieval becomes noisy and contradictory. If it promotes too little, the same mistakes recur. The right balance depends on the risk, change rate and maturity of each engineering environment.
+
+## Document status
+
+Draft standard, version 0.1. This document is a proposed component of the Agentic Sprint Methodology and is open to critique, implementation feedback and revision.

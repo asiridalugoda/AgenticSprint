@@ -1,0 +1,324 @@
+---
+title: "Agentic Engineering Guardrails and Security Model"
+description: "A security model for bounded agent execution, independent verification, context integrity and human-controlled release in an Agentic Sprint."
+date: "2026-08-07"
+updated: "2026-08-07"
+type: "research"
+topics: ["AI Governance & Security", "Agentic Systems", "Engineering"]
+tags: ["agent security", "least privilege", "sandboxing", "provenance", "secure delivery", "guardrails"]
+featured: false
+pinned: false
+draft: false
+canonical: "/guardrails-and-security"
+image: "/social/guardrails-and-security"
+series: "Agentic Sprint Methodology"
+seriesOrder: 7
+version: "0.1"
+status: "Security model"
+documentId: "D7"
+documentKind: "security-model"
+normative: true
+owner: "Siri Dalugoda"
+dependsOn: ["D1", "D2", "D4", "D6"]
+claimClasses: ["normative-methodology", "security-model", "proposed-standard"]
+citation: "Dalugoda, Siri. Agentic Engineering Guardrails and Security Model. Agentic Sprint Methodology, v0.1, 7 August 2026. https://theagenticsprint.com/guardrails-and-security"
+references: ["https://www.rfc-editor.org/rfc/rfc8174.html", "https://csrc.nist.gov/pubs/sp/800/218/final", "https://www.nist.gov/itl/ai-risk-management-framework", "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/", "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations", "https://slsa.dev/spec/v1.2/provenance", "https://opentelemetry.io/docs/concepts/signals/", "https://helixar.ai/about/labs/hdp/"]
+externalLinks: []
+---
+
+An Agentic Sprint increases the amount of software work that can be attempted by machines. It does not remove the need to control what those machines may see, change, execute or release. The security problem is therefore broader than model output quality. It includes authority, environment isolation, tool use, context integrity, dependency risk, evidence and the human decisions that remain outside the autonomous execution plane.
+
+This document defines a minimum guardrail model for agentic engineering. It is intended for teams that allow agents to inspect repositories, prepare plans, change branches, run checks and propose pull requests. It assumes that high-impact work remains subject to human decision gates.
+
+The model is deliberately conservative. A control may make a workflow slower. That is a risk decision to measure and improve, not a reason to remove the control without evidence.
+
+## Status and language
+
+This is a draft security model. It is not a certification scheme, a complete threat model for every agent platform or a claim that the controls eliminate prompt injection, supply-chain compromise or implementation defects.
+
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **NOT RECOMMENDED**, **MAY** and **OPTIONAL** are to be interpreted as described in [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174.html) when they appear in all capitals.
+
+Requirements in this security model use the `AS-GS-NNN` namespace. They are companion requirements under D1 and MAY add controls for security-sensitive work, but they MUST NOT weaken D1 core requirements. A team MAY adopt this model without adopting the optional `AS-AL` profile.
+
+## Security objective
+
+The objective is **bounded autonomous execution**:
+
+- an agent may act only within an authorised scope;
+- a compromised instruction, tool or dependency should have limited reach;
+- independent checks should challenge the Maker's output;
+- high-impact actions should require a human decision;
+- actions and evidence should be attributable and reviewable;
+- a failure should be containable, detectable and recoverable.
+
+This is a layered control problem. No single prompt, model, scanner, signature or approval can provide the whole boundary.
+
+:::figure security-boundaries
+The security boundary around an Agentic Sprint. Context enters a bounded execution environment, Maker agents receive scoped capabilities, independent Checkers inspect the result, and protected merge and release controls remain outside the autonomous execution plane.
+:::
+
+## Threat model
+
+The model considers both accidental and adversarial failure. Relevant sources include:
+
+- an agent that misunderstands the requirement or architecture;
+- prompt injection in source files, issues, documentation or tool output;
+- a malicious or compromised dependency, package, repository or action;
+- a tool that returns misleading data or executes more authority than described;
+- credentials exposed through environment variables, logs, prompts or artefacts;
+- a Maker attempting to alter tests or controls to obtain a passing result;
+- a Checker sharing the Maker's context or blind spots;
+- a poisoned, stale or contradictory agent skill;
+- a human reviewer relying on an agent summary instead of inspecting evidence;
+- a release process that treats implementation completion as production authority;
+- an agent-to-agent handoff that loses the original scope or approval context.
+
+The [OWASP Agentic AI Threats and Mitigations](https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/) work is a useful threat catalogue, but it does not replace a system-specific assessment. A team MUST identify its own assets, trust boundaries, failure impact and compensating controls.
+
+## Authority is not the same as identity
+
+Authentication answers a question such as:
+
+> Which principal is presenting this credential?
+
+Authorisation answers:
+
+> What operations may that principal perform against this resource in this context?
+
+Delegated authority adds another question:
+
+> Who authorised this action, within what scope, through which delegation chain and under which constraints?
+
+These questions are related but not interchangeable. A service account may authenticate successfully and still be forbidden from changing a production database. An agent may have a valid identity and a tool token while lacking authority for the specific operation. A log entry may describe a human approval without proving that the approval was bound to the action that followed.
+
+This document requires systems to preserve those distinctions. It does not prescribe a particular delegation protocol. The [Human Delegation Provenance (HDP)](https://helixar.ai/about/labs/hdp/) work, published through Helixar Limited, is relevant research on cryptographically verifiable delegation. It is an open specification and research effort, not an adopted industry standard. Teams MUST NOT treat a reference to provenance as a substitute for access controls, review or release governance.
+
+## Risk tiers and required controls
+
+Risk tier MUST be assessed before an agent receives write capability. A team MAY use a different scale if it defines equivalent controls.
+
+| Tier | Example work | Minimum controls |
+| --- | --- | --- |
+| R0 | Documentation or isolated low-impact tooling | Scoped workspace, branch protection, basic checks and human diff review |
+| R1 | Reversible application behaviour with bounded impact | Least privilege, sandbox, controlled network, deterministic checks, independent review and human implementation approval |
+| R2 | Identity, permissions, personal data, financial state, shared platform or migration | R2 threat assessment, stronger audit, security review, independent verification, staged rollout and explicit human acceptance |
+| R3 | Destructive, safety-related, irreversible or production-control actions | No Maker production access, dedicated security or risk owner, separate release authority, staged or simulated execution and human approval immediately before action |
+
+The highest plausible impact of the change determines the tier. A small patch that changes authorisation can be higher risk than a large refactor that does not cross a trust boundary.
+
+## Non-negotiable guardrails
+
+The following controls are REQUIRED for a governed Agentic Sprint unless a documented exception is approved by an accountable human with authority for the risk.
+
+### AS-GS-001: No production access for Maker agents
+
+Maker agents MUST NOT receive direct production credentials, unrestricted production network access or the ability to perform production mutations. They MAY work against local, synthetic, masked or explicitly isolated environments.
+
+Production observation, if needed, SHOULD be mediated through approved read-only views with data minimisation, redaction and audit. Production actions MUST occur through a separate controlled path with human release authority.
+
+This boundary applies even when the agent appears trustworthy or the task appears routine. Capability should be controlled by the system, not by an assumption about model intent.
+
+### AS-GS-002: Least privilege
+
+Each agent role MUST receive only the repositories, paths, tools, data, commands, network destinations and execution duration required for its current task. Capabilities SHOULD be short-lived and scoped to a work item or run.
+
+A Coordinator, Maker, Reviewer and Release authority SHOULD have different permissions. For example:
+
+| Role | May inspect | May change | Must not do |
+| --- | --- | --- | --- |
+| Coordinator | Work state and approved context | Create bounded runs and handoffs | Approve its own implementation or release |
+| Maker | Authorised repositories and test environment | Feature branch or isolated worktree | Merge, release or alter protected controls |
+| Checker | Requirement, plan, diff and evidence | Review artefact only, unless explicitly assigned | Treat Maker output as proof or self-approve |
+| Security reviewer | Relevant code, configuration and evidence | Findings and disposition proposal | Grant release authority by default |
+| Release authority | Required evidence and release controls | Approve merge or deployment | Delegate final accountability to the Maker |
+
+Permissions MUST be enforced by the execution environment, not only stated in an instruction file.
+
+### AS-GS-003: Protected branches and human approval
+
+Agent changes MUST land on a protected branch or equivalent review boundary. Maker agents MUST NOT approve or merge their own pull requests. The [GitHub cloud agent risk guidance](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations/) describes comparable controls: agent-created changes are presented for human review and higher-risk actions are restricted.
+
+Human approval MUST identify the revision and the evidence reviewed. A generic approval on a moving branch is not sufficient for a material change.
+
+### AS-GS-004: Sandboxed execution
+
+Agent processes MUST run in a sandbox or isolated environment appropriate to the risk tier. The boundary SHOULD cover:
+
+- filesystem paths and write access;
+- process creation and privileged commands;
+- network egress and ingress;
+- package installation and binary execution;
+- environment variables and credential mounts;
+- resource limits and execution time;
+- persistence between runs.
+
+The sandbox is a containment layer, not a proof that the model will behave correctly. A sandbox that permits an unbounded network or host-level credential access is not a meaningful boundary for the relevant threat.
+
+### AS-GS-005: Network restrictions
+
+Network access MUST be denied by default for Maker agents and opened only for declared destinations and protocols. The policy SHOULD distinguish:
+
+- source-control access;
+- dependency retrieval;
+- test services;
+- documentation or research access;
+- telemetry and evidence storage;
+- production or administrative endpoints.
+
+Requests to expand network access MUST be logged and approved according to the risk tier. Network access should not be granted merely because a build failed.
+
+### AS-GS-006: Secrets and sensitive data
+
+Secrets MUST NOT be placed in prompts, source files, logs, screenshots, model context or unprotected artefacts. Agents SHOULD use short-lived, scoped credentials delivered through a managed mechanism, where credentials are unavoidable.
+
+Teams MUST classify data that may enter the agent context. Personal, financial, security-sensitive, customer or confidential data should be masked, minimised or excluded unless the risk assessment explicitly permits its use.
+
+Secret scanning, log redaction and artefact inspection MUST be part of the quality gate. A secret found in an agent context is an incident or near miss, not merely a documentation issue.
+
+### AS-GS-007: Tool capabilities
+
+Every tool exposed to an agent MUST have a declared name, purpose, input schema, output handling and permission boundary. Tool descriptions MUST NOT be treated as security enforcement.
+
+High-impact tools such as deletion, deployment, permission changes, credential creation, migration execution or external messaging MUST require a separate approval path. A tool should make the target, scope and intended side effect visible before execution.
+
+Tool output MUST be treated as untrusted input. An agent MUST NOT follow instructions embedded in a repository file, issue comment, webpage or command output merely because the text looks authoritative.
+
+### AS-GS-008: Audit trails
+
+The system MUST record enough information to reconstruct material agent activity:
+
+- run and work-item identifiers;
+- agent role and model or service version, where available;
+- relevant instruction and context versions;
+- tools called, input scope and result status;
+- commands executed and exit results;
+- repositories, commits, branches and worktrees touched;
+- checks, findings, approvals and revisions;
+- capability or network-policy changes;
+- human decisions and timestamps.
+
+Audit records MUST be protected from unauthorised modification and retained according to the system's risk and privacy requirements. They are evidence, not an excuse to collect unlimited personal data.
+
+### AS-GS-009: No self-approval
+
+The agent that creates an implementation MUST NOT be the sole agent or authority deciding that it is correct, safe or releasable. Independent review MAY be performed by another agent, a deterministic control or a human, but the independence MUST be meaningful.
+
+Independence includes access to the requirement, constraints and relevant evidence. A second agent that receives only the Maker's conclusion may repeat the same error. For higher-risk work, an independent human or security function MUST be involved.
+
+### AS-GS-010: Model and tool provenance
+
+The evidence package SHOULD identify the model or agent service version, tool versions, instruction bundle, repository revision and dependency lock state used during execution. Where a build or artefact requires provenance, teams SHOULD use a structured format aligned with [SLSA provenance](https://slsa.dev/spec/v1.2/provenance) or an equivalent internal schema.
+
+Provenance records what generated or influenced an artefact. It does not prove that the artefact is correct, safe or authorised. Those decisions require separate verification and approval.
+
+### AS-GS-011: Context integrity
+
+Agent instructions, skills, architecture notes, policy rules and examples MUST be version controlled, reviewed and attributable. Changes to security invariants, tool permissions or release rules MUST require human approval.
+
+The execution system SHOULD record the exact context version used by a run. It SHOULD detect contradictory instructions, unexpected context sources and material changes during execution.
+
+An agent MUST NOT silently promote a local observation into an organisation-wide rule. A reusable correction belongs in a reviewed context change with an owner, rationale, test or example and rollback path.
+
+### AS-GS-012: Dependency and supply-chain risk
+
+Dependency installation, build actions, CI plugins, model providers, agent tools and external repositories are part of the supply chain. The team SHOULD:
+
+- pin or constrain versions where practical;
+- review new dependencies and licences;
+- scan for known vulnerabilities and malicious packages;
+- restrict install and post-install capabilities;
+- verify repository and action provenance;
+- separate untrusted build steps from sensitive credentials;
+- retain dependency and tool versions in the evidence package.
+
+The guardrail model does not assume that a package is safe because it is popular or that a model output is safe because it compiles.
+
+### AS-GS-013: Human-controlled release authority
+
+Release authority MUST remain outside the Maker execution plane. A release decision should consider:
+
+- approved requirement and Build Plan;
+- final diff and migration state;
+- deterministic and independent verification;
+- security, privacy and dependency findings;
+- QA or product evidence;
+- observability and rollback readiness;
+- known residual risk;
+- the release window and affected users or systems.
+
+The release approver MAY accept, reject, defer or require additional evidence. An agent MAY assemble the package and identify missing items, but it MUST NOT turn its own completion status into a release decision.
+
+### AS-GS-014: Verification and telemetry
+
+Guardrails are only useful when their operation can be checked. The system SHOULD emit structured events for run start, capability grant, tool call, policy decision, check result, human decision, failure and release transition.
+
+[OpenTelemetry's signal model](https://opentelemetry.io/docs/concepts/signals/) provides a useful vocabulary for traces, metrics and logs, but teams SHOULD adapt collection to privacy and operational needs. For an agentic run, useful telemetry MAY include:
+
+- trace context connecting orchestration, agent calls and checks;
+- counters for policy denials, retries and scope violations;
+- duration and resource use by stage;
+- evidence links for test and review results;
+- alerts for repeated failure, unusual access or credential exposure.
+
+Telemetry SHOULD support investigation without becoming an uncontrolled copy of the agent's entire context.
+
+### AS-GS-015: Incident and near-miss handling
+
+The team MUST have a response path for a suspected guardrail breach. Examples include leaked credentials, unauthorised repository changes, unexpected network access, a destructive command, poisoned context or evidence that cannot be trusted.
+
+The initial response SHOULD:
+
+1. stop or isolate the run;
+2. revoke or rotate affected credentials and capabilities;
+3. preserve relevant logs, commits, artefacts and context versions;
+4. identify affected repositories, environments and data;
+5. assess whether the change reached a protected or production boundary;
+6. notify the accountable security and engineering owners;
+7. remediate, verify and document the outcome;
+8. decide whether a reusable context or control update is required.
+
+Near misses should also be recorded when the control prevented impact. A near miss may reveal a missing policy, unclear tool boundary or review weakness.
+
+### AS-GS-016: Control evidence
+
+For each governed run, the evidence package SHOULD make the following inspectable:
+
+| Control | Evidence example |
+| --- | --- |
+| Scope | Approved plan, repository allow-list and changed-file summary |
+| Authority | Role, capability grant and human gate decision |
+| Isolation | Sandbox, worktree and network policy identifiers |
+| Secrets | Credential class, expiry and scan result, without secret values |
+| Making and checking | Maker identity, independent review and findings |
+| Build integrity | Commit, dependency lock state and build provenance |
+| Verification | Test, static analysis and security results |
+| Release | Human approver, revision and release decision |
+| Recovery | Rollback, incident or rework record where relevant |
+
+If a control cannot produce evidence, the team MUST state that limitation and decide whether the work can proceed at its risk tier.
+
+### AS-GS-017: Exceptions and change control
+
+An exception to a non-negotiable guardrail MUST be explicit, time-bounded and approved by a human accountable for the affected risk. It MUST state:
+
+- the guardrail and scope of the exception;
+- why the normal control cannot be used;
+- the threat and residual risk;
+- compensating controls;
+- start and expiry time;
+- approver and review owner;
+- conditions that revoke the exception.
+
+An agent MUST NOT create, approve or extend its own exception. Changes to guardrails, security invariants, context permissions and release policy MUST be reviewed as security-sensitive changes.
+
+## What this model does not claim
+
+This model does not claim that sandboxing prevents all prompt injection, that independent agents are automatically independent, that signatures establish intent by themselves or that audit logs prove an action was legitimate. It does not claim that a model, tool or protocol is secure merely because it has provenance.
+
+It also does not claim that every agentic work item requires the same controls. Risk tiering is necessary, but a lower tier MUST NOT be used to hide an unassessed high-impact consequence.
+
+The model does not prescribe Human Delegation Provenance, a particular identity system or a specific cloud platform. Those mechanisms MAY support a control, but they do not replace least privilege, isolation, independent verification or human release authority.
+
+## Document status and limitations
+
+Security model, version 0.1. This document is a proposed methodology component for critique, threat modelling and implementation. It reports no measured security outcome and does not constitute a certification or adopted standard.
