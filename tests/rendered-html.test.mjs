@@ -216,6 +216,22 @@ test("serves page-specific social images and exposes them in metadata", async ()
   assert.match(await document.text(), /property="og:image" content="https:\/\/theagenticsprint\.com\/social\/specification"/);
 });
 
+test("keeps the stylesheet guards that the rendered HTML cannot show", async () => {
+  const [responsive, figures, globals] = await Promise.all([
+    readFile(new URL("../app/responsive.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/figures.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+  // The mobile panel is a grid; without this rule the hidden attribute loses and the menu is always open.
+  assert.match(responsive, /\.mobile-nav-links\[hidden\] \{ display: none; \}/);
+  // The hand-built figure lists sit inside .article-body, whose list rules outrank a bare class.
+  assert.match(figures, /\.article-body ol\.process-flow[^{]*\{ list-style: none; \}/);
+  // Document lists keep their markers: the reset must not strip them.
+  assert.match(globals, /\.article-body ul \{ list-style-type: disc; \}/);
+  assert.match(globals, /\.article-body ol \{ list-style-type: decimal; \}/);
+  assert.doesNotMatch(globals, /prefers-color-scheme:\s*dark/);
+});
+
 test("serves a titled 404 for unknown documents", async () => {
   const missing = await render("/this-document-does-not-exist");
   assert.equal(missing.status, 404);

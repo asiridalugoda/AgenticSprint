@@ -16,6 +16,8 @@
   .mobile-nav-toggle { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: flex-end; gap: 7px; padding: 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.08em; text-transform: uppercase; }
   .mobile-nav-toggle:hover { color: var(--ink); }
   .mobile-nav-links { position: absolute; top: 56px; right: 0; z-index: 12; display: grid; min-width: 180px; padding: 8px 14px; border: 1px solid var(--rule-strong); background: var(--paper); box-shadow: 0 10px 24px rgb(26 25 23 / 10%); }
+  /* The panel's grid display would otherwise outrank the hidden attribute. */
+  .mobile-nav-links[hidden] { display: none; }
   .mobile-nav-links a { display: flex; min-height: 44px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--rule); color: var(--muted); }
   .mobile-nav-links a:last-child { border-bottom: 0; }
   .mobile-nav-links a[aria-current="page"] { color: var(--ink); }

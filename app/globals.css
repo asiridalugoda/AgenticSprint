@@ -141,7 +141,7 @@ ol.principles { margin: 0; padding: 0; border-top: 1px solid var(--rule-strong);
 
 .compact-test { margin: 72px 0 0; padding: 40px 44px 36px; border: 1px solid var(--rule-strong); background: var(--canvas); }
 .compact-test > p { max-width: 62ch; margin: 0 0 20px; font-size: var(--text-lede); line-height: 1.55; }
-.compact-test > p:last-child { margin: 26px 0 0; padding-top: 22px; border-top: 1px solid var(--rule); color: var(--muted); font-size: var(--text-body); }
+.compact-test > p:last-child { margin: 26px 0 0; color: var(--muted); font-size: var(--text-body); }
 ul.compact-test-list { margin: 0; padding: 0; border-top: 1px solid var(--rule); list-style: none; }
 .compact-test-list li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 16px; margin: 0; padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 20px; line-height: 1.45; }
 .tick { display: block; width: 14px; height: 14px; margin-top: 8px; border: 1.5px solid var(--accent); border-radius: 2px; }
@@ -164,7 +164,7 @@ ol.read-on-list { margin: 0; padding: 0; border-top: 1px solid var(--rule); list
 .read-on-summary { max-width: 62ch; color: var(--muted); font-family: var(--font-sans); font-size: var(--text-meta); line-height: 1.55; }
 .read-on-arrow { color: var(--accent); }
 .read-on-essay { max-width: 66ch; margin: 30px 0 0; color: var(--muted); font-family: var(--font-sans); font-size: var(--text-meta); line-height: 1.6; }
-.read-on-essay a { color: var(--accent); }
+.read-on-essay a { display: inline-flex; align-items: center; margin-top: 6px; color: var(--accent); white-space: nowrap; }
 .manifesto .methodology-cite { margin-top: 56px; }
 
 .text-link { display: inline-flex; min-height: 28px; align-items: center; color: var(--accent); font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }

@@ -49,6 +49,8 @@ function externalLabel(url: string) {
     if (hostname === "docs.github.com" && last) return `GitHub Docs: ${humanise(last)}`;
     if (hostname === "arxiv.org" && segments[0] === "abs" && segments[1]) return `arXiv preprint ${segments.slice(1).join("/")}`;
     if (hostname.endsWith("nist.gov")) {
+      const sp = segments.indexOf("sp");
+      if (sp >= 0 && segments[sp + 1] && segments[sp + 2]) return `NIST SP ${segments[sp + 1]}-${segments[sp + 2]}`;
       const name = last === "final" || last === "ipd" ? segments[segments.length - 2] : last;
       return name ? `NIST: ${humanise(name)}` : "NIST";
     }

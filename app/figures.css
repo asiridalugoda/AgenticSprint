@@ -287,3 +287,7 @@ ol.methodology-index-list { margin: 0; padding: 0; border-top: 1px solid var(--r
 .methodology-index-meta { color: var(--muted); font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.04em; }
 .methodology-index-arrow { grid-column: 3; grid-row: 1 / -1; align-self: center; color: var(--accent); }
 
+
+/* The hand-built figure lists sit inside .article-body, whose list rules outrank a bare class. */
+.article-body ol.process-flow, .article-body ol.learning-loop, .article-body ol.maturity-ladder, .article-body ol.legacy-flow, .article-body .inner-loop ol { list-style: none; }
+.article-body .process-step, .article-body .learning-loop li, .article-body .maturity-ladder li, .article-body .legacy-flow li, .article-body .inner-loop li { padding-left: 0; }
