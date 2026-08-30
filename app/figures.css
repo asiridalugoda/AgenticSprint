@@ -1,0 +1,289 @@
+/* Figure chart language and document furniture, ported from dalugoda.com and recoloured through the tokens in globals.css. */
+
+.technical-figure { margin: 42px 0; }
+.technical-figure > img { display: block; width: 100%; height: auto; }
+.technical-figure figcaption { margin-top: 10px; color: var(--faint); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; line-height: 1.45; }
+.diagram-source { margin: 0; border: 1px solid var(--rule); background: var(--paper-deep); }
+.mermaid-source-label { margin-bottom: 8px; color: var(--faint); font-family: var(--font-mono); font-size: var(--text-label); }
+.article-figures { margin: 0 0 42px; }
+.article-figures figure { margin: 0 0 39px; }
+.diagram-figure { overflow-x: auto; }
+.article-diagram { display: block; width: 100%; min-width: 560px; height: auto; border: 1px solid var(--rule); background: var(--paper-deep); }
+.diagram-node { fill: var(--paper); stroke: var(--rule); stroke-width: 1.2; }
+.diagram-spine { fill: var(--paper); stroke: var(--accent); stroke-width: 1.2; }
+.diagram-gate { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+.diagram-arrow { fill: var(--accent); }
+.diagram-line { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+.diagram-feedback { fill: none; stroke: var(--faint); stroke-dasharray: 5 5; stroke-width: 1.2; }
+.diagram-axis, .diagram-rule { stroke: var(--rule); stroke-width: 1; }
+.diagram-trend-down, .diagram-trend-up, .diagram-trend-steady { fill: none; stroke-width: 3; }
+.diagram-trend-down { stroke: var(--accent); }
+.diagram-trend-up { stroke: var(--focus); }
+.diagram-trend-steady { stroke: var(--muted); }
+.diagram-overline, .diagram-node-label, .diagram-gate-label, .diagram-chart-label, .diagram-bar-label { font-family: var(--font-mono); }
+.diagram-overline { fill: var(--accent); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; }
+.diagram-node-label, .diagram-gate-label { fill: var(--ink); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
+.diagram-gate-label { fill: var(--accent); font-size: 11px; }
+.diagram-small { fill: var(--muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.02em; }
+.diagram-chart-label { fill: var(--ink); font-size: 12px; }
+.diagram-bar rect { fill: var(--paper); stroke: var(--rule); stroke-width: 1; }
+.diagram-bar-accent rect { fill: var(--accent-soft); stroke: var(--accent); }
+.diagram-bar-label { fill: var(--ink); font-size: 14px; font-weight: 600; }
+
+.article-visual-figure { width: min(920px, calc(100vw - 340px)); margin: 52px 0; padding: 24px; overflow: hidden; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper-deep); font-family: var(--font-sans); }
+.article-visual-heading { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: baseline; }
+.article-visual-heading h3 { margin: 0; font-size: 24px; }
+.article-visual-kicker, .topology-label, .responsibility-role { color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase; }
+.article-visual-description { max-width: 72ch; margin: 12px 0 22px !important; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.article-visual-canvas { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 22px 0; }
+.article-visual-figure figcaption { margin-top: 14px; color: var(--faint); font-family: var(--font-sans); font-size: 11px; line-height: 1.55; }
+
+.process-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 !important; padding: 0 !important; list-style: none; }
+.process-step { position: relative; min-height: 130px; margin: 0 !important; padding: 15px !important; border: 1px solid var(--rule); border-radius: 4px; background: var(--canvas); }
+.process-step:not(:last-child)::after { position: absolute; top: 50%; right: -10px; z-index: 1; width: 8px; border-top: 1px solid var(--accent); content: ""; }
+.process-step-gate { border-color: var(--accent-mid); background: var(--accent-soft); }
+.process-step-number { display: block; margin-bottom: 14px; color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+.process-step-copy { display: grid; gap: 5px; }
+.process-step-copy strong { font-size: 14px; line-height: 1.25; }
+.process-step-copy span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.process-branch { margin: 16px 0; padding: 16px; border: 1px solid var(--accent-mid); border-radius: 4px; background: var(--canvas); }
+.process-branch-heading { margin-bottom: 12px; color: var(--accent); font-size: 12px; font-weight: 700; }
+.process-branch-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.process-branch-node { display: grid; gap: 4px; padding: 12px; background: var(--paper-deep); }
+.process-branch-node strong { font-size: 13px; }
+.process-branch-node span { color: var(--muted); font-size: 11px; line-height: 1.45; }
+.process-feedback, .visual-callout, .topology-recovery { margin-top: 16px; padding: 13px 15px; border-left: 3px solid var(--accent); background: var(--accent-soft); }
+.process-feedback { display: grid; gap: 3px; }
+.process-feedback strong, .visual-callout strong, .topology-recovery strong { font-size: 13px; }
+.process-feedback span, .visual-callout, .topology-recovery { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+.responsibility-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.responsibility-column { padding: 20px; border: 1px solid var(--rule); border-radius: 4px; background: var(--canvas); }
+.responsibility-humans { border-color: var(--accent-mid); }
+.responsibility-column h4 { margin: 8px 0 14px; font-size: 20px; }
+.responsibility-column ul { margin: 0; padding-left: 18px; }
+.responsibility-column li { margin: 7px 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+.learning-loop { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 0 !important; padding: 0 !important; list-style: none; }
+.learning-loop li { margin: 0 !important; padding: 14px !important; border-top: 2px solid var(--accent); background: var(--canvas); }
+.learning-loop-number { display: block; margin-bottom: 14px; color: var(--accent); font-family: var(--font-mono); font-size: 10px; }
+.learning-loop-copy { display: grid; gap: 5px; }
+.learning-loop-copy strong { font-size: 13px; line-height: 1.3; }
+.learning-loop-copy span { color: var(--muted); font-size: 11px; line-height: 1.45; }
+
+.metric-table-wrap, .content-table-scroll { max-width: 100%; overflow-x: auto; }
+.article-body .content-table-scroll { margin: 0 0 30px; }
+.metric-table, .content-table-scroll table { width: 100%; border-collapse: collapse; background: var(--canvas); font-size: 13px; }
+.metric-table th, .metric-table td, .content-table-scroll th, .content-table-scroll td { padding: 12px 13px; border: 1px solid var(--rule); text-align: left; vertical-align: top; }
+.content-table-scroll th, .content-table-scroll td { border-color: var(--rule-strong); }
+.metric-table thead th, .content-table-scroll thead th { background: var(--paper-deep); color: var(--ink); font-weight: 700; }
+.metric-table tbody th { min-width: 190px; font-weight: 600; }
+.metric-table td:nth-child(2) { color: var(--accent); font-weight: 700; white-space: nowrap; }
+.visual-footnote { margin: 12px 0 0 !important; color: var(--faint); font-size: 11px; }
+
+.maturity-ladder { display: grid; grid-template-columns: repeat(7, minmax(90px, 1fr)); gap: 0; margin: 0 !important; padding: 0 !important; overflow-x: auto; list-style: none; }
+.maturity-ladder li { position: relative; display: grid; min-height: 105px; align-content: start; gap: 8px; margin: 0 !important; padding: 13px !important; border: 1px solid var(--rule); border-right: 0; background: var(--canvas); }
+.maturity-ladder li:last-child { border-right: 1px solid var(--rule); }
+.maturity-ladder .maturity-current { background: var(--accent-soft); border-color: var(--accent-mid); }
+.maturity-level { color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+.maturity-label { font-size: 12px; font-weight: 620; line-height: 1.35; }
+
+.autonomous-topology { display: grid; grid-template-columns: minmax(210px, 0.65fr) minmax(0, 1.35fr); gap: 16px; }
+.execution-spine, .inner-loop { padding: 19px; border: 1px solid var(--rule); border-radius: 4px; background: var(--canvas); }
+.execution-spine h4, .inner-loop h4 { margin: 7px 0 14px; font-size: 20px; }
+.execution-spine ul { margin: 0; padding-left: 18px; }
+.execution-spine li { margin: 5px 0; color: var(--muted); font-size: 12px; }
+.execution-spine p { margin: 14px 0 0 !important; color: var(--muted); font-size: 12px; }
+.inner-loop ol { margin: 0 !important; padding: 0 !important; list-style: none; }
+.inner-loop li { display: grid; grid-template-columns: 28px minmax(105px, 0.7fr) minmax(0, 1fr); gap: 10px; align-items: baseline; margin: 0 !important; padding: 9px 0 !important; border-top: 1px solid var(--rule); }
+.inner-loop li > span { color: var(--accent); font-family: var(--font-mono); font-size: 9px; }
+.inner-loop li > strong { font-size: 12px; }
+.inner-loop li > small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+.delegation-chain { margin: 0 !important; padding: 0 !important; list-style: none; }
+.delegation-chain li { display: grid; grid-template-columns: 34px minmax(140px, 0.75fr) minmax(0, 1.4fr); gap: 14px; align-items: center; margin: 0 !important; padding: 11px 0 !important; border-top: 1px solid var(--rule); }
+.delegation-chain li:first-child { border-top: 0; }
+.delegation-hop { color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; }
+.delegation-actor { display: grid; gap: 2px; }
+.delegation-actor strong { font-size: 13px; line-height: 1.3; }
+.delegation-actor small, .delegation-scope small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+.delegation-scope { display: grid; gap: 6px; }
+.delegation-scope-bar { display: block; height: 5px; min-width: 22px; border-radius: 3px; background: var(--accent-soft); border-left: 3px solid var(--accent); }
+
+.authority-states { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0 !important; padding: 0 !important; list-style: none; }
+.authority-states li { display: grid; align-content: start; gap: 8px; margin: 0 !important; padding: 15px !important; border: 1px solid var(--rule); border-radius: 4px; background: var(--canvas); }
+.authority-states .authority-state-critical { border-color: var(--accent-mid); background: var(--accent-soft); }
+.authority-state-name { color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+.authority-states strong { font-size: 13px; line-height: 1.3; }
+.authority-states small { color: var(--muted); font-size: 11px; line-height: 1.45; }
+
+.authority-evaluation { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 14px; }
+.authority-signals, .authority-question, .authority-outcomes { padding: 19px; border: 1px solid var(--rule); border-radius: 4px; background: var(--canvas); }
+.authority-question { align-content: center; display: grid; border-color: var(--accent-mid); background: var(--accent-soft); }
+.authority-signals h4, .authority-outcomes h4, .authority-question h4 { margin: 7px 0 13px; font-size: 20px; }
+.authority-signals ul { margin: 0; padding-left: 18px; }
+.authority-signals li { margin: 6px 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.authority-question p { margin: 10px 0 0 !important; color: var(--ink); font-size: 13px; line-height: 1.55; }
+.authority-outcomes ol { margin: 0 !important; padding: 0 !important; list-style: none; }
+.authority-outcomes li { display: grid; gap: 2px; margin: 0 !important; padding: 8px 0 !important; border-top: 1px solid var(--rule); }
+.authority-outcomes li:first-of-type { border-top: 0; padding-top: 0 !important; }
+.authority-outcomes li strong { font-size: 12px; }
+.authority-outcomes li small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+
+.legacy-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 10px; margin: 0 !important; padding: 0 !important; list-style: none; }
+.legacy-flow li { display: grid; gap: 10px; margin: 0 !important; padding: 14px !important; border: 1px solid var(--rule); background: var(--canvas); }
+.legacy-flow li span { color: var(--accent); font-family: var(--font-mono); font-size: 10px; }
+.legacy-flow li strong { font-size: 13px; }
+
+.article-references { margin-top: 72px; padding-top: 30px; border-top: 1px solid var(--rule); font-family: var(--font-sans); font-size: var(--text-meta); line-height: 1.6; }
+.article-references h2, .related-writing h2 { margin: 0 0 18px; font-size: var(--text-h3); font-weight: 620; letter-spacing: -0.03em; }
+.reference-note { max-width: 62ch; margin: 0 0 15px; color: var(--muted); }
+.article-references ol { margin: 15px 0 0; padding-left: 20px; list-style-type: decimal; }
+.article-references li { margin: 0; }
+.article-references li::marker { color: var(--faint); }
+.article-references li + li { margin-top: 8px; }
+.article-references a { overflow-wrap: anywhere; }
+.corrections-note { margin-top: 24px !important; color: var(--faint); font-size: var(--text-small); }
+
+/* ---- Methodology ---- */
+
+/* Data-driven figures, rendered in the same chart language as the hand-built ones. */
+.methodology-figure-flow, .methodology-figure-boundary { display: grid; gap: 14px; }
+.methodology-lane { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 10px 18px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.methodology-lane:first-child { padding-top: 0; border-top: 0; }
+.methodology-lane-head, .methodology-region-head { display: grid; gap: 5px; align-content: start; }
+.methodology-lane-label, .methodology-region-label, .methodology-edges-label, .methodology-legend-heading, .methodology-node-tag, .methodology-node-order, .methodology-ladder-step { color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase; }
+.methodology-lane-detail, .methodology-region-detail { max-width: 68ch; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.methodology-region { padding: 14px; border: 1px solid var(--rule-strong); border-radius: 4px; }
+.methodology-region-head { margin-bottom: 12px; }
+
+ol.methodology-node-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+li.methodology-node { display: grid; align-content: start; gap: 5px; margin: 0; padding: 13px; border: 1px solid var(--rule); border-radius: 4px; background: var(--canvas); }
+.methodology-node-order { margin-bottom: 4px; }
+.methodology-node-label { font-size: 13px; font-weight: 620; line-height: 1.3; }
+.methodology-node-detail { color: var(--muted); font-size: 11px; line-height: 1.5; }
+/* One treatment per semantic role, so a legend key can name exactly one thing.
+   Agent work is the plain baseline; a human tint, a gate's heavier accent edge,
+   a system's left bar, evidence's grey fill, a dashed external and a risk's ink
+   edge each read on their own at node size and at 12px in the legend. */
+li.methodology-node-human { border-color: var(--accent-mid); background: var(--accent-soft); }
+li.methodology-node-gate { border-width: 2px; border-color: var(--accent); background: var(--accent-soft); }
+li.methodology-node-agent { border-color: var(--rule-strong); }
+li.methodology-node-system { border-left-width: 4px; border-color: var(--rule-strong); }
+li.methodology-node-evidence { border-color: var(--rule-strong); background: var(--paper-deep); }
+li.methodology-node-external { border-style: dashed; }
+li.methodology-node-risk { border-width: 2px; border-color: var(--ink); }
+.methodology-node-tag { color: var(--ink); }
+
+.methodology-edges { margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--rule); }
+ul.methodology-edge-list { margin: 8px 0 0; padding: 0; list-style: none; }
+.methodology-edge-list li.methodology-edge { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; margin: 0; padding: 8px 0; border-top: 1px solid var(--rule); }
+.methodology-edge-list li.methodology-edge:first-child { border-top: 0; }
+.methodology-edge-node { color: var(--ink); font-size: 12px; font-weight: 620; line-height: 1.35; }
+.methodology-edge-arrow { display: inline-flex; align-items: center; color: var(--muted); }
+.methodology-edge-label { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.methodology-edge-style { margin-left: auto; color: var(--faint); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; }
+.methodology-edge-gated .methodology-edge-arrow, .methodology-edge-gated .methodology-edge-style { color: var(--accent); }
+.methodology-edge-failure .methodology-edge-arrow, .methodology-edge-failure .methodology-edge-style { color: var(--ink); }
+.methodology-edge-feedback .methodology-arrow path:first-child { stroke-dasharray: 3 2; }
+
+.methodology-legend { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--rule); }
+ul.methodology-legend-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px 18px; margin: 10px 0 0; padding: 0; list-style: none; }
+.methodology-legend-list li { display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 3px 9px; margin: 0; padding: 0; }
+.methodology-swatch { grid-row: 1 / span 2; width: 12px; height: 12px; margin-top: 3px; border: 1px solid var(--rule-strong); border-radius: 2px; background: var(--canvas); }
+.methodology-swatch-role-human { border-color: var(--accent-mid); background: var(--accent-soft); }
+.methodology-swatch-role-gate { border-width: 2px; border-color: var(--accent); background: var(--accent-soft); }
+.methodology-swatch-role-agent { border-color: var(--rule-strong); }
+.methodology-swatch-role-system { border-left-width: 4px; border-color: var(--rule-strong); }
+.methodology-swatch-role-evidence { background: var(--paper-deep); }
+.methodology-swatch-role-external { border-style: dashed; }
+.methodology-swatch-role-risk { border-width: 2px; border-color: var(--ink); }
+/* A region is a container drawn around other nodes, not a node itself. */
+.methodology-swatch-region { border-style: dotted; border-color: var(--accent); }
+/* An edge is a line. Drawing it as one keeps every edge key clear of every role key. */
+.methodology-swatch-edge-normal,
+.methodology-swatch-edge-gated,
+.methodology-swatch-edge-failure,
+.methodology-swatch-edge-feedback { height: 0; margin-top: 8px; border-width: 2px 0 0; border-radius: 0; background: none; }
+.methodology-swatch-edge-normal { border-top-color: var(--rule-strong); }
+.methodology-swatch-edge-gated { border-top-color: var(--accent); }
+.methodology-swatch-edge-failure { border-top-color: var(--ink); }
+.methodology-swatch-edge-feedback { border-top-style: dashed; border-top-color: var(--muted); }
+/* Two entries the figure draws the same way are one key, not two. When a
+   treatment repeats inside a legend the entry keeps its label and loses the
+   swatch, so every swatch on the page stands for exactly one thing. */
+.methodology-swatch-none { border-color: transparent; background: none; }
+.methodology-legend-label { color: var(--ink); font-family: var(--font-mono); font-size: 10px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase; }
+.methodology-legend-detail { color: var(--muted); font-size: 11px; line-height: 1.45; }
+
+.methodology-matrix-scroll { max-width: 100%; overflow-x: auto; }
+.methodology-matrix-scroll:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+table.methodology-matrix { width: 100%; min-width: 560px; border-collapse: collapse; background: var(--canvas); font-size: 13px; }
+.methodology-matrix th, .methodology-matrix td { padding: 12px 13px; border: 1px solid var(--rule); text-align: left; vertical-align: top; }
+.methodology-matrix thead th { background: var(--paper-deep); }
+.methodology-matrix tbody th { min-width: 150px; }
+.methodology-axis-label { display: block; color: var(--ink); font-size: 12px; font-weight: 700; }
+.methodology-axis-detail { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; font-weight: 400; line-height: 1.45; }
+.methodology-cell-label { display: block; font-size: 12px; font-weight: 650; line-height: 1.35; }
+.methodology-cell-detail { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+
+ol.methodology-ladder { display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 0; margin: 0; padding: 0; list-style: none; }
+.methodology-ladder li { display: grid; align-content: start; gap: 7px; margin: 0; padding: 13px; border: 1px solid var(--rule); border-right: 0; background: var(--canvas); }
+.methodology-ladder li:last-child { border-right: 1px solid var(--rule); }
+.methodology-ladder-label { font-size: 12px; font-weight: 640; line-height: 1.35; }
+.methodology-ladder-detail { color: var(--muted); font-size: 11px; line-height: 1.45; }
+p.methodology-ladder-note { margin: 14px 0 0; color: var(--faint); font-family: var(--font-sans); font-size: 11px; line-height: 1.55; }
+
+/* Document status block for methodology and template documents. */
+.document-status { margin: 0 0 40px; padding: 18px 20px; border: 1px solid var(--rule); border-left: 1px solid var(--accent); border-radius: 4px; background: var(--paper-deep); font-family: var(--font-sans); font-size: var(--text-meta); }
+.document-status-list { display: grid; grid-template-columns: 164px minmax(0, 1fr); margin: 0; }
+.document-status-row { display: contents; }
+.document-status-row dt { padding: 9px 0; border-top: 1px solid var(--rule); color: var(--muted); font-size: var(--text-small); line-height: 1.5; }
+.document-status-row dd { margin: 0; padding: 9px 0; border-top: 1px solid var(--rule); color: var(--ink); line-height: 1.5; }
+.document-status-row:first-child dt, .document-status-row:first-child dd { padding-top: 0; border-top: 0; }
+ul.document-status-links { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.document-status-links li { margin: 0; padding: 0; }
+.document-status-links a { color: var(--ink); text-decoration: none; }
+.document-status-links a:hover, .document-status-links a:focus-visible { color: var(--accent); text-decoration: underline; }
+.document-status-id { margin-right: 9px; color: var(--accent); font-family: var(--font-mono); font-size: var(--text-label); font-weight: 650; letter-spacing: 0.07em; }
+.document-status-claims { color: var(--muted); font-size: var(--text-small); }
+
+/* Series navigation and citation. */
+.methodology-series-nav { margin: 56px 0 0; padding-top: 30px; border-top: 1px solid var(--rule); font-family: var(--font-sans); }
+.methodology-series-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.methodology-series-link { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 14px; padding: 18px 20px; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink); text-decoration: none; transition: background-color 200ms var(--ease-out); }
+.methodology-series-link:hover, .methodology-series-link:focus-visible { background: var(--paper-deep); }
+.methodology-series-direction { grid-column: 1 / -1; color: var(--faint); font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.07em; text-transform: uppercase; }
+.methodology-series-body { display: grid; grid-column: 2; grid-row: 2; gap: 4px; min-width: 0; }
+.methodology-series-id { color: var(--accent); font-family: var(--font-mono); font-size: var(--text-label); font-weight: 650; letter-spacing: 0.07em; }
+.methodology-series-title { font-size: var(--text-meta); font-weight: 600; line-height: 1.35; }
+.methodology-series-arrow { grid-row: 2; align-self: center; color: var(--accent); }
+.methodology-series-previous .methodology-series-arrow { grid-column: 1; transform: rotate(180deg); }
+.methodology-series-next .methodology-series-arrow { grid-column: 3; }
+.methodology-series-empty { display: block; }
+.methodology-cite { margin-top: 26px; padding: 18px 20px; border: 1px solid var(--rule); border-radius: 4px; background: var(--paper-deep); }
+p.methodology-cite-text { margin: 0; overflow-wrap: anywhere; color: var(--ink); font-family: var(--font-mono); font-size: var(--text-small); line-height: 1.6; }
+.methodology-cite-copy { margin-top: 14px; padding: 8px 14px; border: 1px solid var(--rule-strong); border-radius: 3px; background: var(--paper); color: var(--accent); font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer; transition: border-color 200ms var(--ease-out), color 200ms var(--ease-out); }
+.methodology-cite-copy:hover, .methodology-cite-copy:focus-visible { border-color: var(--accent); color: var(--accent-strong); }
+
+/* Methodology index on the Agentic Sprint hub. */
+.methodology-index { margin: 64px 0 0; padding-top: 34px; border-top: 1px solid var(--rule); font-family: var(--font-sans); }
+.methodology-index h2 { margin: 0 0 16px; }
+.methodology-index h3 { margin: 0 0 6px; font-size: var(--text-h3); }
+p.methodology-index-intro { max-width: 68ch; margin: 0 0 34px; color: var(--muted); font-size: var(--text-meta); line-height: 1.65; }
+.methodology-index-group { scroll-margin-top: 26px; }
+.methodology-index-group + .methodology-index-group { margin-top: 40px; }
+p.methodology-index-group-note { margin: 0 0 12px; color: var(--faint); font-size: var(--text-small); line-height: 1.55; }
+ol.methodology-index-list { margin: 0; padding: 0; border-top: 1px solid var(--rule); list-style: none; }
+.methodology-index-list li { margin: 0; padding: 0; border-bottom: 1px solid var(--rule); }
+.methodology-index-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px 16px; align-items: start; padding: 18px 8px; color: var(--ink); text-decoration: none; transition: background-color 200ms var(--ease-out); }
+.methodology-index-row:hover, .methodology-index-row:focus-visible { background: var(--paper-deep); }
+.methodology-index-row:hover .methodology-index-title, .methodology-index-row:focus-visible .methodology-index-title { color: var(--accent); }
+.methodology-index-id { color: var(--accent); font-family: var(--font-mono); font-size: var(--text-label); font-weight: 650; letter-spacing: 0.07em; line-height: 1.9; }
+.methodology-index-main { display: grid; gap: 5px; min-width: 0; }
+.methodology-index-title { font-size: var(--text-lede); font-weight: 580; letter-spacing: -0.015em; line-height: 1.3; transition: color 200ms var(--ease-out); }
+.methodology-index-summary { max-width: 58ch; color: var(--muted); font-size: var(--text-meta); line-height: 1.55; }
+.methodology-index-depends { color: var(--faint); font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.05em; }
+.methodology-index-side { display: flex; flex-wrap: wrap; grid-column: 2; grid-row: 2; gap: 4px 20px; align-items: baseline; }
+.methodology-index-meta { color: var(--muted); font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: 0.04em; }
+.methodology-index-arrow { grid-column: 3; grid-row: 1 / -1; align-self: center; color: var(--accent); }
+
