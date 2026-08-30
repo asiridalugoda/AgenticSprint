@@ -32,7 +32,7 @@ The content was imported from a dalugoda.com checkout with only its addresses re
 node scripts/import-content.mjs --check /path/to/dalugoda
 ```
 
-The check exits non-zero if any file in `content/` differs from the rewritten source.
+The check exits non-zero if any file in `content/` differs from the rewritten source. The methodology left dalugoda.com on 30 August 2026, so the checkout has to be at or before commit `2af3129` of that repository.
 
 ## Licences
 

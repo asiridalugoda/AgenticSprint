@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="The Agentic Sprint">
+  <rect width="64" height="64" fill="#faf9f6"/>
+  <rect x="6.5" y="6.5" width="51.0" height="51.0" fill="none" stroke="#a0361a" stroke-width="3"/>
+  <path transform="translate(15.914 48.500) scale(0.02193 -0.02193)" d="M364 478V590H1040V478ZM1323 107 1478 52V0H917V52L1089 105L640 1191H697L276 105L440 52V0H-11V52L145 105L657 1368H791Z" fill="#a0361a"/>
+</svg>

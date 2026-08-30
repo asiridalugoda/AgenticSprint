@@ -232,13 +232,43 @@ test("keeps the stylesheet guards that the rendered HTML cannot show", async () 
   assert.doesNotMatch(globals, /prefers-color-scheme:\s*dark/);
 });
 
+test("serves the icon set and the manifest", async () => {
+  const home = await (await render("/")).text();
+  assert.match(home, /<link rel="icon" href="\/favicon\.ico[^"]*"[^>]*type="image\/x-icon"/);
+  assert.match(home, /<link rel="icon" href="\/icon0\.svg[^"]*"[^>]*type="image\/svg\+xml"/);
+  assert.match(home, /<link rel="icon" href="\/icon1[^"]*" type="image\/png" sizes="512x512"/);
+  assert.match(home, /<link rel="apple-touch-icon" href="\/apple-icon[^"]*" type="image\/png" sizes="180x180"/);
+  assert.match(home, /<link rel="manifest" href="\/manifest\.webmanifest"/);
+
+  const [ico, svg, png, apple, manifest] = await Promise.all([
+    fetchResource("/favicon.ico"),
+    fetchResource("/icon0.svg"),
+    fetchResource("/icon1"),
+    fetchResource("/apple-icon"),
+    fetchResource("/manifest.webmanifest"),
+  ]);
+  for (const response of [ico, svg, png, apple, manifest]) assert.equal(response.status, 200);
+  assert.match(ico.headers.get("content-type") ?? "", /image\/(x-icon|vnd\.microsoft\.icon)/);
+  assert.match(svg.headers.get("content-type") ?? "", /image\/svg\+xml/);
+  assert.match(png.headers.get("content-type") ?? "", /image\/png/);
+  assert.match(apple.headers.get("content-type") ?? "", /image\/png/);
+  assert.match(manifest.headers.get("content-type") ?? "", /application\/manifest\+json/);
+  const manifestJson = await manifest.json();
+  assert.equal(manifestJson.name, "The Agentic Sprint");
+  assert.ok(manifestJson.icons.some((icon) => icon.sizes === "512x512"));
+});
+
 test("serves a titled 404 for unknown documents", async () => {
   const missing = await render("/this-document-does-not-exist");
   assert.equal(missing.status, 404);
   assert.match(await missing.text(), /<title>Page not found · The Agentic Sprint<\/title>/);
 });
 
-test("keeps parity with the dalugoda.com source when a checkout is available", { skip: !existsSync(process.env.DALUGODA_ROOT ?? "") && "DALUGODA_ROOT is not set" }, () => {
-  const result = spawnSync(process.execPath, ["scripts/import-content.mjs", "--check", process.env.DALUGODA_ROOT], { cwd: root, encoding: "utf8" });
+// The methodology left dalugoda.com on 30 August 2026, so parity can only be
+// checked against a checkout at or before commit 2af3129 of that repository.
+const parityRoot = process.env.DALUGODA_ROOT ?? "";
+const parityAvailable = existsSync(parityRoot) && existsSync(`${parityRoot}/content/methodology`);
+test("keeps parity with the dalugoda.com source when a checkout is available", { skip: !parityAvailable && "DALUGODA_ROOT does not point at a checkout that still carries the methodology" }, () => {
+  const result = spawnSync(process.execPath, ["scripts/import-content.mjs", "--check", parityRoot], { cwd: root, encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });

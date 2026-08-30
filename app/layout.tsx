@@ -52,10 +52,6 @@ export const metadata: Metadata = {
       "application/atom+xml": [{ url: "/atom.xml", title: `${site.name} · Atom feed` }],
     },
   },
-  icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-  },
   openGraph: {
     type: "website",
     url: site.baseUrl,
