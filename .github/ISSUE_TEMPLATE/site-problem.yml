@@ -1,0 +1,23 @@
+name: Site problem
+description: Something on the site is broken, unreadable or inaccessible.
+labels: ["site"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      placeholder: https://theagenticsprint.com/
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happens, and what you expected
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, device and assistive technology
+      description: Include a screen reader or other assistive technology if one is involved.
+      placeholder: Safari 18 on iOS, VoiceOver

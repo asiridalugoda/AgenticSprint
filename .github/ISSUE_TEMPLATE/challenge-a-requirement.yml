@@ -1,0 +1,40 @@
+name: Challenge a requirement
+description: A requirement is wrong, unclear, or impractical in a real engineering system.
+labels: ["methodology"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the most useful kind of issue. A requirement that survives a serious objection is worth more than one nobody has tested.
+  - type: input
+    id: document
+    attributes:
+      label: Document and identifier
+      description: For example "D5" or "D6, requirement AS-DOD-004".
+      placeholder: D1
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong with it
+      options:
+        - It is wrong
+        - It is unclear or ambiguous
+        - It is right in principle but impractical
+        - It conflicts with another document
+        - It is missing something it should cover
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: What you tried and what happened
+      description: Concrete experience carries more weight than a hypothetical.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would change
+      description: Optional. A sketch is fine; it does not have to be finished wording.
