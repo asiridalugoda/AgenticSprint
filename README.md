@@ -34,6 +34,15 @@ node scripts/import-content.mjs --check /path/to/dalugoda
 
 The check exits non-zero if any file in `content/` differs from the rewritten source. The methodology left dalugoda.com on 30 August 2026, so the checkout has to be at or before commit `2af3129` of that repository.
 
+## Contributing
+
+Disagreement is the most useful contribution. If a requirement does not survive contact with a real engineering system, that is worth an issue.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) first: the documents carry stable identifiers, a normative status and their own versions, and changing a requirement is a version change. Everything goes through a pull request, and CI has to be green.
+
+- [Code of conduct](CODE_OF_CONDUCT.md)
+- [Security policy](SECURITY.md)
+
 ## Licences
 
 - Site source code: Apache License 2.0 (`LICENSE`).

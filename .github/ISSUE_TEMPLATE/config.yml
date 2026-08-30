@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Read the methodology
+    url: https://theagenticsprint.com/documents
+    about: Every document, with its identifier, status and version.
+  - name: Report a security vulnerability
+    url: https://github.com/asiridalugoda/AgenticSprint/security/advisories/new
+    about: Report privately rather than in a public issue.
