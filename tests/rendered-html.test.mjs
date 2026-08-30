@@ -259,6 +259,39 @@ test("widens the front page description without disturbing the social card", asy
   assert.equal(ogDescription, "Ten principles for human-governed software delivery with autonomous agents.");
 });
 
+test("renders a standalone Mermaid diagram, and leaves copyable ones as source", async () => {
+  // A Mermaid fence inside a template's copyable ````markdown block is literal
+  // text a team pastes into their own repository, so it must stay as source.
+  // A fence outside one is a diagram this site should draw.
+  const directory = new URL("../content/templates/", import.meta.url);
+  const standalone = [];
+  for (const entry of (await readdir(directory)).filter((name) => name.endsWith(".mdx"))) {
+    const source = await readFile(new URL(entry, directory), "utf8");
+    const path = source.match(/^canonical:\s*"([^"]+)"$/m)[1];
+    let depth = 0;
+    for (const line of source.split("\n")) {
+      if (/^````/.test(line)) depth = depth === 0 ? 1 : 0;
+      else if (/^```mermaid\s*$/.test(line) && depth === 0) standalone.push(path);
+    }
+  }
+  assert.equal(standalone.length, 1, `expected one standalone diagram, saw ${standalone.length}`);
+
+  const html = await (await render(standalone[0])).text();
+  // The old behaviour printed the source under this label and drew nothing.
+  assert.doesNotMatch(html, /class="mermaid-source-label"/, "the raw Mermaid fallback is still being used");
+  assert.match(html, /<summary>Diagram source<\/summary>/, "the diagram source is no longer offered");
+  for (const label of ["Human or approved trigger", "Authority boundary", "Application service", "Data store"]) {
+    assert.ok(html.includes(label), `the rendered diagram is missing the node "${label}"`);
+  }
+  // Ranked layout, not a flat list: the boundary sits downstream of the trigger.
+  assert.match(html, /class="methodology-node-label"/);
+
+  // The copyable templates keep their diagrams as source, inside the block.
+  const buildPlan = await (await render("/templates/build-plan")).text();
+  assert.ok(buildPlan.includes("sequenceDiagram"), "the build plan lost its copyable sequence diagram");
+  assert.doesNotMatch(buildPlan, /<summary>Diagram source<\/summary>/, "a copyable diagram was rendered as a figure");
+});
+
 test("serves the icon set and the manifest", async () => {
   const home = await (await render("/")).text();
   assert.match(home, /<link rel="icon" href="\/favicon\.ico[^"]*"[^>]*type="image\/x-icon"/);

@@ -291,3 +291,18 @@ ol.methodology-index-list { margin: 0; padding: 0; border-top: 1px solid var(--r
 /* The hand-built figure lists sit inside .article-body, whose list rules outrank a bare class. */
 .article-body ol.process-flow, .article-body ol.learning-loop, .article-body ol.maturity-ladder, .article-body ol.legacy-flow, .article-body .inner-loop ol { list-style: none; }
 .article-body .process-step, .article-body .learning-loop li, .article-body .maturity-ladder li, .article-body .legacy-flow li, .article-body .inner-loop li { padding-left: 0; }
+
+/* A rank holding one node should not stretch that node across the figure while
+   a sibling rank divides the same width between three, so these rows keep empty
+   tracks. Scoped to the Mermaid figures; the hand-built ones are unchanged. */
+.mermaid-flow ol.methodology-node-row { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+
+/* Mermaid blocks rendered as figures. The sequence list carries a step number,
+   and the source stays available because a template is meant to be copied. */
+.methodology-sequence-list { counter-reset: none; }
+.methodology-edge-step { color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 650; letter-spacing: 0.07em; }
+.mermaid-source { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.mermaid-source summary { color: var(--muted); cursor: pointer; font-family: var(--font-mono); font-size: 10px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase; }
+.mermaid-source summary:hover { color: var(--accent); }
+.mermaid-source pre { margin: 12px 0 0; padding: 14px 16px; overflow-x: auto; border: 1px solid var(--rule); background: var(--paper-deep); font-family: var(--font-mono); font-size: 12px; line-height: 1.6; }
+.article-body .mermaid-source pre { margin: 12px 0 0; }

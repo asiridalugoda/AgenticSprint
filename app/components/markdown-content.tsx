@@ -4,6 +4,7 @@ import Image from "next/image";
 import { parseMarkdown, type ContentBlock } from "@/lib/content";
 import { ArticleFigure, LegacyFlowFigure } from "./article-figures";
 import { isMethodologyFigureName, MethodologyFigure, normaliseFigureName } from "./methodology-figure";
+import { canRenderMermaid, MermaidFigure } from "./mermaid-figure";
 import { TechnicalFigure } from "./technical-figure";
 
 function safeHref(value: string) {
@@ -219,7 +220,16 @@ function Table({ block, index }: { block: Extract<ContentBlock, { kind: "table" 
   );
 }
 
+/**
+ * A Mermaid block becomes a rendered figure when the source is in the subset
+ * the parser understands, and falls back to the source otherwise. Nothing is
+ * drawn in the browser: the diagram is HTML, so it survives print, a screen
+ * reader and scripting being off.
+ */
 function MermaidCode({ block, index }: { block: Extract<ContentBlock, { kind: "code" }>; index: number }) {
+  if (canRenderMermaid(block.text)) {
+    return <MermaidFigure key={`mermaid-${index}`} instanceId={`content-mermaid-${index}`} source={block.text} />;
+  }
   return (
     <TechnicalFigure caption="Mermaid diagram source. The source is preserved for accessibility and portability.">
       <div className="mermaid-source-label" id={`mermaid-label-${index}`}>Mermaid diagram source</div>
