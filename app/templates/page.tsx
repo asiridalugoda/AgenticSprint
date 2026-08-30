@@ -5,7 +5,7 @@ import { BreadcrumbStructuredData, CollectionStructuredData, licences } from "..
 import { getTemplateSeries } from "@/lib/content";
 import { listingKeywords, pageMetadata } from "@/lib/social";
 
-const description = "Nine working templates a team copies into a repository and fills in while running an Agentic Sprint.";
+const description = "Nine working templates for running an Agentic Sprint: build plan, review and QA evidence, agent handover, security assessment and retrospective.";
 
 const templates = getTemplateSeries();
 

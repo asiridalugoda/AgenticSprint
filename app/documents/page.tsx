@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
 import { listingKeywords, pageMetadata } from "@/lib/social";
 
 const description =
-  "The Agentic Sprint methodology in full: the normative specification and its companion standards, the informative documents that explain and measure them, and the working templates.";
+  "Thirteen numbered documents and nine templates: the normative Agentic Sprint specification, its companion standards, and the guides that apply them.";
 
 const documents = getMethodologySeries();
 const templates = getTemplateSeries();

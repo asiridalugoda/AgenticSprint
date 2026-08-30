@@ -8,7 +8,7 @@ import { getMethodologySeries, getTemplateSeries } from "@/lib/content";
 import { site } from "@/lib/site";
 import { pageMetadata } from "@/lib/social";
 
-const description = "Who wrote the Agentic Sprint, what its status is, how it is licensed, how to cite it and how to contribute.";
+const description = "Who wrote the Agentic Sprint, its status as a version 0.1 proposal open to critique, how it is licensed under CC BY 4.0 and CC0, and how to cite it.";
 
 export const metadata = pageMetadata({
   slug: "about",
