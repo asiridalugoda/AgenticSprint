@@ -1,0 +1,22 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+
+# env files
+.env*
+
+# typescript
+next-env.d.ts
+*.tsbuildinfo
+
+# tooling artefacts
+/.playwright-mcp/
+/.claude/worktrees/
