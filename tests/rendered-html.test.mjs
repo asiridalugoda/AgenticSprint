@@ -232,6 +232,33 @@ test("keeps the stylesheet guards that the rendered HTML cannot show", async () 
   assert.doesNotMatch(globals, /prefers-color-scheme:\s*dark/);
 });
 
+test("gives search engines a usable description on every page", async () => {
+  const sitemap = await (await fetchResource("/sitemap.xml")).text();
+  const paths = [...sitemap.matchAll(/<loc>https:\/\/theagenticsprint\.com([^<]*)<\/loc>/g)].map((match) => match[1] || "/");
+  assert.ok(paths.length >= 25, `expected the full sitemap, saw ${paths.length} entries`);
+
+  for (const path of paths) {
+    const html = await (await render(path)).text();
+    const description = html.match(/name="description" content="([^"]*)"/)?.[1];
+    assert.ok(description, `${path} has no meta description`);
+    // Google shows roughly 155 characters; below about 70 it tends to write its own.
+    assert.ok(description.length >= 70, `${path} description is ${description.length} characters`);
+    assert.ok(description.length <= 185, `${path} description is ${description.length} characters`);
+  }
+});
+
+test("widens the front page description without disturbing the social card", async () => {
+  const html = await (await render("/")).text();
+  const description = html.match(/name="description" content="([^"]*)"/)?.[1];
+  const ogDescription = html.match(/property="og:description" content="([^"]*)"/)?.[1];
+
+  assert.match(description, /agents run the execution loops, humans control the gates/);
+  assert.ok(description.length >= 140 && description.length <= 160, `front page description is ${description.length} characters`);
+  // The generated card image carries the manifesto's own dek, so og:description
+  // has to keep saying the same thing the picture says.
+  assert.equal(ogDescription, "Ten principles for human-governed software delivery with autonomous agents.");
+});
+
 test("serves the icon set and the manifest", async () => {
   const home = await (await render("/")).text();
   assert.match(home, /<link rel="icon" href="\/favicon\.ico[^"]*"[^>]*type="image\/x-icon"/);
