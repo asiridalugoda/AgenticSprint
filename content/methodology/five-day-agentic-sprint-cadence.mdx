@@ -66,7 +66,7 @@ The sequence is select, plan, authorise, execute, verify, QA, accept and learn, 
 | Tuesday | Autonomous execution | Maker agents build | Handle exceptions. Prepare next week's context, tests and backlog | Pull requests with evidence |
 | Wednesday | Execute and check | Makers remediate, Checkers review | Architecture and security escalation. Regression cases from the plans | Checker-approved candidates |
 | Thursday | Engineering review and QA | Support fixes and retests | Engineers and QA validate | Human Gate 2 and QA passed |
-| Friday | Release and learning | Generate evidence and retrospective analysis | Accept, release and learn | Human Gate 3 passed, sprint closed |
+| Friday | Validation, release and learning | Generate evidence and retrospective analysis | Stakeholder validation, release and learn | Human Gate 3 passed, sprint closed |
 
 Or, more simply: Monday decides, Tuesday builds, Wednesday proves, Thursday validates, Friday ships and learns.
 
@@ -81,6 +81,7 @@ A team running this cadence needs the roles in the [Operating Model](/operating-
 - **QA engineer.** Reviews the test strategy in each Build Plan on Monday, prepares independent test cases during the week and validates accepted candidates on Thursday.
 - **Release authority.** Decides ship, hold or reject on Friday. Often the lead engineer or an engineering manager. For high-risk work it should be a different person from the plan approver.
 - **Security owner.** Reviews any item whose Build Plan touches identity, permissions, secrets, sensitive data or an externally reachable interface. Consulted on Monday, escalated to on Wednesday.
+- **Business stakeholder.** The person most affected by the outcome: the operations lead whose queue changes, the finance owner whose report moves, the support manager whose customers see it. Present for a short session on Friday morning to confirm that the accepted change is the outcome the business asked for. Not a tester. A witness that the business result is real.
 
 The agents are role holders too, and the tools can be assigned to them in more than one way:
 
@@ -234,6 +235,12 @@ An item that fails QA late on Thursday usually misses Friday's release. That is 
 
 ## Friday: ship and learn
 
+### Stakeholder validation
+
+Before the release authority decides, the most impacted business stakeholder sees each accepted candidate and validates the business outcome. Not the acceptance criteria: QA covered those on Thursday. The question is whether the result is the thing the business needed. Fifteen minutes with the person whose queue, report or customer the change affects catches the one error that survives every gate in the methodology: a correct implementation of the wrong outcome.
+
+The product owner brings the stakeholder, the QA engineer runs the session on the accepted candidate, and the answer is recorded with the evidence. Immediate validation of the business outcome is the bar for Friday morning. A full UAT cycle can follow the release where the risk tier or the organisation requires it, and its findings enter next week's backlog like any other correction. What does not happen is a release that nobody from the business has seen.
+
 ### The release window
 
 Friday morning is the release window. For every candidate that reached it, the release authority checks the chain:
@@ -243,6 +250,7 @@ Friday morning is the release window. For every candidate that reached it, the r
 | Human Gate 1 | The plan was approved, and the change is the one that was approved |
 | Human Gate 2 | Engineering accepted the outcome and its residual risk |
 | QA | Product behaviour verified against intent, not against the Maker's tests |
+| Business outcome | The most impacted stakeholder has seen the candidate and confirmed the outcome |
 | Security | Checks complete for the item's risk tier |
 | CI | Green on the final revision |
 | Rollback | The path stated in the plan is still usable |
@@ -275,7 +283,7 @@ The [Retrospective Template](/templates/retrospective) structures the session. T
 
 ### Exit condition
 
-Human Gate 3 has been decided for every candidate. The sprint is closed. Deferred items carry their state into Monday's selection. Approved context changes are versioned.
+Every candidate has been seen by its stakeholder and Human Gate 3 has been decided for it. The sprint is closed. Deferred items carry their state into Monday's selection. Approved context changes are versioned.
 
 ## The weekly rhythm
 
@@ -283,7 +291,7 @@ Described publicly, the rhythm is simple:
 
 | | Monday | Tuesday | Wednesday | Thursday | Friday |
 | --- | --- | --- | --- | --- | --- |
-| Humans | Select and authorise | Triage and preparation | Escalation and preparation | Review and QA | Release and learn |
+| Humans | Select and authorise | Triage and preparation | Escalation and preparation | Review and QA | Validate, release and learn |
 | Agents | Plan | Build | Verify and fix | Fix and evidence | Analyse |
 | Gate | Human Gate 1 | | Execution cutoff | Human Gate 2 | Human Gate 3 |
 
@@ -301,7 +309,7 @@ Each role has two jobs in the week: a decision job on its own day, and a prepara
 | Tuesday | Triage only. Write and test the context changes approved last Friday | Build regression cases for this week's items from the approved plans. Human UAT on last week's release | Refine next week's candidates to Ready |
 | Wednesday | Escalations only. Tune Checker rules and the context pack against this week's failures | Finish the regression additions. Prepare exploratory charters | Refine next week's candidates to Ready |
 | Thursday | Engineering acceptance, all day | QA, all afternoon | Reachable for intent questions |
-| Friday | Release and the learning review | Learning review. Fold this week's cases into the standing suite | Learning review and a first pass at next week's selection |
+| Friday | Release and the learning review | Runs the stakeholder validation session. Learning review. Fold this week's cases into the standing suite | Brings the most impacted stakeholder to Friday morning. Learning review and a first pass at next week's selection |
 
 Four things follow from that table:
 
@@ -380,7 +388,7 @@ Report the counts, not a ratio alone, and report which items stopped at which st
 The five-day shape is a default, not a rule. Some adaptations keep the structure:
 
 - **Two-week cadence.** Monday selection and Friday release stay where they are and the middle stretches. Keep the execution cutoff at least two working days before release, so that review and QA are never compressed into the last afternoon.
-- **Rolling release.** A team with continuous deployment can hold Human Gate 3 on any day. Keep the Friday learning review, because that is the ceremony that compounds.
+- **Rolling release.** A team with continuous deployment can hold Human Gate 3, and the stakeholder validation before it, on any day. Keep the Friday learning review, because that is the ceremony that compounds.
 - **Higher-risk domains.** R2 and R3 items may need Monday's plan review to include the security owner and Thursday's acceptance to include an architecture reviewer. Reduce the selected count to keep Thursday possible.
 - **Very small teams.** One engineer can hold the lead engineer, QA and release roles for low-risk work, but the decisions are still recorded separately and the Checker is still a separate agent.
 - **Mixed human and agent work.** Items that are not ready for agentic execution can run beside the agentic backlog in the conventional way. Keep them off the agentic board so that the funnel stays honest.

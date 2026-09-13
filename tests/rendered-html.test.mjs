@@ -323,6 +323,9 @@ test("publishes the 5-Day Cadence as D14 and links it from the front page and th
     assert.ok(html.includes(title), `the cadence is missing the figure "${title}"`);
   }
   assert.equal((html.match(/<code data-language="text">/g) || []).length, 2, "only the readiness card and the correction record remain as code blocks");
+  // Friday validates the business outcome with its stakeholder before release authority decides.
+  assert.match(html, /<h3 id="stakeholder-validation">/);
+  assert.ok(html.includes('class="methodology-node-label">Stakeholder validation<'), "the week figure has no stakeholder validation node");
   // The preparation days are a section of their own, and Tuesday points at it.
   assert.match(html, /<h2 id="the-other-half-of-the-week">/);
   assert.match(html, /href="#the-other-half-of-the-week"/);
