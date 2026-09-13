@@ -118,7 +118,7 @@ test("resolves every figure to a renderer", async () => {
 });
 
 test("renders no em or en dashes on published pages", async () => {
-  const paths = ["/", "/specification", "/whitepaper", "/documents", "/templates", "/templates/build-plan", "/about", "/llms.txt", "/llms-full.txt", "/md/agentic-sprint-manifesto"];
+  const paths = ["/", "/specification", "/whitepaper", "/five-day-cadence", "/documents", "/templates", "/templates/build-plan", "/about", "/llms.txt", "/llms-full.txt", "/md/agentic-sprint-manifesto", "/md/five-day-agentic-sprint-cadence"];
   for (const path of paths) {
     const response = await fetchResource(path);
     assert.equal(response.status, 200, path);
@@ -183,7 +183,7 @@ test("publishes crawl and retrieval resources", async () => {
   assert.match(sitemapText, /<loc>https:\/\/theagenticsprint\.com\/templates\/build-plan<\/loc>/);
   assert.doesNotMatch(sitemapText, /\/md\//);
   assert.doesNotMatch(sitemapText, /\/manifesto</);
-  assert.equal((sitemapText.match(/<url>/g) || []).length, 4 + 21, "front page, three indexes, twelve documents and nine templates");
+  assert.equal((sitemapText.match(/<url>/g) || []).length, 4 + 22, "front page, three indexes, thirteen documents and nine templates");
 
   const llmsText = await llms.text();
   assert.match(llmsText, /^# theagenticsprint\.com/);
@@ -192,7 +192,7 @@ test("publishes crawl and retrieval resources", async () => {
   assert.match(llmsText, /https:\/\/dalugoda\.com\/agentic-sprint\)/, "points at the original essay");
 
   const fullText = await full.text();
-  assert.match(fullText, /## Methodology documents \(13\)/);
+  assert.match(fullText, /## Methodology documents \(14\)/);
   assert.match(fullText, /## Working templates \(9\)/);
 
   assert.match(await rss.text(), /<title>D1: Agentic Sprint Specification v0\.1<\/title>/);
@@ -290,6 +290,33 @@ test("renders a standalone Mermaid diagram, and leaves copyable ones as source",
   const buildPlan = await (await render("/templates/build-plan")).text();
   assert.ok(buildPlan.includes("sequenceDiagram"), "the build plan lost its copyable sequence diagram");
   assert.doesNotMatch(buildPlan, /<summary>Diagram source<\/summary>/, "a copyable diagram was rendered as a figure");
+});
+
+test("publishes the 5-Day Cadence as D14 and links it from the front page and the index", async () => {
+  const html = await (await render("/five-day-cadence")).text();
+  assert.match(html, /<title>The 5-Day Agentic Sprint Cadence · The Agentic Sprint<\/title>/);
+  assert.match(html, /"identifier":"D14"/);
+  assert.match(html, /D14(?:<!-- -->)? · (?:<!-- -->)?Informative/);
+  // The week figure has one lane per day, and the board-state figure is a ladder.
+  for (const lane of ["Monday: decide", "Tuesday: build", "Wednesday: prove", "Thursday: validate", "Friday: ship and learn"]) {
+    assert.ok(html.includes(lane), `the cadence figure is missing the lane "${lane}"`);
+  }
+  assert.match(html, /class="methodology-ladder"/);
+  for (const state of ["Selected", "Authorised", "Candidate", "Accepted", "Released"]) {
+    assert.ok(html.includes(`class="methodology-ladder-label">${state}<`), `the board-state figure is missing "${state}"`);
+  }
+  assert.doesNotMatch(html, /article-visual-unknown|Figure definition pending/);
+  // The series navigation reaches it from the whitepaper and it carries its own citation.
+  assert.match(html, /Agentic Sprint Whitepaper v1\.0/);
+  assert.match(html, /https:\/\/theagenticsprint\.com\/five-day-cadence/);
+
+  const home = await (await render("/")).text();
+  assert.match(home, /href="\/five-day-cadence"/, "the front page does not offer the cadence");
+  const documents = await (await render("/documents")).text();
+  assert.match(documents, /href="\/five-day-cadence"/, "the documents index does not list the cadence");
+  const llms = await (await fetchResource("/llms.txt")).text();
+  assert.match(llms, /\(D14, Operating cadence, informative\)/);
+  assert.match(llms, /D1 to D14, T1 to T9/);
 });
 
 test("serves the icon set and the manifest", async () => {

@@ -35,7 +35,7 @@ export function GET() {
     "",
     "The `/md/` links are clean Markdown editions of each document, intended for reading, citation and machine-assisted research. Each carries the document identifier, version, status, dependencies, canonical URL and licence in its frontmatter.",
     "",
-    "Document identifiers (D1 to D13, T1 to T9) are stable. Cite a requirement by its document and identifier, not by a page position. D1 is the normative root; the manifesto (D11) introduces no requirements and cannot override D1.",
+    `Document identifiers (D1 to D${documents.length}, T1 to T${templates.length}) are stable. Cite a requirement by its document and identifier, not by a page position. D1 is the normative root; the manifesto (D11) introduces no requirements and cannot override D1.`,
     "",
     `Licences: documents CC BY 4.0; templates CC0 1.0. Citation for the series: ${site.seriesCitation}`,
     "",

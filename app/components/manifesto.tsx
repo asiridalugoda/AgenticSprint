@@ -33,6 +33,7 @@ export function ManifestoPage({ article }: { article: Article }) {
   const specification = getSpecification();
   const documents = getMethodologySeries();
   const templates = getTemplateSeries();
+  const cadence = documents.find((document) => document.documentKind === "operating-cadence");
   const version = versionLabel(article.version);
 
   return (
@@ -111,6 +112,14 @@ export function ManifestoPage({ article }: { article: Article }) {
             summary={`The normative core. ${specification.description}`}
             title={specification.title}
           />
+          {cadence ? (
+            <ReadOnRow
+              href={cadence.path}
+              id={cadence.documentId || "D14"}
+              summary={`What a week looks like in practice. ${cadence.description}`}
+              title={cadence.title}
+            />
+          ) : null}
           <ReadOnRow
             href="/documents"
             id={`D1 to D${documents.length}`}

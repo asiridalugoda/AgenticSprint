@@ -76,6 +76,11 @@ function readSection(root, section) {
     .map((entry) => ({ section, name: entry, source: readFileSync(join(directory, entry), "utf8") }));
 }
 
+/** True for a document first published on this site, which therefore has no dalugoda.com source. */
+function isNativeDocument(source) {
+  return /^origin:\s*"theagenticsprint\.com"$/m.test(source);
+}
+
 /** Every root-relative link must resolve to a page this site serves. */
 function validateLinks(files) {
   const known = new Set(files.map((file) => file.rewritten.match(/^canonical:\s*"([^"]+)"$/m)[1]));
@@ -116,7 +121,12 @@ function main() {
     for (const section of sections) {
       const present = new Set(files.filter((file) => file.section === section).map((file) => file.name));
       for (const entry of readdirSync(join(repoRoot, "content", section)).filter((entry) => entry.endsWith(".mdx"))) {
-        if (!present.has(entry)) drift.push(`not in source: content/${section}/${entry}`);
+        if (present.has(entry)) continue;
+        // A document written for this site after the move has no source to
+        // compare against. It says so in its frontmatter, and the check
+        // leaves it alone rather than reporting it as drift.
+        if (isNativeDocument(readFileSync(join(repoRoot, "content", section, entry), "utf8"))) continue;
+        drift.push(`not in source: content/${section}/${entry}`);
       }
     }
     if (drift.length) {

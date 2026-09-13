@@ -11,7 +11,7 @@ For anything larger than a typo, please open an issue first.
 
 - [ ] Typo, formatting or broken link
 - [ ] Site code, styling or tests
-- [ ] Informative document (D2, D3, D11, D12, D13) or a template
+- [ ] Informative document (D2, D3, D11, D12, D13, D14) or a template
 - [ ] Normative document (D1, D4 to D10), which changes what the methodology requires
 
 ## If a document changed

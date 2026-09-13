@@ -7,7 +7,7 @@ export type ArticleType = "essay" | "research" | "concept" | "technical" | "fiel
 
 /**
  * Two collections make up the site. The methodology collection is the numbered
- * series D1 to D13; the template collection is T1 to T9. Both are read from
+ * series D1 to D14; the template collection is T1 to T9. Both are read from
  * disk once, at module load, so a malformed document fails the build rather
  * than shipping a broken route.
  */
@@ -239,7 +239,7 @@ export function getAllPublishedDocuments() {
   return articles.filter((article) => !article.draft).sort(byDateDescending);
 }
 
-/** D1 to D13 in series order. */
+/** D1 to D14 in series order. */
 export function getMethodologySeries() {
   return articles.filter((article) => !article.draft && article.collection === "methodology").sort(bySeriesOrder);
 }

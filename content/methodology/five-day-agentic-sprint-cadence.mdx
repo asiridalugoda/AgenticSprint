@@ -1,0 +1,479 @@
+---
+title: "The 5-Day Agentic Sprint Cadence"
+description: "How a team runs an Agentic Sprint in one week with Claude Code, Codex, lead engineers and QA: decide, build, prove, validate, then ship and learn."
+date: "2026-09-13"
+updated: "2026-09-13"
+type: "concept"
+topics: ["Delivery & Organisations", "Agentic Systems", "Engineering"]
+tags: ["Agentic Sprint", "weekly cadence", "sprint planning", "Claude Code", "Codex", "review capacity", "human gates", "QA", "execution cutoff"]
+featured: false
+pinned: false
+draft: false
+canonical: "/five-day-cadence"
+image: "/social/five-day-cadence"
+series: "Agentic Sprint Methodology"
+seriesOrder: 14
+version: "0.1"
+status: "Operating cadence"
+documentId: "D14"
+documentKind: "operating-cadence"
+normative: false
+owner: "Siri Dalugoda"
+origin: "theagenticsprint.com"
+dependsOn: ["D1", "D3", "D4", "D5", "D6", "D8", "D9", "D10", "D11", "D12"]
+claimClasses: ["operating-model", "recommended-practice", "implementation-guidance", "non-empirical"]
+citation: "Dalugoda, Siri. The 5-Day Agentic Sprint Cadence. Agentic Sprint Methodology, v0.1, 13 September 2026. https://theagenticsprint.com/five-day-cadence"
+references: ["https://code.claude.com/docs/en/overview", "https://developers.openai.com/codex/", "https://git-scm.com/docs/git-worktree.html"]
+externalLinks: ["https://code.claude.com/docs/en/overview", "https://developers.openai.com/codex/", "https://git-scm.com/docs/git-worktree.html"]
+---
+
+## Purpose
+
+This document describes what an Agentic Sprint looks like across one working week. The [Specification](/specification) defines the lifecycle and its three human gates. The [Operating Model](/operating-model) describes the roles and the ceremonies. Neither says what a lead engineer, a QA engineer and a pair of coding agents actually do on a Tuesday. This document does.
+
+It is written for a team that has read the methodology and wants to start running it next Monday. It uses Claude Code and Codex as the example agents because they are the tools most teams reach for first. Nothing in the cadence depends on either product. Any agent that can work in an isolated workspace, run the repository's checks and leave evidence behind can fill the same seat.
+
+This is an informative document. It adds no requirements to D1, and its lowercase recommendations describe one way to arrange the week. A team that runs a two-week cadence, or that places the gates on different days, can still conform to the specification.
+
+## The one change that matters
+
+A conventional sprint fits a set of human implementation tasks into a timebox. The week is spent producing the work.
+
+In an Agentic Sprint the humans do not spend the week producing the work. They select it, authorise it, review it, test it and accept it. The agents consume the execution capacity. That inverts where the week's effort goes:
+
+| | Conventional sprint | Agentic Sprint |
+| --- | --- | --- |
+| Who implements | Engineers, for most of the week | Maker agents, inside an authorised boundary |
+| What limits the sprint | Engineering hours | Human review, QA and decision capacity |
+| Where humans concentrate | Writing and integrating code | Monday decisions, Thursday acceptance, Friday release and learning |
+| What a green pipeline means | The change is probably ready for review | The change is a candidate. Acceptance is still a human decision |
+| How the team learns | A retrospective | A learning review that can change next week's agent context |
+
+The rest of this document follows from that inversion. Agent capacity is cheap and human attention is not, so the cadence is designed to protect human attention. Decisions are batched into short ceremonies, agents run unattended between them, and a hard weekly boundary stops the queue of generated work from outgrowing the people who have to understand it.
+
+## The week at a glance
+
+:::figure weekly-cadence
+Monday selects and authorises. Tuesday builds. Wednesday proves, with a cutoff after which no new implementation starts. Thursday accepts and validates. Friday ships and learns, and the lesson feeds next Monday's plans.
+:::
+
+The sequence is select, plan, authorise, execute, verify, QA, accept and learn, with a hard boundary at the end of the week. Mapped onto five days:
+
+| Day | Primary activity | Agents | Humans | Exit condition |
+| --- | --- | --- | --- | --- |
+| Monday morning | Sprint selection | Analyse backlog readiness and risk | Select the sprint outcomes | Agentic Sprint Backlog locked |
+| Monday afternoon | Build planning | Generate Build Plans in parallel | Review and approve the plans | Human Gate 1 passed |
+| Tuesday | Autonomous execution | Maker agents build | Handle exceptions only | Pull requests with evidence |
+| Wednesday | Execute and check | Makers remediate, Checkers review | Architecture and security escalation | Checker-approved candidates |
+| Thursday | Engineering review and QA | Support fixes and retests | Engineers and QA validate | Human Gate 2 and QA passed |
+| Friday | Release and learning | Generate evidence and retrospective analysis | Accept, release and learn | Human Gate 3 passed, sprint closed |
+
+Or, more simply: Monday decides, Tuesday builds, Wednesday proves, Thursday validates, Friday ships and learns.
+
+The three human decision points are the ones the specification already defines: Build Plan Approval on Monday, Engineering Implementation Acceptance on Thursday and Release Authority on Friday. The cadence does not add a gate. It gives each gate a day.
+
+## The people and the agents
+
+A team running this cadence needs the roles in the [Operating Model](/operating-model). In a small team they map onto people like this:
+
+- **Product owner.** Owns the meaning of each requirement and its acceptance criteria. Present on Monday morning and reachable for clarification questions during the week.
+- **Lead engineer.** Approves Build Plans on Monday, handles execution triage on Tuesday and Wednesday, and holds Engineering Implementation Acceptance on Thursday. Usually also the context steward.
+- **QA engineer.** Reviews the test strategy in each Build Plan on Monday, prepares independent test cases during the week and validates accepted candidates on Thursday.
+- **Release authority.** Decides ship, hold or reject on Friday. Often the lead engineer or an engineering manager. For high-risk work it should be a different person from the plan approver.
+- **Security owner.** Reviews any item whose Build Plan touches identity, permissions, secrets, sensitive data or an externally reachable interface. Consulted on Monday, escalated to on Wednesday.
+
+The agents are role holders too, and the tools can be assigned to them in more than one way:
+
+- **Planning agent.** Reads the work item, the repository and the context pack, and writes a Build Plan. Claude Code in plan mode, or a Codex task instructed to produce a plan and change no code, both work.
+- **Maker agent.** Implements one approved plan in an isolated worktree or cloud sandbox. Claude Code running against a git worktree, or a Codex cloud task with its own container, are typical.
+- **Checker agent.** Reviews the Maker's change against the approved plan, the acceptance criteria and the repository's rules. It does not share the Maker's session or memory. A practical arrangement is to check with a different tool from the one that built: Codex reviewing a Claude Code change, or Claude Code reviewing a Codex change. Different models make different mistakes, and that difference is part of the independence.
+- **Coordinator.** The orchestration that distributes approved plans, tracks state and pauses at gates. It can be an off-the-shelf orchestrator, the optional [Autonomous Loop](/autonomous-loop-integration) profile, or a lead engineer with a board and a script. What matters is that it cannot approve or release.
+
+The Maker is never its own Checker. That rule from the [Quality and Verification Model](/quality-and-verification) is the reason the week has a Wednesday.
+
+## Monday morning: select the week's Agentic Backlog
+
+Do not bring the whole product backlog into the agentic system. Monday morning is a 30 to 45 minute Agentic Sprint Planning session that narrows the backlog three times:
+
+```text
+Product backlog:                   80 items
+        ↓  meets the Definition of Ready
+Ready for agentic execution:       15 items
+        ↓  fits this week's human review capacity
+Agentic Sprint Backlog:             6 items   AS-101 to AS-106
+```
+
+The important narrowing is the last one. The team is capacity-constrained by human review, not by agent coding capacity. There may be enough Claude Code and Codex capacity to generate forty pull requests in a week. That does not mean the team should generate them. If the lead engineer and the QA engineer can properly review, test and accept six changes, then the sprint capacity is six independently reviewable outcomes.
+
+### Definition of Ready, applied
+
+Before an item enters the sprint it needs the entry conditions in the [Definition of Ready](/definition-of-ready-and-done): requirement, acceptance criteria, context, risk tier, testability, dependencies and a named human owner. A short card per item is enough for the planning session:
+
+```text
+AS-104  Add scheduled payment cancellation
+        Risk tier:          R2 (financial state)
+        Repositories:       payments-api, web
+        Acceptance:         5 criteria, each with a verification method
+        Dependencies:       none
+        Engineering owner:  lead engineer, Payments
+        QA owner:           QA engineer, Payments
+        Agent complexity:   medium
+```
+
+If the requirement is unclear, the item does not enter the sprint. It becomes a clarification or discovery task and goes back to the product owner. The operating model is explicit that an item which is not ready should become discovery work rather than letting an agent invent the missing intent. The cost of ambiguity is multiplied by execution speed, so Monday morning is the cheapest place to stop it.
+
+### Exit condition
+
+The Agentic Sprint Backlog is locked. Each item has a human owner, a QA owner, a risk tier and a place in the queue. Nothing is added after this point without removing something else.
+
+## Monday afternoon: agents plan, humans approve
+
+Instead of engineers spending Monday working out how to implement each item, the planning agents are released across the entire sprint backlog in parallel:
+
+```text
+AS-101 ──→ Planning agent ──→ Build Plan
+AS-102 ──→ Planning agent ──→ Build Plan
+AS-103 ──→ Planning agent ──→ Build Plan
+AS-104 ──→ Planning agent ──→ Build Plan
+AS-105 ──→ Planning agent ──→ Build Plan
+AS-106 ──→ Planning agent ──→ Build Plan
+```
+
+Each plan follows the [Build Plan Standard](/build-plan-standard): interpretation of the requirement, explicit scope, affected repositories and components, sequencing, API and data impact, security considerations, test strategy, rollback, risks and a traceability table from every acceptance criterion to a verification condition. The [Build Plan Template](/templates/build-plan) is the form.
+
+Six plans take the agents minutes. Reading them takes the humans longer, which is the point of the next ceremony.
+
+### The Monday plan review
+
+A 60 to 90 minute session. The lead engineer, the QA engineer and, for R2 or higher items, the security owner read each plan. They are not reviewing code. They are reviewing what the agents intend to build.
+
+Each plan gets one of three decisions:
+
+- **Approve.** The plan becomes the authorised implementation boundary and the item moves to Authorised.
+- **Revise.** The plan goes back to the planning agent with specific feedback. Revisions usually return within the hour and are re-read, not re-run from scratch.
+- **Reject.** The requirement or the approach is wrong. The item leaves the sprint and returns to discovery. Rejecting on Monday is cheap. Rejecting on Thursday is not.
+
+That is Human Gate 1. The reviewer's attention goes to the assumptions most likely to cause an expensive or unsafe implementation: the interpretation of the requirement, the architecture, the data impact and the rollback path. A plan that hides its own uncertainty is revised until it does not.
+
+Once a plan is approved, the item's state moves from Planned to Authorised, and the machines get the rest of the week.
+
+## Tuesday: execution day
+
+Tuesday should feel almost strangely quiet. Nobody sits beside Codex watching it type.
+
+The coordinator distributes each approved plan to a Maker agent. Each Maker works in its own isolated workspace, on its own branch, with only the permissions the plan requires:
+
+```text
+                    Agentic Sprint Backlog
+                             │
+          ┌──────────────────┼──────────────────┐
+          ↓                  ↓                  ↓
+       AS-101             AS-102             AS-103
+          │                  │                  │
+       Maker A            Maker B            Maker C
+    (Claude Code)         (Codex)          (Claude Code)
+          │                  │                  │
+      Worktree           Sandbox            Worktree
+          │                  │                  │
+       Tests               Tests              Tests
+          │                  │                  │
+          └────────────── Evidence ─────────────┘
+```
+
+Git worktrees give Claude Code a separate working tree per item on a single clone. A Codex cloud task gets a fresh container per run. Either way, two Makers never share a working directory, and neither has production credentials.
+
+Inside one item, a Maker following the optional [Autonomous Loop](/autonomous-loop-integration) profile decomposes the approved plan into dependency-ordered goals with persistent state:
+
+```text
+Goal 1 ──→ implement ──→ test ──→ Checker ──→ PASS ──→ Goal 2
+                                     │
+                                   FAIL
+                                     ↓
+                                 evidence
+                                     ↓
+                                remediation
+                                     ↓
+                                 re-check
+```
+
+By the end of Tuesday, most items have a pull request open with tests passing and a first bundle of evidence: the diff, the plan-versus-actual comparison, test output and the Checker's first findings.
+
+### What humans do on Tuesday
+
+Humans handle exceptions only. A Maker escalates, and the coordinator pauses the item, when it meets something outside its authorised boundary:
+
+- a blocked dependency the plan did not anticipate;
+- a deviation from the approved architecture;
+- an unexpected database migration;
+- a security concern, such as a credential or a new trust boundary;
+- an acceptance criterion that turns out to be ambiguous once it meets the code;
+- repeated Checker failure on the same goal.
+
+Those arrive at the execution triage ceremony the operating model describes: a short session, or a standing channel, where the lead engineer makes a decision and the Maker continues, narrows or stops. Triage exists so that people decide rather than watch. A lead engineer who spends Tuesday reading agent transcripts has been demoted to a supervisor of typing.
+
+## Wednesday: verification day
+
+This is where the cadence is more opinionated than the specification requires.
+
+By Wednesday morning, new implementation should be winding down. Wednesday belongs to the Maker, Checker, Maker loop:
+
+```text
+Maker agent
+    │
+    ▼
+Implementation
+    │
+    ├── unit tests
+    ├── integration tests
+    ├── contract tests
+    └── evidence bundle
+         │
+         ▼
+  Independent Checker
+         │
+     ┌───┴────┐
+     ↓        ↓
+   PASS      FAIL
+              │
+              ▼
+        Maker remediation
+              │
+              ▼
+          re-check
+```
+
+The same agent does not simply report that it wrote the change and its own tests passed. The methodology rejects that model: independent checks, deterministic controls and human review are three separate challenge mechanisms, and Wednesday is when the first two do their work, so that Thursday's humans receive candidates rather than drafts.
+
+In practice the Checker is a second agent with a narrow question. Given the approved plan, the acceptance criteria, the repository rules and the diff: does the implementation do what was approved, does every criterion have a test, and what would a hostile reviewer find? Its findings go back to the Maker as remediation goals, and the Checker runs again on the result. A team using Claude Code and Codex together will often make one the Maker and the other the Checker for the same item, so that the review is not a re-reading of the author's own reasoning.
+
+### The Wednesday execution cutoff
+
+The cadence adds one rule of its own: new planned implementation does not start after Wednesday. Remediation can continue after the cutoff. New goals cannot.
+
+Without a cutoff, cheap agent capacity produces exactly the failure the methodology warns about:
+
+```text
+Agent execution capacity
+████████████████████████████████████████
+Human review capacity
+██████
+```
+
+The backlog does not shrink. It moves from "waiting for development" to "waiting for someone to review 37 AI-generated pull requests". The team's real constraint is human cognitive bandwidth, and the cutoff protects it by guaranteeing Thursday's reviewers a bounded, finished set of candidates.
+
+### Exit condition
+
+By the end of Wednesday every sprint item is in one of two states:
+
+- **Candidate.** Checker-approved, evidence complete, ready for human engineering review.
+- **Failed or deferred.** The item did not reach candidate status. It carries its recorded state, evidence and last hypothesis into next week, or back to discovery.
+
+Not endlessly "in progress". An item that is still in progress on Thursday morning is deferred, and the reason is recorded for Friday's learning review.
+
+## Thursday: human acceptance and QA
+
+Thursday is where human attention is concentrated. Instead of engineers spending five days writing code, they spend one concentrated day evaluating finished candidates.
+
+### Engineering review
+
+For each candidate the lead engineer receives a review package, not a stream of agent output:
+
+```text
+Approved Build Plan
+        ↓
+Implementation diff
+        ↓
+Plan versus actual, with every deviation named
+        ↓
+Test evidence
+        ↓
+Checker evidence
+        ↓
+Security evidence, where the risk tier requires it
+        ↓
+Human engineering review
+```
+
+The engineer asks one question: did it build what we approved? Not: does this code look vaguely fine? The [Review Evidence Template](/templates/review-evidence) lists what the package contains.
+
+The decision is Human Gate 2, Engineering Implementation Acceptance. The engineer accepts the technical outcome and its residual risk, returns the item to the Maker with specific findings, or rejects it. Six candidates at 45 to 60 minutes each is a full day for one lead engineer. That arithmetic, not the number of agents, is what set Monday's capacity.
+
+### Independent QA
+
+Accepted items move to the QA engineer. QA validates the acceptance criteria and the user journeys against product intent, not against whether the agents' own tests are green. The [Quality and Verification Model](/quality-and-verification) places independent QA after engineering acceptance and before release authority, and the cadence keeps it there. The QA engineer has had since Monday's plan review to prepare cases, so Thursday afternoon is execution and exploration, not design.
+
+Anything that fails QA loops back with evidence:
+
+```text
+QA fail
+   ↓
+evidence
+   ↓
+Maker fixes
+   ↓
+Checker re-checks
+   ↓
+Engineering review again, if the change is material
+   ↓
+QA again
+```
+
+An item that fails QA late on Thursday usually misses Friday's release. That is the correct outcome. The [QA Evidence Template](/templates/qa-evidence) records what was tested and what was found.
+
+## Friday: ship and learn
+
+### The release window
+
+Friday morning is the release window. For every candidate that reached it, the release authority checks the chain:
+
+```text
+Human Gate 1   Plan approved                  ✓
+Human Gate 2   Engineering accepted           ✓
+QA             Product behaviour verified     ✓
+Security       Checks complete for the tier   ✓
+CI             Green on the final revision    ✓
+Rollback       Path stated and still usable   ✓
+Evidence       Retained and navigable         ✓
+```
+
+Then Human Gate 3, Release Authority. The human decides ship, hold or reject. A hold is a release decision, not a failure. It says the change is accepted but the moment is wrong, for a reason that is recorded. The Maker never gains production authority by implication. The specification keeps release authority distinct from implementation, and a Friday morning release window is simply that distinction with a time on it.
+
+### The Agentic Sprint Learning Review
+
+Friday afternoon is arguably the most valuable ceremony of the week. It is not a traditional retrospective that asks what went well. It asks: what did humans have to correct?
+
+Every correction from the week is examined. For example:
+
+```text
+AS-104  Scheduled payment cancellation
+        Checker failed twice on goal 3.
+        Reason:      the Maker misunderstood the team's idempotency pattern.
+        Correction:  key the operation on PaymentOperationId, not RequestId.
+```
+
+Then the team decides whether the correction was specific to that ticket or is reusable knowledge. If it is reusable, it enters the governed path in the [Context Governance Standard](/context-governance):
+
+```text
+Human correction
+      ↓
+Proposed context change
+      ↓
+Review by the context steward
+      ↓
+Test against representative tasks
+      ↓
+ARCHITECTURE.md, AGENTS.md, CLAUDE.md, a skill or a Checker rule
+      ↓
+Versioned and reversible
+```
+
+Next Monday's planning agents load the new context. The correction was made once, by a person, and the delivery system now knows it. That is what the manifesto means when it says correction should improve the system, and it is why a team running this cadence gets better at it week by week instead of repeating the same review comments.
+
+The [Retrospective Template](/templates/retrospective) structures the session. The field that matters most is the one that separates a local fix from a durable lesson.
+
+### Exit condition
+
+Human Gate 3 has been decided for every candidate. The sprint is closed. Deferred items carry their state into Monday's selection. Approved context changes are versioned.
+
+## The weekly rhythm
+
+Described publicly, the rhythm is simple:
+
+| | Monday | Tuesday | Wednesday | Thursday | Friday |
+| --- | --- | --- | --- | --- | --- |
+| Humans | Select and authorise | Triage | Triage and escalation | Review and QA | Release and learn |
+| Agents | Plan | Build | Verify and fix | Fix and evidence | Analyse |
+| Gate | Human Gate 1 | | Execution cutoff | Human Gate 2 | Human Gate 3 |
+
+Or even more simply: Monday decides, Tuesday builds, Wednesday proves, Thursday validates, Friday ships and learns.
+
+## Board states and capacity
+
+### Board states
+
+The board has five states a work item passes through, plus two exits. Each state is entered by a human decision or an independent check, never by an agent's own status report:
+
+:::figure sprint-funnel
+Each state counts work items that passed a decision. A sprint is measured by how many selected items became released, and by where the rest stopped.
+:::
+
+| State | Entered by | Meaning |
+| --- | --- | --- |
+| Selected | Monday selection | In this week's Agentic Sprint Backlog with a named owner |
+| Authorised | Human Gate 1 | Build Plan approved, and a Maker may begin |
+| Candidate | Independent Checker | Implementation and evidence complete before the Wednesday cutoff |
+| Accepted | Human Gate 2 and QA | Engineering accepted and product behaviour verified |
+| Released | Human Gate 3 | Shipped, or held with a recorded reason |
+| Deferred | Any gate | Carried to next week with recorded state and evidence |
+| Rejected | Any gate | Returned to discovery with the reason recorded |
+
+An orchestrator can show finer states underneath, such as which goal a Maker is on. The five human states are the ones the team reports.
+
+### Agentic Sprint Capacity
+
+The cadence defines capacity as follows.
+
+> **Agentic Sprint Capacity** is the number of independently verifiable outcomes the team can responsibly review, validate and accept within the execution window.
+
+Not tokens. Not agent-hours. Not story points. Not generated pull requests. Accepted outcomes.
+
+A useful first estimate is the number of candidates the lead engineer can review on Thursday at 45 to 60 minutes each, checked against the number the QA engineer can validate the same afternoon, and reduced for any R2 or R3 item that needs a security review. Most teams find the answer is a single digit. That is not a limitation of the agents. It is an honest measure of the team.
+
+This is Principle 10 of the [Manifesto](/), measure accepted outcomes rather than raw activity, applied to planning.
+
+### Work-in-progress limits
+
+The operating model recommends limiting the number of changes awaiting human decisions. In this cadence the natural limits are:
+
+- plans awaiting approval on Monday afternoon: the sprint backlog and no more;
+- items in execution at once: the sprint backlog, or fewer for R2 and R3 work;
+- candidates awaiting engineering review on Thursday: what one day of review can absorb;
+- items awaiting QA: what the QA engineer can validate on Thursday afternoon;
+- context changes awaiting the steward: cleared each Friday.
+
+If any queue grows past its limit, the answer is to select less on the following Monday, not to add Makers.
+
+## Metrics for the week
+
+The [Metrics Framework](/metrics) defines the measures. The cadence needs only a handful, reported as a funnel every Friday:
+
+| Measure | Definition | What it tells the team |
+| --- | --- | --- |
+| Selected | Items locked on Monday morning | The week's commitment |
+| Authorised | Plans approved at Human Gate 1 | Requirement and plan quality |
+| Candidate | Items that reached Checker-approved status by the Wednesday cutoff | Execution and context quality |
+| Accepted | Items through Human Gate 2 and QA | Implementation fit |
+| Released | Items through Human Gate 3 | Delivered outcomes, the throughput measure |
+| First-Pass Plan Acceptance | Plans approved on Monday without revision, divided by plans reviewed | Whether the context pack and the readiness check are working |
+| Review Load | Human review minutes per accepted item | Whether Thursday is sustainable |
+| Repeat Error Rate | Corrections that recur from a previous week | Whether Friday's learning review is working |
+
+Report the counts, not a ratio alone, and report which items stopped at which state and why. A week with six selected, six authorised, five candidates, four accepted and four released is a good week. A week with fifteen selected and four released is a planning failure, however busy the agents were.
+
+## Adapting the cadence
+
+The five-day shape is a default, not a rule. Some adaptations keep the structure:
+
+- **Two-week cadence.** Monday selection and Friday release stay where they are and the middle stretches. Keep the execution cutoff at least two working days before release, so that review and QA are never compressed into the last afternoon.
+- **Rolling release.** A team with continuous deployment can hold Human Gate 3 on any day. Keep the Friday learning review, because that is the ceremony that compounds.
+- **Higher-risk domains.** R2 and R3 items may need Monday's plan review to include the security owner and Thursday's acceptance to include an architecture reviewer. Reduce the selected count to keep Thursday possible.
+- **Very small teams.** One engineer can hold the lead engineer, QA and release roles for low-risk work, but the decisions are still recorded separately and the Checker is still a separate agent.
+- **Mixed human and agent work.** Items that are not ready for agentic execution can run beside the agentic backlog in the conventional way. Keep them off the agentic board so that the funnel stays honest.
+
+## What this document does not claim
+
+This cadence does not claim that a team will ship six items a week, that Claude Code or Codex will produce candidates without correction, or that a one-week cycle suits every product. It does not claim that Thursday's review can be shortened because the Checker passed. It describes one way to arrange the week so that the methodology's gates fall on days when the right people are in the room, and so that generated work never outruns the people accountable for it.
+
+## What to read next
+
+- [Agentic Sprint Operating Model](/operating-model) for the roles, decision rights and ceremonies the cadence schedules.
+- [Agentic Definition of Ready and Definition of Done](/definition-of-ready-and-done) for the Monday entry conditions and the Wednesday exit conditions.
+- [Build Plan Standard](/build-plan-standard) and the [Build Plan Template](/templates/build-plan) for what the Monday afternoon review reads.
+- [Agentic Sprint Quality and Verification Model](/quality-and-verification) for why the Maker is never its own Checker.
+- [Agent Learning and Context Governance Standard](/context-governance) for how a Friday correction becomes next Monday's context.
+- [Agentic Sprint Metrics Framework](/metrics) for the definitions behind the Friday funnel.
+- [Agentic Sprint Implementation Guide](/implementation-guide) for how to reach the point where running this week is safe.
+
+## Document status and limitations
+
+This is version 0.1 of a proposed operating cadence in the Agentic Sprint Methodology series. It is informative: it adds no requirements to D1 and can be adopted, adapted or ignored without affecting conformance. The day-by-day timings are a planning default, not a measured result. Claude Code and Codex are named as examples of tools that can hold the planning, Maker and Checker roles. The cadence does not depend on either, and no claim is made about their performance. No observed throughput, quality or cost result is implied.

@@ -1,6 +1,6 @@
 # theagenticsprint.com
 
-The home of the Agentic Sprint: a human-governed operating model for software delivery with autonomous agents. The site publishes the Agentic Sprint Manifesto as its front page and, behind it, the full methodology: thirteen numbered documents (D1 to D13) and nine working templates (T1 to T9).
+The home of the Agentic Sprint: a human-governed operating model for software delivery with autonomous agents. The site publishes the Agentic Sprint Manifesto as its front page and, behind it, the full methodology: fourteen numbered documents (D1 to D14) and nine working templates (T1 to T9).
 
 The methodology was first published on [dalugoda.com](https://dalugoda.com). This site now owns it. dalugoda.com keeps the [original essay](https://dalugoda.com/agentic-sprint) and the [Autonomous Loop](https://dalugoda.com/autonomous-loop) project record, and points here for the rest.
 
@@ -17,7 +17,7 @@ npm run dev
 
 ## How the content is organised
 
-- `content/methodology/` holds D1 to D13. Each file carries a document identifier, status, version, normative flag, dependencies and a citation in its frontmatter.
+- `content/methodology/` holds D1 to D14. Each file carries a document identifier, status, version, normative flag, dependencies and a citation in its frontmatter.
 - `content/templates/` holds T1 to T9.
 - `lib/methodology-figures.ts` holds the semantic data for the figures the documents embed through the `:::figure <name>` directive.
 - Document identifiers are stable. Cite a requirement by its document and identifier, not by a page position.
@@ -26,13 +26,15 @@ Machine-readable editions of every document are served at `/md/<slug>`, and the 
 
 ## Checking parity with the source
 
-The content was imported from a dalugoda.com checkout with only its addresses rewritten. To prove nothing else changed:
+D1 to D13 and the templates were imported from a dalugoda.com checkout with only their addresses rewritten. To prove nothing else changed:
 
 ```bash
 node scripts/import-content.mjs --check /path/to/dalugoda
 ```
 
-The check exits non-zero if any file in `content/` differs from the rewritten source. The methodology left dalugoda.com on 30 August 2026, so the checkout has to be at or before commit `2af3129` of that repository.
+The check exits non-zero if any imported file in `content/` differs from the rewritten source. The methodology left dalugoda.com on 30 August 2026, so the checkout has to be at or before commit `2af3129` of that repository.
+
+Documents written for this site after the move, starting with D14, declare `origin: "theagenticsprint.com"` in their frontmatter. The check leaves those alone: they have no dalugoda.com source to compare against.
 
 ## Contributing
 
@@ -46,7 +48,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) first: the documents carry stable identi
 ## Licences
 
 - Site source code: Apache License 2.0 (`LICENSE`).
-- Documents D1 to D13: CC BY 4.0.
+- Documents D1 to D14: CC BY 4.0.
 - Templates T1 to T9: CC0 1.0.
 
 See `LICENSE-CONTENT.md` for the details.

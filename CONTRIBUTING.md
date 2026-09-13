@@ -4,7 +4,7 @@ The Agentic Sprint is published so it can be read, adopted, adapted and argued w
 
 This repository holds two different kinds of thing, and they are contributed to differently.
 
-- **The methodology** in `content/methodology/` (D1 to D13) and `content/templates/` (T1 to T9). Changing these changes what the methodology says.
+- **The methodology** in `content/methodology/` (D1 to D14) and `content/templates/` (T1 to T9). Changing these changes what the methodology says.
 - **The site** that publishes it: everything else.
 
 ## Before you start
@@ -17,7 +17,7 @@ Every document carries frontmatter that is load-bearing:
 
 | Field | What it means |
 | --- | --- |
-| `documentId` | The stable identifier, D1 to D13 or T1 to T9. Never reuse or renumber one. |
+| `documentId` | The stable identifier, D1 to D14 or T1 to T9. Never reuse or renumber one. |
 | `normative` | Whether the document states requirements. Normative documents use the RFC 2119 keywords. |
 | `version` | The document's own version, independent of the series. |
 | `status` | Draft specification, security model, working template, and so on. |
@@ -27,7 +27,7 @@ Every document carries frontmatter that is load-bearing:
 Some rules follow from that structure:
 
 - **D1 is the normative root.** No other document may contradict or override it. If your change requires D1 to change, say so explicitly; that is a larger change than it looks.
-- **An informative document may not add a requirement.** D2, D3, D11, D12, D13 and every template explain, measure or apply the model. If your change adds a MUST to one of them, it belongs in a normative document instead.
+- **An informative document may not add a requirement.** D2, D3, D11, D12, D13, D14 and every template explain, measure or apply the model. If your change adds a MUST to one of them, it belongs in a normative document instead.
 - **Changing a requirement is a version change.** Edit `version`, `updated` and the `citation` in the same commit, so a reader can tell which text a citation refers to.
 - **Dates are unique across the series.** The registry enforces it: the reading order of the series is its date order.
 - **Do not renumber.** People cite by identifier. A new document gets the next free number.
