@@ -6,7 +6,7 @@ import { getDocumentByPath, getMethodologySeries } from "@/lib/content";
 import { articleMetadata } from "@/lib/social";
 
 /**
- * D1 to D13 live at the root, one segment deep. The manifesto (D11) is the
+ * D1 to D14 live at the root, one segment deep. The manifesto (D11) is the
  * front page and is excluded here; /manifesto redirects to / in next.config.
  * The static folders (documents, templates, about) resolve before this route.
  */

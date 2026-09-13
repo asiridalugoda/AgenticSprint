@@ -4,7 +4,7 @@ The Agentic Sprint is published so that it can be read, adopted, adapted and arg
 
 ## The documents: CC BY 4.0
 
-The methodology documents in `content/methodology/` (D1 to D13, including the Agentic Sprint Manifesto and the Agentic Sprint Specification) are licensed under the Creative Commons Attribution 4.0 International licence.
+The methodology documents in `content/methodology/` (D1 to D14, including the Agentic Sprint Manifesto and the Agentic Sprint Specification) are licensed under the Creative Commons Attribution 4.0 International licence.
 
 You may share and adapt them for any purpose, including commercially, provided you give appropriate credit, link to the licence, and indicate whether changes were made.
 

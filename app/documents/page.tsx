@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { DocumentIndex } from "../components/document-index";
 import { ArrowUpRight } from "../components/icons";
 import { SiteShell } from "../components/site-shell";
@@ -7,10 +9,11 @@ import { site } from "@/lib/site";
 import { listingKeywords, pageMetadata } from "@/lib/social";
 
 const description =
-  "Thirteen numbered documents and nine templates: the normative Agentic Sprint specification, its companion standards, and the guides that apply them.";
+  "Fourteen numbered documents and nine templates: the normative Agentic Sprint specification, its companion standards, and the guides that apply them.";
 
 const documents = getMethodologySeries();
 const templates = getTemplateSeries();
+const cadence = documents.find((document) => document.documentKind === "operating-cadence");
 
 export const metadata = pageMetadata({
   slug: "documents",
@@ -39,6 +42,11 @@ export default function DocumentsPage() {
           </div>
           <aside className="listing-index-note">
             <p>Identifiers are stable. Cite a requirement by its document and identifier, not by a page position.</p>
+            {cadence ? (
+              <p>
+                Want to see the week before the rules? Start with <Link href={cadence.path}>{cadence.documentId}, the 5-Day Cadence</Link>.
+              </p>
+            ) : null}
           </aside>
         </section>
         <section className="listing-body" aria-label="Document index">
