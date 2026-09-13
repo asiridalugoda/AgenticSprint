@@ -89,12 +89,17 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-NZ">
+    // The font variables have to live on the root element: globals.css defines
+    // --font-serif, --font-sans and --font-mono on :root in terms of them, and a
+    // custom property is resolved where it is declared. Declared on <body>, the
+    // variables were out of scope, every token was invalid, and the whole site
+    // fell back to the browser's default serif.
+    <html className={`${newsreader.variable} ${plexSans.variable} ${plexMono.variable}`} lang="en-NZ">
       <head>
         <link rel="describedby" href="/llms.txt" />
         <link rel="alternate" type="text/plain" href="/llms-full.txt" title="Full document index" />
       </head>
-      <body className={`${newsreader.variable} ${plexSans.variable} ${plexMono.variable}`}>
+      <body>
         <a className="skip-link" href="#content">Skip to content</a>
         <SiteStructuredData />
         {children}

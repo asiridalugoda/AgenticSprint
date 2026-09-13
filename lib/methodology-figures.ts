@@ -23,6 +23,11 @@ export const methodologyFigureNames = [
   "maturity-model",
   "weekly-cadence",
   "sprint-funnel",
+  "backlog-narrowing",
+  "maker-isolation",
+  "maker-checker-loop",
+  "capacity-mismatch",
+  "thursday-acceptance",
 ] as const;
 
 export type MethodologyFigureName = (typeof methodologyFigureNames)[number];
@@ -3252,6 +3257,221 @@ export const methodologyFigures = {
         },
       ],
     },
+  },
+  "backlog-narrowing": {
+    id: "backlog-narrowing",
+    kind: "progression",
+    title: "Narrowing the backlog on Monday morning",
+    caption: "Three filters. The last one is human review capacity, not agent capacity, and it is the one that sets the sprint.",
+    accessibleDescription:
+      "The product backlog of about eighty items is filtered first by the Definition of Ready, leaving about fifteen items ready for agentic execution, and then by the week's human review capacity, leaving an Agentic Sprint Backlog of six items, AS-101 to AS-106. Agent capacity could take all fifteen; the team's capacity to review, test and accept cannot. The numbers are an illustration, not a target.",
+    groups: [
+      { id: "narrowing-filters", label: "Filters", detail: "Readiness first, then review capacity." },
+    ],
+    nodes: [
+      { id: "narrowing-product", order: 1, label: "Product backlog", detail: "About eighty items.", role: "external", group: "narrowing-filters" },
+      { id: "narrowing-ready", order: 2, label: "Ready for agentic execution", detail: "About fifteen items that meet the Definition of Ready.", role: "gate", group: "narrowing-filters" },
+      { id: "narrowing-sprint", order: 3, label: "Agentic Sprint Backlog", detail: "Six items the team can review, test and accept this week.", role: "gate", group: "narrowing-filters" },
+    ],
+    edges: [
+      { from: "narrowing-product", to: "narrowing-ready", label: "meets the Definition of Ready", style: "gated" },
+      { from: "narrowing-ready", to: "narrowing-sprint", label: "fits this week's human review capacity", style: "gated" },
+    ],
+    progression: {
+      note: "The last filter is the one that matters. Agent capacity could take all fifteen. The team's capacity to review, test and accept cannot.",
+      stages: [
+        { id: "narrowing-stage-product", order: 1, label: "Product backlog: about 80", detail: "Everything the product owner could ask for." },
+        { id: "narrowing-stage-ready", order: 2, label: "Ready: about 15", detail: "Each meets the Definition of Ready: intent, criteria, context, risk tier, owner." },
+        { id: "narrowing-stage-sprint", order: 3, label: "Sprint backlog: 6", detail: "AS-101 to AS-106. What the lead engineer and QA engineer can accept this week." },
+      ],
+    },
+  },
+
+  "maker-isolation": {
+    id: "maker-isolation",
+    kind: "flow",
+    title: "Tuesday: one Maker per item, one workspace per Maker",
+    caption: "Three items, three Makers, three isolated workspaces. Nothing is shared except the evidence they hand back, and none of them can reach production.",
+    accessibleDescription:
+      "Human Gate 1 releases three approved plans, AS-101, AS-102 and AS-103. Each goes to its own Maker agent: Maker A running Claude Code, Maker B running Codex, Maker C running Claude Code. Each Maker works in its own isolated workspace, a git worktree for Claude Code and a cloud sandbox for Codex, on its own branch, with only the permissions its plan requires. Every workspace runs the repository's checks and produces an evidence bundle: the diff, the plan-versus-actual comparison, test output and the Checker's first findings. No Maker shares a working directory with another and no Maker holds production credentials.",
+    legend: [
+      { id: "isolation-agent", label: "Maker agent", detail: "Claude Code or Codex, one approved plan each.", role: "agent" },
+      { id: "isolation-workspace", label: "Isolated workspace", detail: "A git worktree or a cloud sandbox, never shared.", role: "system" },
+      { id: "isolation-evidence", label: "Evidence", detail: "What comes back for Wednesday's Checker and Thursday's humans.", role: "evidence" },
+      { id: "isolation-gate", label: "Authorisation", detail: "Only an approved plan starts a Maker.", role: "gate" },
+    ],
+    groups: [
+      { id: "isolation-authorised", label: "Authorised plans", detail: "The output of Monday's plan review." },
+      { id: "isolation-execution", label: "Isolated execution", detail: "Parallel, unattended, bounded." },
+      { id: "isolation-evidence-group", label: "Evidence", detail: "Checks and bundles, per item." },
+    ],
+    lanes: [
+      { id: "isolation-lane-plans", label: "Approved plans", detail: "Human Gate 1 has passed for each item.", nodeIds: ["isolation-gate-one"] },
+      { id: "isolation-lane-makers", label: "Makers", detail: "One agent per item, started by the coordinator.", nodeIds: ["isolation-maker-a", "isolation-maker-b", "isolation-maker-c"] },
+      { id: "isolation-lane-workspaces", label: "Workspaces", detail: "Separate working state, separate branch, task-scoped permissions.", nodeIds: ["isolation-worktree-a", "isolation-sandbox-b", "isolation-worktree-c"] },
+      { id: "isolation-lane-evidence", label: "Checks and evidence", detail: "Each workspace runs the repository's checks and hands back a bundle.", nodeIds: ["isolation-checks", "isolation-evidence"] },
+    ],
+    nodes: [
+      { id: "isolation-gate-one", order: 1, label: "Build Plan Approval", detail: "Human Gate 1. Three approved plans: AS-101, AS-102, AS-103.", role: "gate", group: "isolation-authorised" },
+      { id: "isolation-maker-a", order: 2, label: "AS-101: Maker A", detail: "Claude Code, running against a git worktree.", role: "agent", group: "isolation-execution" },
+      { id: "isolation-maker-b", order: 3, label: "AS-102: Maker B", detail: "Codex, running as a cloud task in its own container.", role: "agent", group: "isolation-execution" },
+      { id: "isolation-maker-c", order: 4, label: "AS-103: Maker C", detail: "Claude Code, running against a second git worktree.", role: "agent", group: "isolation-execution" },
+      { id: "isolation-worktree-a", order: 5, label: "Git worktree", detail: "A separate working tree on the same clone, on its own branch.", role: "system", group: "isolation-execution" },
+      { id: "isolation-sandbox-b", order: 6, label: "Cloud sandbox", detail: "A fresh container per run, with the repository cloned into it.", role: "system", group: "isolation-execution" },
+      { id: "isolation-worktree-c", order: 7, label: "Git worktree", detail: "A separate working tree on the same clone, on its own branch.", role: "system", group: "isolation-execution" },
+      { id: "isolation-checks", order: 8, label: "Repository checks", detail: "Lint, build, unit, integration and contract tests, run inside each workspace.", role: "evidence", group: "isolation-evidence-group" },
+      { id: "isolation-evidence", order: 9, label: "Evidence bundle", detail: "Diff, plan versus actual, test output and the Checker's first findings, per item.", role: "evidence", group: "isolation-evidence-group" },
+    ],
+    edges: [
+      { from: "isolation-gate-one", to: "isolation-maker-a", label: "authorises AS-101", style: "gated" },
+      { from: "isolation-gate-one", to: "isolation-maker-b", label: "authorises AS-102", style: "gated" },
+      { from: "isolation-gate-one", to: "isolation-maker-c", label: "authorises AS-103", style: "gated" },
+      { from: "isolation-maker-a", to: "isolation-worktree-a", label: "writes isolated state", style: "normal" },
+      { from: "isolation-maker-b", to: "isolation-sandbox-b", label: "writes isolated state", style: "normal" },
+      { from: "isolation-maker-c", to: "isolation-worktree-c", label: "writes isolated state", style: "normal" },
+      { from: "isolation-worktree-a", to: "isolation-checks", label: "runs checks", style: "normal" },
+      { from: "isolation-sandbox-b", to: "isolation-checks", label: "runs checks", style: "normal" },
+      { from: "isolation-worktree-c", to: "isolation-checks", label: "runs checks", style: "normal" },
+      { from: "isolation-checks", to: "isolation-evidence", label: "records results", style: "normal" },
+    ],
+  },
+
+  "maker-checker-loop": {
+    id: "maker-checker-loop",
+    kind: "flow",
+    title: "Wednesday: the Maker, Checker, Maker loop",
+    caption: "The Maker never judges its own work. A failed check returns as a bounded remediation goal, and the Checker runs again on the result.",
+    accessibleDescription:
+      "A goal from the approved plan goes to the Maker agent, which produces an implementation with unit, integration and contract tests. Deterministic checks run first. An independent Checker, often a different tool from the Maker, then reviews the change against the approved plan, the acceptance criteria and the repository's rules. If it passes, the result becomes a candidate with evidence, or the next goal starts. If it fails, the failure is recorded with evidence and returns to the Maker as a remediation goal; the Checker runs again on the remediated result. The Maker has no edge to approval.",
+    legend: [
+      { id: "loop-legend-maker", label: "Maker", detail: "Implements a goal. Cannot pass its own work.", role: "agent" },
+      { id: "loop-legend-checker", label: "Independent Checker", detail: "A separate agent with a narrow question.", role: "agent" },
+      { id: "loop-legend-evidence", label: "Evidence", detail: "Tests, checks and the candidate bundle.", role: "evidence" },
+      { id: "loop-legend-failure", label: "Failed check", detail: "Returns to the Maker with findings. Never silently retried.", edgeStyle: "failure" },
+    ],
+    groups: [
+      { id: "loop-make", label: "Make", detail: "One bounded goal at a time." },
+      { id: "loop-verify", label: "Verify", detail: "Deterministic controls, then an independent Checker." },
+      { id: "loop-decide", label: "Outcome", detail: "Candidate, next goal, or remediation." },
+    ],
+    lanes: [
+      { id: "loop-lane-make", label: "Make", detail: "The Maker takes one goal and produces an implementation with tests.", nodeIds: ["loop-goal", "loop-maker", "loop-implementation"] },
+      { id: "loop-lane-verify", label: "Verify", detail: "Checks run, then a separate agent challenges the result.", nodeIds: ["loop-checks", "loop-checker"] },
+      { id: "loop-lane-outcome", label: "Outcome", detail: "Pass moves forward. Fail returns with evidence.", nodeIds: ["loop-candidate", "loop-failed-check", "loop-remediation"] },
+    ],
+    nodes: [
+      { id: "loop-goal", order: 1, label: "Goal", detail: "One dependency-ordered goal from the approved plan, with a verification condition.", role: "system", group: "loop-make" },
+      { id: "loop-maker", order: 2, label: "Maker agent", detail: "Implements the goal in its isolated workspace.", role: "agent", group: "loop-make" },
+      { id: "loop-implementation", order: 3, label: "Implementation and tests", detail: "Code plus unit, integration and contract tests.", role: "evidence", group: "loop-make" },
+      { id: "loop-checks", order: 4, label: "Deterministic checks", detail: "Lint, build, test suite, scans. Retained as evidence.", role: "evidence", group: "loop-verify" },
+      { id: "loop-checker", order: 5, label: "Independent Checker", detail: "Does it do what was approved? Does every criterion have a test? What would a hostile reviewer find?", role: "agent", group: "loop-verify" },
+      { id: "loop-candidate", order: 6, label: "Candidate with evidence", detail: "Or the next goal, until the item is complete.", role: "evidence", group: "loop-decide" },
+      { id: "loop-failed-check", order: 7, label: "Failed check", detail: "Recorded with findings, evidence and the next hypothesis.", role: "risk", group: "loop-decide" },
+      { id: "loop-remediation", order: 8, label: "Maker remediation", detail: "The findings become bounded goals. New implementation does not start after the cutoff; remediation may.", role: "agent", group: "loop-decide" },
+    ],
+    edges: [
+      { from: "loop-goal", to: "loop-maker", label: "assigns bounded goal", style: "normal" },
+      { from: "loop-maker", to: "loop-implementation", label: "produces change and tests", style: "normal" },
+      { from: "loop-implementation", to: "loop-checks", label: "submits to deterministic checks", style: "normal" },
+      { from: "loop-checks", to: "loop-checker", label: "opens evidence for challenge", style: "normal" },
+      { from: "loop-checker", to: "loop-candidate", label: "passes", style: "gated" },
+      { from: "loop-candidate", to: "loop-goal", label: "selects the next goal", style: "feedback" },
+      { from: "loop-checker", to: "loop-failed-check", label: "fails", style: "failure" },
+      { from: "loop-failed-check", to: "loop-remediation", label: "returns findings as goals", style: "normal" },
+      { from: "loop-remediation", to: "loop-checker", label: "resubmits for re-check", style: "feedback" },
+    ],
+  },
+
+  "capacity-mismatch": {
+    id: "capacity-mismatch",
+    kind: "matrix",
+    title: "Why the week needs a cutoff",
+    caption: "Agent execution capacity and human review capacity are not the same size. The smaller one is the real sprint.",
+    accessibleDescription:
+      "The matrix compares agent execution capacity with human review capacity across three columns. In one week, agents running in parallel could plausibly generate forty pull requests, while the lead engineer and QA engineer can review, test and accept about six outcomes. Agent capacity is limited by tokens, compute and the approved backlog, none of which the team feels on Thursday; human capacity is limited by attention and hours, because comprehension does not parallelise the way generation does. Exceeding agent capacity costs money; exceeding human capacity produces a queue nobody can read, superficial review or a missed release. The cutoff exists to keep the first inside the second.",
+    legend: [
+      { id: "mismatch-agent", label: "Agent capacity", detail: "Cheap, parallel, unattended.", role: "agent" },
+      { id: "mismatch-human", label: "Human capacity", detail: "Bounded by attention. This is the sprint.", role: "human" },
+    ],
+    groups: [
+      { id: "mismatch-group", label: "Capacities", detail: "Two capacities, one constraint." },
+    ],
+    nodes: [
+      { id: "mismatch-agent-node", order: 1, label: "Agent execution capacity", detail: "What Claude Code and Codex can generate in a week.", role: "agent", group: "mismatch-group" },
+      { id: "mismatch-human-node", order: 2, label: "Human review capacity", detail: "What the lead engineer and QA engineer can accept in a week.", role: "human", group: "mismatch-group" },
+    ],
+    edges: [
+      { from: "mismatch-agent-node", to: "mismatch-human-node", label: "must fit inside", style: "gated" },
+    ],
+    matrix: {
+      rows: [
+        { id: "mismatch-row-agent", label: "Agent execution capacity", detail: "What Claude Code and Codex can generate in a week." },
+        { id: "mismatch-row-human", label: "Human review capacity", detail: "What the lead engineer and QA engineer can accept in a week." },
+      ],
+      columns: [
+        { id: "mismatch-col-volume", label: "Volume in one week", detail: "An illustration, not a measurement." },
+        { id: "mismatch-col-limit", label: "What limits it", detail: "The constraint the team actually feels." },
+        { id: "mismatch-col-cost", label: "What exceeding it costs", detail: "Why the cutoff protects the smaller one." },
+      ],
+      cells: [
+        { row: "mismatch-row-agent", column: "mismatch-col-volume", label: "Forty pull requests is plausible", detail: "Parallel Makers in isolated workspaces, running unattended from Tuesday." },
+        { row: "mismatch-row-agent", column: "mismatch-col-limit", label: "Tokens, compute and the approved backlog", detail: "None of which the team feels on Thursday." },
+        { row: "mismatch-row-agent", column: "mismatch-col-cost", label: "Money", detail: "Recoverable, and visible on an invoice." },
+        { row: "mismatch-row-human", column: "mismatch-col-volume", label: "About six accepted outcomes", detail: "One reviewer's Thursday at 45 to 60 minutes each, and one QA afternoon." },
+        { row: "mismatch-row-human", column: "mismatch-col-limit", label: "Attention and hours", detail: "Comprehension does not parallelise the way generation does." },
+        { row: "mismatch-row-human", column: "mismatch-col-cost", label: "A queue nobody can read", detail: "Superficial review or a missed release: the failure the methodology is built to avoid." },
+      ],
+    },
+  },
+
+  "thursday-acceptance": {
+    id: "thursday-acceptance",
+    kind: "flow",
+    title: "Thursday: the review package, two decisions and the return path",
+    caption: "The lead engineer reads a package, not a transcript. QA tests intent, not the Maker's tests. Anything that fails goes back with evidence.",
+    accessibleDescription:
+      "For each candidate the lead engineer receives a review package in order: the approved Build Plan, the implementation diff, the plan-versus-actual comparison with every deviation named, the test evidence, the Checker evidence and, where the risk tier requires it, the security evidence. Human Gate 2, Engineering Implementation Acceptance, asks one question: did it build what we approved? An accepted item goes to independent QA, which validates the acceptance criteria and user journeys against product intent. A QA pass makes the item a candidate for Friday's release. A QA failure returns with evidence: the Maker fixes, the Checker re-checks, engineering reviews again if the change is material, and QA runs again. An item that fails late on Thursday usually misses Friday's release.",
+    legend: [
+      { id: "thursday-evidence", label: "Review package", detail: "Read in this order. Reduces search time, not judgement.", role: "evidence" },
+      { id: "thursday-gate", label: "Human decision", detail: "Engineering acceptance, then independent QA.", role: "gate" },
+      { id: "thursday-return", label: "Return path", detail: "A QA failure goes back to the Maker with evidence.", edgeStyle: "failure" },
+    ],
+    groups: [
+      { id: "thursday-package", label: "Review package", detail: "Six items, in reading order." },
+      { id: "thursday-decisions", label: "Decisions", detail: "Human Gate 2 and independent QA." },
+      { id: "thursday-return-group", label: "Return path", detail: "Fix, re-check, review if material, QA again." },
+    ],
+    lanes: [
+      { id: "thursday-lane-package", label: "Review package", detail: "What the lead engineer receives for each candidate, in reading order.", nodeIds: ["thursday-plan", "thursday-diff", "thursday-plan-vs-actual", "thursday-test-evidence", "thursday-checker-evidence", "thursday-security-evidence"] },
+      { id: "thursday-lane-decisions", label: "Decisions", detail: "Did it build what we approved? Does it behave as the product intends?", nodeIds: ["thursday-gate-two", "thursday-qa", "thursday-candidate"] },
+      { id: "thursday-lane-return", label: "Return path", detail: "A QA failure loops back with evidence and usually misses this week's release.", nodeIds: ["thursday-qa-fail", "thursday-maker-fix", "thursday-recheck", "thursday-review-again"] },
+    ],
+    nodes: [
+      { id: "thursday-plan", order: 1, label: "Approved Build Plan", detail: "What Monday authorised.", role: "evidence", group: "thursday-package" },
+      { id: "thursday-diff", order: 2, label: "Implementation diff", detail: "The change set on the item's branch.", role: "evidence", group: "thursday-package" },
+      { id: "thursday-plan-vs-actual", order: 3, label: "Plan versus actual", detail: "Every deviation from the approved plan, named.", role: "evidence", group: "thursday-package" },
+      { id: "thursday-test-evidence", order: 4, label: "Test evidence", detail: "Fresh results with the revision and environment under test.", role: "evidence", group: "thursday-package" },
+      { id: "thursday-checker-evidence", order: 5, label: "Checker evidence", detail: "The independent Checker's findings and what was remediated.", role: "evidence", group: "thursday-package" },
+      { id: "thursday-security-evidence", order: 6, label: "Security evidence", detail: "Where the risk tier requires it.", role: "evidence", group: "thursday-package" },
+      { id: "thursday-gate-two", order: 7, label: "Engineering Implementation Acceptance", detail: "Human Gate 2. The lead engineer asks whether it built what was approved.", role: "gate", group: "thursday-decisions" },
+      { id: "thursday-qa", order: 8, label: "Independent QA", detail: "The QA engineer validates criteria and journeys against product intent.", role: "human", group: "thursday-decisions" },
+      { id: "thursday-candidate", order: 9, label: "Candidate for Friday", detail: "Accepted and verified. Waits for Release Authority.", role: "evidence", group: "thursday-decisions" },
+      { id: "thursday-qa-fail", order: 10, label: "QA failure", detail: "A criterion or journey did not hold. Recorded with evidence.", role: "risk", group: "thursday-return-group" },
+      { id: "thursday-maker-fix", order: 11, label: "Maker fixes", detail: "A bounded remediation goal.", role: "agent", group: "thursday-return-group" },
+      { id: "thursday-recheck", order: 12, label: "Checker re-checks", detail: "The independent Checker runs again on the fix.", role: "agent", group: "thursday-return-group" },
+      { id: "thursday-review-again", order: 13, label: "Engineering review again", detail: "Only if the change is material.", role: "human", group: "thursday-return-group" },
+    ],
+    edges: [
+      { from: "thursday-plan", to: "thursday-diff", label: "is compared with", style: "normal" },
+      { from: "thursday-security-evidence", to: "thursday-gate-two", label: "completes the package", style: "gated" },
+      { from: "thursday-gate-two", to: "thursday-qa", label: "passes to independent QA", style: "gated" },
+      { from: "thursday-qa", to: "thursday-candidate", label: "verifies product behaviour", style: "gated" },
+      { from: "thursday-qa", to: "thursday-qa-fail", label: "records failed criterion", style: "failure" },
+      { from: "thursday-qa-fail", to: "thursday-maker-fix", label: "returns with evidence", style: "normal" },
+      { from: "thursday-maker-fix", to: "thursday-recheck", label: "resubmits", style: "normal" },
+      { from: "thursday-recheck", to: "thursday-review-again", label: "if material", style: "normal" },
+      { from: "thursday-review-again", to: "thursday-qa", label: "QA again", style: "feedback" },
+    ],
   },
 } as const satisfies Readonly<Record<MethodologyFigureName, MethodologyFigure>>;
 
