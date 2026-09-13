@@ -177,6 +177,9 @@ ol.read-on-list { margin: 0; padding: 0; border-top: 1px solid var(--rule); list
 .listing-intro { max-width: 60ch; margin: 28px 0 0; color: var(--muted); font-size: var(--text-lede); line-height: 1.55; text-wrap: pretty; }
 .listing-index-note { align-self: end; padding-bottom: 6px; color: var(--muted); font-family: var(--font-sans); font-size: var(--text-meta); }
 .listing-index-note p { max-width: 260px; margin: 0; line-height: 1.55; }
+.listing-index-note p + p { margin-top: 10px; }
+.listing-index-note a { color: var(--accent); }
+.listing-index-note a:hover { color: var(--accent-strong); }
 .listing-body { padding-top: 40px; border-top: 1px solid var(--rule); }
 .further-reading { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; margin: 0 0 40px; padding: 22px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); color: var(--muted); font-family: var(--font-sans); font-size: var(--text-meta); }
 .further-reading a { color: var(--accent); }

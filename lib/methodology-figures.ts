@@ -2868,7 +2868,7 @@ export const methodologyFigures = {
     title: "The 5-Day Agentic Sprint Cadence",
     caption: "Humans decide on Monday, Thursday and Friday. Agents build and prove in between. A Wednesday cutoff keeps the two in balance.",
     accessibleDescription:
-      "The week runs left to right through five lanes. On Monday a ready backlog is narrowed by human sprint selection, planning agents write a Build Plan for every selected item in parallel, and Human Gate 1, Build Plan Approval, authorises each plan. On Tuesday maker agents such as Claude Code or Codex implement each approved plan in an isolated worktree or sandbox. A boundary exception, such as an unexpected migration or a security concern, pauses the item and escalates to human execution triage, which returns a decision to the maker. On Wednesday the execution cutoff stops new implementation. Independent checkers review each change, a failed check returns as maker remediation, and a passing check produces a candidate with evidence. On Thursday Human Gate 2, Engineering Implementation Acceptance, accepts the candidate and independent QA validates product behaviour. A QA return goes back to remediation. On Friday Human Gate 3, Release Authority, decides ship, hold or reject, and the learning review examines every human correction. A reusable correction becomes a versioned context change that informs next Monday's planning agents. No agent approves its own work, and no maker has a path to release.",
+      "The week runs left to right through five lanes. On Monday a ready backlog is narrowed by human sprint selection, planning agents write a Build Plan for every selected item in parallel, and Human Gate 1, Build Plan Approval, authorises each plan. On Tuesday maker agents such as Claude Code or Codex implement each approved plan in an isolated worktree or sandbox. A boundary exception, such as an unexpected migration or a security concern, pauses the item and escalates to human execution triage, which returns a decision to the maker. On Wednesday the execution cutoff stops new implementation. Independent checkers review each change, a failed check returns as maker remediation, and a passing check produces a candidate with evidence. On Thursday Human Gate 2, Engineering Implementation Acceptance, accepts the candidate and independent QA validates product behaviour. A QA return goes back to remediation. On Friday the most impacted business stakeholder validates the business outcome of each accepted candidate, then Human Gate 3, Release Authority, decides ship, hold or reject, and the learning review examines every human correction. A reusable correction becomes a versioned context change that informs next Monday's planning agents. No agent approves its own work, and no maker has a path to release.",
     legend: [
       {
         id: "cadence-human",
@@ -2946,8 +2946,8 @@ export const methodologyFigures = {
       {
         id: "cadence-friday",
         label: "Friday: ship and learn",
-        detail: "Release authority decides. The learning review turns corrections into context.",
-        nodeIds: ["cadence-gate-three", "cadence-release", "cadence-learning", "cadence-context"],
+        detail: "The business stakeholder validates the outcome, release authority decides, and the learning review turns corrections into context.",
+        nodeIds: ["cadence-stakeholder", "cadence-gate-three", "cadence-release", "cadence-learning", "cadence-context"],
       },
     ],
     nodes: [
@@ -3064,8 +3064,16 @@ export const methodologyFigures = {
         group: "cadence-decisions",
       },
       {
-        id: "cadence-gate-three",
+        id: "cadence-stakeholder",
         order: 15,
+        label: "Stakeholder validation",
+        detail: "The most impacted business stakeholder confirms the outcome is the one the business asked for. Full UAT can follow.",
+        role: "human",
+        group: "cadence-decisions",
+      },
+      {
+        id: "cadence-gate-three",
+        order: 16,
         label: "Release Authority",
         detail: "Human Gate 3. Ship, hold or reject, with the reason recorded.",
         role: "gate",
@@ -3073,7 +3081,7 @@ export const methodologyFigures = {
       },
       {
         id: "cadence-release",
-        order: 16,
+        order: 17,
         label: "Release",
         detail: "The approved change moves through protected release controls.",
         role: "system",
@@ -3081,7 +3089,7 @@ export const methodologyFigures = {
       },
       {
         id: "cadence-learning",
-        order: 17,
+        order: 18,
         label: "Learning review",
         detail: "Asks what humans had to correct, and whether each correction is reusable.",
         role: "human",
@@ -3089,7 +3097,7 @@ export const methodologyFigures = {
       },
       {
         id: "cadence-context",
-        order: 18,
+        order: 19,
         label: "Versioned context change",
         detail: "A reviewed, tested update to architecture guidance, agent instructions, a skill or a checker rule.",
         role: "evidence",
@@ -3113,7 +3121,8 @@ export const methodologyFigures = {
       { from: "cadence-gate-two", to: "cadence-qa", label: "passes to independent QA", style: "gated" },
       { from: "cadence-qa", to: "cadence-qa-return", label: "records failed criterion", style: "failure" },
       { from: "cadence-qa-return", to: "cadence-remediation", label: "returns with evidence", style: "feedback" },
-      { from: "cadence-qa", to: "cadence-gate-three", label: "reports product outcome", style: "gated" },
+      { from: "cadence-qa", to: "cadence-stakeholder", label: "reports product outcome", style: "gated" },
+      { from: "cadence-stakeholder", to: "cadence-gate-three", label: "confirms business outcome", style: "gated" },
       { from: "cadence-gate-three", to: "cadence-release", label: "authorises release", style: "gated" },
       { from: "cadence-gate-three", to: "cadence-learning", label: "closes the sprint", style: "normal" },
       { from: "cadence-learning", to: "cadence-context", label: "proposes a reusable lesson", style: "gated" },
@@ -3127,7 +3136,7 @@ export const methodologyFigures = {
     title: "Board states of a 5-Day Agentic Sprint",
     caption: "Five states, each entered by a decision. The sprint is measured by how many selected items became released.",
     accessibleDescription:
-      "The board states form a funnel. Selected items are locked on Monday morning by human sprint selection. Authorised items have a Build Plan approved at Human Gate 1 on Monday afternoon. Candidate items have passed the independent checker with complete evidence before the Wednesday execution cutoff. Accepted items have passed Human Gate 2, Engineering Implementation Acceptance, and independent QA on Thursday. Released items have passed Human Gate 3, Release Authority, on Friday. An item can leave the funnel at any state as deferred, carrying its recorded state into next week, or rejected, returning to discovery. No state is entered by an agent's own status report. Agentic Sprint Capacity is the number of items the team can responsibly carry from selected to accepted in one week.",
+      "The board states form a funnel. Selected items are locked on Monday morning by human sprint selection. Authorised items have a Build Plan approved at Human Gate 1 on Monday afternoon. Candidate items have passed the independent checker with complete evidence before the Wednesday execution cutoff. Accepted items have passed Human Gate 2, Engineering Implementation Acceptance, and independent QA on Thursday. Released items have been validated by the most impacted business stakeholder and passed Human Gate 3, Release Authority, on Friday. An item can leave the funnel at any state as deferred, carrying its recorded state into next week, or rejected, returning to discovery. No state is entered by an agent's own status report. Agentic Sprint Capacity is the number of items the team can responsibly carry from selected to accepted in one week.",
     legend: [
       {
         id: "funnel-state",
@@ -3253,7 +3262,7 @@ export const methodologyFigures = {
           id: "released-stage",
           order: 5,
           label: "Released",
-          detail: "Friday. Human Gate 3 decided: ship, hold or reject.",
+          detail: "Friday. Stakeholder validation, then Human Gate 3: ship, hold or reject.",
         },
       ],
     },
@@ -3455,7 +3464,7 @@ export const methodologyFigures = {
       { id: "thursday-security-evidence", order: 6, label: "Security evidence", detail: "Where the risk tier requires it.", role: "evidence", group: "thursday-package" },
       { id: "thursday-gate-two", order: 7, label: "Engineering Implementation Acceptance", detail: "Human Gate 2. The lead engineer asks whether it built what was approved.", role: "gate", group: "thursday-decisions" },
       { id: "thursday-qa", order: 8, label: "Independent QA", detail: "The QA engineer validates criteria and journeys against product intent.", role: "human", group: "thursday-decisions" },
-      { id: "thursday-candidate", order: 9, label: "Candidate for Friday", detail: "Accepted and verified. Waits for Release Authority.", role: "evidence", group: "thursday-decisions" },
+      { id: "thursday-candidate", order: 9, label: "Candidate for Friday", detail: "Accepted and verified. Waits for stakeholder validation and Release Authority.", role: "evidence", group: "thursday-decisions" },
       { id: "thursday-qa-fail", order: 10, label: "QA failure", detail: "A criterion or journey did not hold. Recorded with evidence.", role: "risk", group: "thursday-return-group" },
       { id: "thursday-maker-fix", order: 11, label: "Maker fixes", detail: "A bounded remediation goal.", role: "agent", group: "thursday-return-group" },
       { id: "thursday-recheck", order: 12, label: "Checker re-checks", detail: "The independent Checker runs again on the fix.", role: "agent", group: "thursday-return-group" },
