@@ -63,8 +63,8 @@ The sequence is select, plan, authorise, execute, verify, QA, accept and learn, 
 | --- | --- | --- | --- | --- |
 | Monday morning | Sprint selection | Analyse backlog readiness and risk | Select the sprint outcomes | Agentic Sprint Backlog locked |
 | Monday afternoon | Build planning | Generate Build Plans in parallel | Review and approve the plans | Human Gate 1 passed |
-| Tuesday | Autonomous execution | Maker agents build | Handle exceptions only | Pull requests with evidence |
-| Wednesday | Execute and check | Makers remediate, Checkers review | Architecture and security escalation | Checker-approved candidates |
+| Tuesday | Autonomous execution | Maker agents build | Handle exceptions. Prepare next week's context, tests and backlog | Pull requests with evidence |
+| Wednesday | Execute and check | Makers remediate, Checkers review | Architecture and security escalation. Regression cases from the plans | Checker-approved candidates |
 | Thursday | Engineering review and QA | Support fixes and retests | Engineers and QA validate | Human Gate 2 and QA passed |
 | Friday | Release and learning | Generate evidence and retrospective analysis | Accept, release and learn | Human Gate 3 passed, sprint closed |
 
@@ -159,7 +159,7 @@ Once a plan is approved, the item's state moves from Planned to Authorised, and 
 
 ## Tuesday: execution day
 
-Tuesday should feel almost strangely quiet. Nobody sits beside Codex watching it type.
+Tuesday should feel almost strangely quiet. Nobody sits beside Codex watching it type. Quiet for the agents' supervisors, that is. What the humans do with the day is covered in [The other half of the week](#the-other-half-of-the-week).
 
 The coordinator distributes each approved plan to a Maker agent. Each Maker works in its own isolated workspace, on its own branch, with only the permissions the plan requires:
 
@@ -381,11 +381,34 @@ Described publicly, the rhythm is simple:
 
 | | Monday | Tuesday | Wednesday | Thursday | Friday |
 | --- | --- | --- | --- | --- | --- |
-| Humans | Select and authorise | Triage | Triage and escalation | Review and QA | Release and learn |
+| Humans | Select and authorise | Triage and preparation | Escalation and preparation | Review and QA | Release and learn |
 | Agents | Plan | Build | Verify and fix | Fix and evidence | Analyse |
 | Gate | Human Gate 1 | | Execution cutoff | Human Gate 2 | Human Gate 3 |
 
 Or even more simply: Monday decides, Tuesday builds, Wednesday proves, Thursday validates, Friday ships and learns.
+
+## The other half of the week
+
+The day-by-day tables show each group on its own decision day. They hide what the same people do on the other group's days, and that is where the cadence earns its compounding.
+
+Each role has two jobs in the week: a decision job on its own day, and a preparation job on the days that belong to someone else. Agents freeing up Tuesday and Wednesday does not make those days idle. It makes them the days on which the next iteration gets better.
+
+| Day | Lead engineer | QA engineer | Product owner |
+| --- | --- | --- | --- |
+| Monday | Plan review | Test strategy review, first regression cases | Selection and clarification |
+| Tuesday | Triage only. Write and test the context changes approved last Friday | Build regression cases for this week's items from the approved plans. Human UAT on last week's release | Refine next week's candidates to Ready |
+| Wednesday | Escalations only. Tune Checker rules and the context pack against this week's failures | Finish the regression additions. Prepare exploratory charters | Refine next week's candidates to Ready |
+| Thursday | Engineering acceptance, all day | QA, all afternoon | Reachable for intent questions |
+| Friday | Release and the learning review | Learning review. Fold this week's cases into the standing suite | Learning review and a first pass at next week's selection |
+
+Four things follow from that table:
+
+- **The learning review has somewhere to land.** Friday produces the correction and the proposed context change. Tuesday and Wednesday are when the lead engineer actually writes the skill, architecture note or Checker rule and tests it against representative tasks. Without those days the learning loop is an intention rather than a scheduled activity, and the Repeat Error Rate does not fall.
+- **QA moves upstream.** Writing regression cases from the approved Build Plans on Tuesday, before any code exists, tests against intent rather than against the implementation. It is what the [Quality and Verification Model](/quality-and-verification) asks for, and it is why Thursday afternoon can be execution rather than design. Human UAT on the previous week's release fills a slot that would otherwise be idle.
+- **The product owner's preparation is the readiness work.** Monday morning can be 30 to 45 minutes because the Definition of Ready narrowing was done during the previous week's execution days, not in the meeting.
+- **A quiet Tuesday is quiet for the agents' supervisors, not for the team.** The capacity that agents free up is spent making the next iteration better. That is the compounding the manifesto claims, and it is visible on the calendar.
+
+One caution. The same free days are where a team will be tempted to select more on Monday. If Tuesday and Wednesday look idle, someone will argue for twelve items instead of six. The preparation work is what protects the capacity number, so name it as the intended use of those days rather than leaving them as slack.
 
 ## Board states and capacity
 

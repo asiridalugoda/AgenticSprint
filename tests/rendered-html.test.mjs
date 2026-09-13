@@ -306,6 +306,9 @@ test("publishes the 5-Day Cadence as D14 and links it from the front page and th
     assert.ok(html.includes(`class="methodology-ladder-label">${state}<`), `the board-state figure is missing "${state}"`);
   }
   assert.doesNotMatch(html, /article-visual-unknown|Figure definition pending/);
+  // The preparation days are a section of their own, and Tuesday points at it.
+  assert.match(html, /<h2 id="the-other-half-of-the-week">/);
+  assert.match(html, /href="#the-other-half-of-the-week"/);
   // The series navigation reaches it from the whitepaper and it carries its own citation.
   assert.match(html, /Agentic Sprint Whitepaper v1\.0/);
   assert.match(html, /https:\/\/theagenticsprint\.com\/five-day-cadence/);

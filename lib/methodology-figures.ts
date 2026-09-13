@@ -2923,13 +2923,13 @@ export const methodologyFigures = {
       {
         id: "cadence-tuesday",
         label: "Tuesday: build",
-        detail: "Makers run unattended. Humans handle exceptions only.",
+        detail: "Makers run unattended. Humans handle exceptions and prepare next week: context, regression cases, backlog.",
         nodeIds: ["cadence-makers", "cadence-exception", "cadence-triage"],
       },
       {
         id: "cadence-wednesday",
         label: "Wednesday: prove",
-        detail: "No new implementation after the cutoff. Checkers challenge, makers remediate.",
+        detail: "No new implementation after the cutoff. Checkers challenge, makers remediate, QA finishes its cases.",
         nodeIds: ["cadence-cutoff", "cadence-checkers", "cadence-remediation", "cadence-candidate"],
       },
       {
