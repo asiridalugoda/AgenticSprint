@@ -4,6 +4,8 @@ import {
   getMethodologyFigure,
   methodologyFigureNames,
   type MethodologyEdge,
+  type MethodologyEngagementCell,
+  type MethodologyEngagementLane,
   type MethodologyFigure as MethodologyFigureData,
   type MethodologyFigureName,
   type MethodologyLegendItem,
@@ -312,12 +314,78 @@ function ProgressionBody({ figure }: { figure: MethodologyFigureData }) {
   );
 }
 
+const engagementLevelLabels = { high: "High", medium: "Medium", low: "Low" } as const;
+
+/**
+ * One lane group inside a day: the agent lane or the human lane. Each row is a
+ * three-bar meter and a short note. The meter is decoration; the level is
+ * printed beside the name so it reads without the bars.
+ */
+function EngagementLaneGroup({ label, role, lanes, cells }: { label: string; role: "agent" | "human"; lanes: readonly MethodologyEngagementLane[]; cells: readonly MethodologyEngagementCell[] }) {
+  const rows = lanes.flatMap((lane) => {
+    const cell = cells.find((candidate) => candidate.lane === lane.id);
+    return cell ? [{ lane, cell }] : [];
+  });
+  if (!rows.length) return null;
+
+  return (
+    <section aria-label={label} className={`methodology-engagement-lane methodology-engagement-lane-${role}`}>
+      <span className="methodology-engagement-lane-label">{label}</span>
+      <ul>
+        {rows.map(({ lane, cell }) => (
+          <li className={`methodology-engagement-cell methodology-engagement-${cell.level}`} key={lane.id}>
+            <span aria-hidden="true" className="methodology-engagement-meter"><i /><i /><i /></span>
+            <span className="methodology-engagement-name">
+              {lane.label}
+              <span className="methodology-engagement-level"> {engagementLevelLabels[cell.level]}</span>
+            </span>
+            <span className="methodology-engagement-note">{cell.note}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/**
+ * The week as five day cards, each split into an agent lane and a human lane,
+ * so the reader sees where the agents run continuously and where people step
+ * in. Days sit side by side on a wide screen and stack on a narrow one; the
+ * timeline stays the primary mental model either way.
+ */
+function EngagementBody({ figure }: { figure: MethodologyFigureData }) {
+  const engagement = figure.engagement;
+  if (!engagement) return null;
+  const agentLanes = engagement.lanes.filter((lane) => lane.role === "agent");
+  const humanLanes = engagement.lanes.filter((lane) => lane.role === "human");
+
+  return (
+    <div className="methodology-engagement">
+      <ol aria-label={figure.title} className="methodology-engagement-week">
+        {engagement.days.map((day) => (
+          <li className="methodology-engagement-day" key={day.id}>
+            <div className="methodology-engagement-head">
+              <span className="methodology-engagement-day-label">{day.label}</span>
+              <strong className="methodology-engagement-headline">{day.headline}</strong>
+              {day.gate ? <span className="methodology-engagement-gate">{day.gate}</span> : null}
+            </div>
+            <EngagementLaneGroup cells={day.cells} label="Agent lane" lanes={agentLanes} role="agent" />
+            <EngagementLaneGroup cells={day.cells} label="Human lane" lanes={humanLanes} role="human" />
+          </li>
+        ))}
+      </ol>
+      <p className="methodology-ladder-note">{engagement.note}</p>
+    </div>
+  );
+}
+
 function FigureBody({ figure, instanceId }: { figure: MethodologyFigureData; instanceId: string }): ReactNode {
   switch (figure.kind) {
     case "flow": return <FlowBody figure={figure} instanceId={instanceId} />;
     case "boundary": return <BoundaryBody figure={figure} instanceId={instanceId} />;
     case "matrix": return <MatrixBody figure={figure} instanceId={instanceId} />;
     case "progression": return <ProgressionBody figure={figure} />;
+    case "engagement": return <EngagementBody figure={figure} />;
   }
 }
 

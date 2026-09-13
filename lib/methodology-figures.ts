@@ -28,11 +28,12 @@ export const methodologyFigureNames = [
   "maker-checker-loop",
   "capacity-mismatch",
   "thursday-acceptance",
+  "human-engagement",
 ] as const;
 
 export type MethodologyFigureName = (typeof methodologyFigureNames)[number];
 
-export type MethodologyFigureKind = "flow" | "boundary" | "matrix" | "progression";
+export type MethodologyFigureKind = "flow" | "boundary" | "matrix" | "progression" | "engagement";
 
 export type MethodologySemanticRole =
   | "human"
@@ -113,6 +114,40 @@ export type MethodologyProgression = Readonly<{
   note: string;
 }>;
 
+/**
+ * How much of a day each lane asks of its people. Three levels are enough:
+ * a concentrated block, a bounded task, or being available for an
+ * escalation. Between those, the person is doing their normal work.
+ */
+export type MethodologyEngagementLevel = "high" | "medium" | "low";
+
+export type MethodologyEngagementLane = Readonly<{
+  id: string;
+  label: string;
+  role: "agent" | "human";
+  detail: string;
+}>;
+
+export type MethodologyEngagementCell = Readonly<{
+  lane: string;
+  level: MethodologyEngagementLevel;
+  note: string;
+}>;
+
+export type MethodologyEngagementDay = Readonly<{
+  id: string;
+  label: string;
+  headline: string;
+  gate?: string;
+  cells: readonly MethodologyEngagementCell[];
+}>;
+
+export type MethodologyEngagement = Readonly<{
+  lanes: readonly MethodologyEngagementLane[];
+  days: readonly MethodologyEngagementDay[];
+  note: string;
+}>;
+
 export type MethodologyFigure = Readonly<{
   id: MethodologyFigureName;
   kind: MethodologyFigureKind;
@@ -126,6 +161,7 @@ export type MethodologyFigure = Readonly<{
   edges: readonly MethodologyEdge[];
   matrix?: MethodologyMatrix;
   progression?: MethodologyProgression;
+  engagement?: MethodologyEngagement;
 }>;
 
 export const methodologyFigures = {
@@ -2868,7 +2904,7 @@ export const methodologyFigures = {
     title: "The 5-Day Agentic Sprint Cadence",
     caption: "Humans decide on Monday, Thursday and Friday. Agents build and prove in between. A Wednesday cutoff keeps the two in balance.",
     accessibleDescription:
-      "The week runs left to right through five lanes. On Monday a ready backlog is narrowed by human sprint selection, planning agents write a Build Plan for every selected item in parallel, and Human Gate 1, Build Plan Approval, authorises each plan. On Tuesday maker agents such as Claude Code or Codex implement each approved plan in an isolated worktree or sandbox. A boundary exception, such as an unexpected migration or a security concern, pauses the item and escalates to human execution triage, which returns a decision to the maker. On Wednesday the execution cutoff stops new implementation. Independent checkers review each change, a failed check returns as maker remediation, and a passing check produces a candidate with evidence. On Thursday Human Gate 2, Engineering Implementation Acceptance, accepts the candidate and independent QA validates product behaviour. A QA return goes back to remediation. On Friday the most impacted business stakeholder validates the business outcome of each accepted candidate, then Human Gate 3, Release Authority, decides ship, hold or reject, and the learning review examines every human correction. A reusable correction becomes a versioned context change that informs next Monday's planning agents. No agent approves its own work, and no maker has a path to release.",
+      "The week runs left to right through five lanes. On Monday a ready backlog is narrowed by human sprint selection, planning agents write a Build Plan for every selected item in parallel, and Human Gate 1, Build Plan Approval, authorises each plan. On Tuesday maker agents such as Claude Code or Codex implement each approved plan in an isolated worktree or sandbox. A boundary exception, such as an unexpected migration or a security concern, pauses the item and escalates to human execution triage, which returns a decision to the maker. On Wednesday the execution cutoff stops new implementation. Checker agents verify each change, a failed check returns as maker remediation, and a passing check produces a candidate with evidence. On Thursday Human Gate 2, Engineering Implementation Acceptance, accepts the candidate and independent QA validates product behaviour. A QA return goes back to remediation. On Friday the most impacted business stakeholder validates the business outcome of each accepted candidate, then Human Gate 3, Release Authority, decides ship, hold or reject, and the learning review examines every human correction. A reusable correction becomes a versioned context change that informs next Monday's planning agents. No agent approves its own work, and no maker has a path to release.",
     legend: [
       {
         id: "cadence-human",
@@ -2928,19 +2964,19 @@ export const methodologyFigures = {
       {
         id: "cadence-tuesday",
         label: "Tuesday: build",
-        detail: "Makers run unattended. Humans handle exceptions and prepare next week: context, regression cases, backlog.",
+        detail: "Maker agents run unattended. Humans are available for exceptions and otherwise do their normal work.",
         nodeIds: ["cadence-makers", "cadence-exception", "cadence-triage"],
       },
       {
         id: "cadence-wednesday",
         label: "Wednesday: prove",
-        detail: "No new implementation after the cutoff. Checkers challenge, makers remediate, QA finishes its cases.",
+        detail: "No new implementation after the cutoff. Checker agents verify, Maker agents remediate. Humans are available for escalation.",
         nodeIds: ["cadence-cutoff", "cadence-checkers", "cadence-remediation", "cadence-candidate"],
       },
       {
         id: "cadence-thursday",
         label: "Thursday: validate",
-        detail: "Engineers accept the technical outcome. QA validates the product outcome.",
+        detail: "Human validation. Engineers accept the technical outcome, QA validates the behaviour.",
         nodeIds: ["cadence-gate-two", "cadence-qa", "cadence-qa-return"],
       },
       {
@@ -3018,8 +3054,8 @@ export const methodologyFigures = {
       {
         id: "cadence-checkers",
         order: 9,
-        label: "Independent checkers",
-        detail: "A separate agent, often a different tool from the maker, reviews the change against the plan and criteria.",
+        label: "Checker agents",
+        detail: "A separate agent, often a different tool from the Maker, verifies the change against the plan and the criteria.",
         role: "agent",
         group: "cadence-execution",
       },
@@ -3184,7 +3220,7 @@ export const methodologyFigures = {
         id: "funnel-candidate",
         order: 3,
         label: "Candidate",
-        detail: "Checker-approved with complete evidence before the Wednesday cutoff.",
+        detail: "Verified by the Checker agent, with complete evidence, before the Wednesday cutoff.",
         role: "evidence",
         group: "funnel-states",
       },
@@ -3256,7 +3292,7 @@ export const methodologyFigures = {
           id: "accepted-stage",
           order: 4,
           label: "Accepted",
-          detail: "Thursday. Human Gate 2 and independent QA passed.",
+          detail: "Thursday. Human validation: Human Gate 2 and independent QA passed.",
         },
         {
           id: "released-stage",
@@ -3351,10 +3387,10 @@ export const methodologyFigures = {
     title: "Wednesday: the Maker, Checker, Maker loop",
     caption: "The Maker never judges its own work. A failed check returns as a bounded remediation goal, and the Checker runs again on the result.",
     accessibleDescription:
-      "A goal from the approved plan goes to the Maker agent, which produces an implementation with unit, integration and contract tests. Deterministic checks run first. An independent Checker, often a different tool from the Maker, then reviews the change against the approved plan, the acceptance criteria and the repository's rules. If it passes, the result becomes a candidate with evidence, or the next goal starts. If it fails, the failure is recorded with evidence and returns to the Maker as a remediation goal; the Checker runs again on the remediated result. The Maker has no edge to approval.",
+      "A goal from the approved plan goes to the Maker agent, which produces an implementation with unit, integration and contract tests. Deterministic checks run first. A Checker agent, often a different tool from the Maker, then verifies the change against the approved plan, the acceptance criteria and the repository's rules. If it passes, the result becomes a candidate with evidence, or the next goal starts. If it fails, the failure is recorded with evidence and returns to the Maker as a remediation goal; the Checker runs again on the remediated result. The Maker has no edge to approval.",
     legend: [
       { id: "loop-legend-maker", label: "Maker", detail: "Implements a goal. Cannot pass its own work.", role: "agent" },
-      { id: "loop-legend-checker", label: "Independent Checker", detail: "A separate agent with a narrow question.", role: "agent" },
+      { id: "loop-legend-checker", label: "Checker agent", detail: "A separate agent with a narrow question. Verification, not validation.", role: "agent" },
       { id: "loop-legend-evidence", label: "Evidence", detail: "Tests, checks and the candidate bundle.", role: "evidence" },
       { id: "loop-legend-failure", label: "Failed check", detail: "Returns to the Maker with findings. Never silently retried.", edgeStyle: "failure" },
     ],
@@ -3365,7 +3401,7 @@ export const methodologyFigures = {
     ],
     lanes: [
       { id: "loop-lane-make", label: "Make", detail: "The Maker takes one goal and produces an implementation with tests.", nodeIds: ["loop-goal", "loop-maker", "loop-implementation"] },
-      { id: "loop-lane-verify", label: "Verify", detail: "Checks run, then a separate agent challenges the result.", nodeIds: ["loop-checks", "loop-checker"] },
+      { id: "loop-lane-verify", label: "Verify", detail: "Checks run, then a Checker agent verifies the result.", nodeIds: ["loop-checks", "loop-checker"] },
       { id: "loop-lane-outcome", label: "Outcome", detail: "Pass moves forward. Fail returns with evidence.", nodeIds: ["loop-candidate", "loop-failed-check", "loop-remediation"] },
     ],
     nodes: [
@@ -3395,12 +3431,12 @@ export const methodologyFigures = {
     id: "capacity-mismatch",
     kind: "matrix",
     title: "Why the week needs a cutoff",
-    caption: "Agent execution capacity and human review capacity are not the same size. The smaller one is the real sprint.",
+    caption: "Agent generation capacity and human validation capacity are not the same size. Sprint capacity is the smaller one.",
     accessibleDescription:
-      "The matrix compares agent execution capacity with human review capacity across three columns. In one week, agents running in parallel could plausibly generate forty pull requests, while the lead engineer and QA engineer can review, test and accept about six outcomes. Agent capacity is limited by tokens, compute and the approved backlog, none of which the team feels on Thursday; human capacity is limited by attention and hours, because comprehension does not parallelise the way generation does. Exceeding agent capacity costs money; exceeding human capacity produces a queue nobody can read, superficial review or a missed release. The cutoff exists to keep the first inside the second.",
+      "The matrix compares agent generation capacity with human validation capacity across three columns. In one week, agents running in parallel could plausibly generate forty pull requests, while the lead engineer and QA engineer can review, test and accept about six outcomes. Agent capacity is limited by tokens, compute and the approved backlog, none of which the team feels on Thursday; human capacity is limited by attention and hours, because comprehension does not parallelise the way generation does. Exceeding agent capacity costs money; exceeding human capacity produces a queue nobody can read, superficial review or a missed release. The cutoff exists to keep the first inside the second.",
     legend: [
       { id: "mismatch-agent", label: "Agent capacity", detail: "Cheap, parallel, unattended.", role: "agent" },
-      { id: "mismatch-human", label: "Human capacity", detail: "Bounded by attention. This is the sprint.", role: "human" },
+      { id: "mismatch-human", label: "Human validation capacity", detail: "Bounded by attention. This is the sprint capacity.", role: "human" },
     ],
     groups: [
       { id: "mismatch-group", label: "Capacities", detail: "Two capacities, one constraint." },
@@ -3415,7 +3451,7 @@ export const methodologyFigures = {
     matrix: {
       rows: [
         { id: "mismatch-row-agent", label: "Agent execution capacity", detail: "What Claude Code and Codex can generate in a week." },
-        { id: "mismatch-row-human", label: "Human review capacity", detail: "What the lead engineer and QA engineer can accept in a week." },
+        { id: "mismatch-row-human", label: "Human validation capacity", detail: "What the lead engineer and QA engineer can deeply validate in a week." },
       ],
       columns: [
         { id: "mismatch-col-volume", label: "Volume in one week", detail: "An illustration, not a measurement." },
@@ -3436,10 +3472,10 @@ export const methodologyFigures = {
   "thursday-acceptance": {
     id: "thursday-acceptance",
     kind: "flow",
-    title: "Thursday: the review package, two decisions and the return path",
-    caption: "The lead engineer reads a package, not a transcript. QA tests intent, not the Maker's tests. Anything that fails goes back with evidence.",
+    title: "Thursday: human validation, two decisions and the return path",
+    caption: "Verification happened on Wednesday. Thursday is validation: the lead engineer reads a package, not a transcript, and QA tests intent, not the Maker's tests.",
     accessibleDescription:
-      "For each candidate the lead engineer receives a review package in order: the approved Build Plan, the implementation diff, the plan-versus-actual comparison with every deviation named, the test evidence, the Checker evidence and, where the risk tier requires it, the security evidence. Human Gate 2, Engineering Implementation Acceptance, asks one question: did it build what we approved? An accepted item goes to independent QA, which validates the acceptance criteria and user journeys against product intent. A QA pass makes the item a candidate for Friday's release. A QA failure returns with evidence: the Maker fixes, the Checker re-checks, engineering reviews again if the change is material, and QA runs again. An item that fails late on Thursday usually misses Friday's release.",
+      "For each candidate the lead engineer receives a review package in order: the approved Build Plan, the implementation diff, the plan-versus-actual comparison with every deviation named, the test evidence, the Checker agent's evidence and, where the risk tier requires it, the security evidence. Human Gate 2, Engineering Implementation Acceptance, asks one question: did it build what we approved? An accepted item goes to independent QA, which validates the acceptance criteria and user journeys against product intent. A QA pass makes the item a candidate for Friday's release. A QA failure returns with evidence: the Maker fixes, the Checker re-checks, engineering reviews again if the change is material, and QA runs again. An item that fails late on Thursday usually misses Friday's release.",
     legend: [
       { id: "thursday-evidence", label: "Review package", detail: "Read in this order. Reduces search time, not judgement.", role: "evidence" },
       { id: "thursday-gate", label: "Human decision", detail: "Engineering acceptance, then independent QA.", role: "gate" },
@@ -3460,14 +3496,14 @@ export const methodologyFigures = {
       { id: "thursday-diff", order: 2, label: "Implementation diff", detail: "The change set on the item's branch.", role: "evidence", group: "thursday-package" },
       { id: "thursday-plan-vs-actual", order: 3, label: "Plan versus actual", detail: "Every deviation from the approved plan, named.", role: "evidence", group: "thursday-package" },
       { id: "thursday-test-evidence", order: 4, label: "Test evidence", detail: "Fresh results with the revision and environment under test.", role: "evidence", group: "thursday-package" },
-      { id: "thursday-checker-evidence", order: 5, label: "Checker evidence", detail: "The independent Checker's findings and what was remediated.", role: "evidence", group: "thursday-package" },
+      { id: "thursday-checker-evidence", order: 5, label: "Checker evidence", detail: "The Checker agent's findings and what was remediated.", role: "evidence", group: "thursday-package" },
       { id: "thursday-security-evidence", order: 6, label: "Security evidence", detail: "Where the risk tier requires it.", role: "evidence", group: "thursday-package" },
       { id: "thursday-gate-two", order: 7, label: "Engineering Implementation Acceptance", detail: "Human Gate 2. The lead engineer asks whether it built what was approved.", role: "gate", group: "thursday-decisions" },
       { id: "thursday-qa", order: 8, label: "Independent QA", detail: "The QA engineer validates criteria and journeys against product intent.", role: "human", group: "thursday-decisions" },
       { id: "thursday-candidate", order: 9, label: "Candidate for Friday", detail: "Accepted and verified. Waits for stakeholder validation and Release Authority.", role: "evidence", group: "thursday-decisions" },
       { id: "thursday-qa-fail", order: 10, label: "QA failure", detail: "A criterion or journey did not hold. Recorded with evidence.", role: "risk", group: "thursday-return-group" },
       { id: "thursday-maker-fix", order: 11, label: "Maker fixes", detail: "A bounded remediation goal.", role: "agent", group: "thursday-return-group" },
-      { id: "thursday-recheck", order: 12, label: "Checker re-checks", detail: "The independent Checker runs again on the fix.", role: "agent", group: "thursday-return-group" },
+      { id: "thursday-recheck", order: 12, label: "Checker agent re-checks", detail: "The Checker agent runs again on the fix.", role: "agent", group: "thursday-return-group" },
       { id: "thursday-review-again", order: 13, label: "Engineering review again", detail: "Only if the change is material.", role: "human", group: "thursday-return-group" },
     ],
     edges: [
@@ -3481,6 +3517,91 @@ export const methodologyFigures = {
       { from: "thursday-recheck", to: "thursday-review-again", label: "if material", style: "normal" },
       { from: "thursday-review-again", to: "thursday-qa", label: "QA again", style: "feedback" },
     ],
+  },
+  "human-engagement": {
+    id: "human-engagement",
+    kind: "engagement",
+    title: "Allocated, not occupied: who is engaged on which day",
+    caption: "Agents run continuously through the pipeline. People are engaged at the gates and available for escalation in between. Human attention peaks on Monday and Thursday, and the rest of each person's week is their normal work. Humans are allocated, not occupied.",
+    accessibleDescription:
+      "A week of five days with an agent lane and a human lane per day. Monday is human decision concentration: agents are high, analysing and planning; the product owner is high, selecting scope and clarifying intent; the lead engineer is medium, reviewing and approving plans; QA is low, reviewing test strategy. Human Gate 1 falls on Monday. Tuesday is agent-heavy execution: agents are high as Maker agents build in isolation; every human lane is low, available for escalation only. Wednesday is agent-heavy verification: agents are high as Checker agents verify and Maker agents remediate; every human lane is low, with the lead engineer enforcing the execution cutoff. Thursday is human validation concentration: agents are medium for targeted fixes and re-checks; the lead engineer and QA are high, validating candidates; the product owner is medium, confirming intent and edge cases. Human Gate 2 falls on Thursday. Friday is human release and learning: agents are medium, preparing release evidence and summaries; every human lane is medium for the stakeholder validation, the release decision and the learning review. Human Gate 3 falls on Friday. A high level is a concentrated block of the day, a medium level is a bounded task, and a low level is availability for an escalation, a question or a spot-check. Between those, people do their normal work. Humans are allocated to the sprint, not occupied by it.",
+    legend: [
+      { id: "engagement-agent", label: "Agent lane", detail: "Continuous execution: planning, making, verifying, remediating.", role: "agent" },
+      { id: "engagement-human", label: "Human lane", detail: "Intervention points: decide, escalate, validate, release, learn.", role: "human" },
+      { id: "engagement-gate", label: "Human Gate", detail: "A decision that has to be made that day by a named person.", role: "gate" },
+    ],
+    groups: [
+      { id: "engagement-week", label: "The week", detail: "Five days, two lanes." },
+    ],
+    nodes: [
+      { id: "engagement-monday", order: 1, label: "Monday", detail: "Human decision concentration.", role: "human", group: "engagement-week" },
+      { id: "engagement-tuesday", order: 2, label: "Tuesday", detail: "Agent-heavy execution.", role: "agent", group: "engagement-week" },
+      { id: "engagement-wednesday", order: 3, label: "Wednesday", detail: "Agent-heavy verification.", role: "agent", group: "engagement-week" },
+      { id: "engagement-thursday", order: 4, label: "Thursday", detail: "Human validation concentration.", role: "human", group: "engagement-week" },
+      { id: "engagement-friday", order: 5, label: "Friday", detail: "Human release and learning.", role: "human", group: "engagement-week" },
+    ],
+    edges: [
+      { from: "engagement-monday", to: "engagement-tuesday", label: "Human Gate 1 releases the agents", style: "gated" },
+      { from: "engagement-tuesday", to: "engagement-wednesday", label: "execution becomes verification", style: "normal" },
+      { from: "engagement-wednesday", to: "engagement-thursday", label: "candidates cross the cutoff", style: "gated" },
+      { from: "engagement-thursday", to: "engagement-friday", label: "Human Gate 2 passes validated work", style: "gated" },
+    ],
+    engagement: {
+      note: "Three bars: a concentrated block of the day. Two: a bounded task. One: available for an escalation, a question or a spot-check. Between the bars, people do their normal work.",
+      lanes: [
+        { id: "agents", label: "Agents", role: "agent", detail: "Planning, Maker and Checker agents." },
+        { id: "product", label: "Product owner", role: "human", detail: "Intent, scope and the business stakeholder." },
+        { id: "engineering", label: "Lead engineer", role: "human", detail: "Plan approval, escalation, engineering acceptance, release." },
+        { id: "qa", label: "QA engineer", role: "human", detail: "Test strategy, independent validation." },
+      ],
+      days: [
+        {
+          id: "monday", label: "Monday", headline: "Human decision concentration", gate: "Human Gate 1",
+          cells: [
+            { lane: "agents", level: "high", note: "Analyse items, write Build Plans, flag ambiguity" },
+            { lane: "product", level: "high", note: "Select scope, clarify, approve intent" },
+            { lane: "engineering", level: "medium", note: "Review and approve plans" },
+            { lane: "qa", level: "low", note: "Review test strategy" },
+          ],
+        },
+        {
+          id: "tuesday", label: "Tuesday", headline: "Agent-heavy execution",
+          cells: [
+            { lane: "agents", level: "high", note: "Maker agents build in isolation" },
+            { lane: "product", level: "low", note: "Answer intent questions" },
+            { lane: "engineering", level: "low", note: "Escalations only" },
+            { lane: "qa", level: "low", note: "Prepare cases from the plans" },
+          ],
+        },
+        {
+          id: "wednesday", label: "Wednesday", headline: "Agent-heavy verification", gate: "Execution cutoff",
+          cells: [
+            { lane: "agents", level: "high", note: "Checker agents verify, Maker agents remediate" },
+            { lane: "product", level: "low", note: "Escalations only" },
+            { lane: "engineering", level: "low", note: "Escalations, enforce the cutoff" },
+            { lane: "qa", level: "low", note: "Finish cases, spot-check evidence" },
+          ],
+        },
+        {
+          id: "thursday", label: "Thursday", headline: "Human validation concentration", gate: "Human Gate 2",
+          cells: [
+            { lane: "agents", level: "medium", note: "Targeted fixes and re-checks" },
+            { lane: "product", level: "medium", note: "Confirm intent and edge cases" },
+            { lane: "engineering", level: "high", note: "Validate candidates" },
+            { lane: "qa", level: "high", note: "Validate behaviour" },
+          ],
+        },
+        {
+          id: "friday", label: "Friday", headline: "Human release and learning", gate: "Human Gate 3",
+          cells: [
+            { lane: "agents", level: "medium", note: "Release evidence, summaries, proposed context" },
+            { lane: "product", level: "medium", note: "Stakeholder validation, next week's selection" },
+            { lane: "engineering", level: "medium", note: "Release decision, learning review" },
+            { lane: "qa", level: "medium", note: "Stakeholder session, learning review" },
+          ],
+        },
+      ],
+    },
   },
 } as const satisfies Readonly<Record<MethodologyFigureName, MethodologyFigure>>;
 
