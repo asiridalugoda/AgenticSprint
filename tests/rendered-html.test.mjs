@@ -232,6 +232,18 @@ test("keeps the stylesheet guards that the rendered HTML cannot show", async () 
   assert.doesNotMatch(globals, /prefers-color-scheme:\s*dark/);
 });
 
+test("declares the font variables on the root element, where the tokens that use them live", async () => {
+  // globals.css defines --font-serif, --font-sans and --font-mono on :root in
+  // terms of the next/font variables. A custom property resolves where it is
+  // declared, so if the variables sit on <body> every token is invalid and the
+  // whole site silently renders in the browser's default serif.
+  const html = await (await render("/")).text();
+  const root = html.match(/<html[^>]*>/)?.[0] ?? "";
+  for (const face of ["newsreader", "ibm_plex_sans", "ibm_plex_mono"]) {
+    assert.match(root, new RegExp(`class="[^"]*${face}[^"]*__variable`), `the ${face} variable is not on <html>`);
+  }
+});
+
 test("gives search engines a usable description on every page", async () => {
   const sitemap = await (await fetchResource("/sitemap.xml")).text();
   const paths = [...sitemap.matchAll(/<loc>https:\/\/theagenticsprint\.com([^<]*)<\/loc>/g)].map((match) => match[1] || "/");
@@ -306,6 +318,11 @@ test("publishes the 5-Day Cadence as D14 and links it from the front page and th
     assert.ok(html.includes(`class="methodology-ladder-label">${state}<`), `the board-state figure is missing "${state}"`);
   }
   assert.doesNotMatch(html, /article-visual-unknown|Figure definition pending/);
+  // The day-by-day diagrams are figures, not ASCII art: only the two records stay as code blocks.
+  for (const title of ["Narrowing the backlog on Monday morning", "Tuesday: one Maker per item, one workspace per Maker", "Wednesday: the Maker, Checker, Maker loop", "Why the week needs a cutoff", "Thursday: the review package, two decisions and the return path", "Agent learning and context governance"]) {
+    assert.ok(html.includes(title), `the cadence is missing the figure "${title}"`);
+  }
+  assert.equal((html.match(/<code data-language="text">/g) || []).length, 2, "only the readiness card and the correction record remain as code blocks");
   // The preparation days are a section of their own, and Tuesday points at it.
   assert.match(html, /<h2 id="the-other-half-of-the-week">/);
   assert.match(html, /href="#the-other-half-of-the-week"/);
