@@ -319,10 +319,20 @@ test("publishes the 5-Day Cadence as D14 and links it from the front page and th
   }
   assert.doesNotMatch(html, /article-visual-unknown|Figure definition pending/);
   // The day-by-day diagrams are figures, not ASCII art: only the two records stay as code blocks.
-  for (const title of ["Narrowing the backlog on Monday morning", "Tuesday: one Maker per item, one workspace per Maker", "Wednesday: the Maker, Checker, Maker loop", "Why the week needs a cutoff", "Thursday: the review package, two decisions and the return path", "Agent learning and context governance"]) {
+  for (const title of ["Narrowing the backlog on Monday morning", "Tuesday: one Maker per item, one workspace per Maker", "Wednesday: the Maker, Checker, Maker loop", "Why the week needs a cutoff", "Thursday: human validation, two decisions and the return path", "Agent learning and context governance"]) {
     assert.ok(html.includes(title), `the cadence is missing the figure "${title}"`);
   }
   assert.equal((html.match(/<code data-language="text">/g) || []).length, 2, "only the readiness card and the correction record remain as code blocks");
+  // The human engagement model is first-class: its own section, the two-lane week figure with five
+  // day cards, the dedicated-team question, and capacity defined by human validation.
+  assert.match(html, /<h2 id="allocated-not-occupied">/);
+  assert.match(html, /methodology-figure-engagement"/);
+  assert.equal((html.match(/class="methodology-engagement-day"/g) || []).length, 5, "five day cards");
+  assert.equal((html.match(/class="methodology-engagement-lane methodology-engagement-lane-agent"/g) || []).length, 5, "an agent lane per day");
+  assert.equal((html.match(/class="methodology-engagement-lane methodology-engagement-lane-human"/g) || []).length, 5, "a human lane per day");
+  assert.match(html, /<h2 id="do-i-need-a-dedicated-team-for-five-days">/);
+  assert.match(html, /<h3 id="sprint-capacity">/);
+  assert.ok(html.includes("Humans are allocated, not occupied"), "the critical message is missing");
   // Friday validates the business outcome with its stakeholder before release authority decides.
   assert.match(html, /<h3 id="stakeholder-validation">/);
   assert.ok(html.includes('class="methodology-node-label">Stakeholder validation<'), "the week figure has no stakeholder validation node");

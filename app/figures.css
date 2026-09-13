@@ -233,6 +233,34 @@ ol.methodology-ladder { display: grid; grid-template-columns: repeat(auto-fit, m
 .methodology-ladder-detail { color: var(--muted); font-size: 11px; line-height: 1.45; }
 p.methodology-ladder-note { margin: 14px 0 0; color: var(--faint); font-family: var(--font-sans); font-size: 11px; line-height: 1.55; }
 
+/* Engagement: five day cards, each with an agent lane and a human lane. The
+   three-bar meter says how much of the day a lane asks of its people. The
+   agent lane keeps the plain agent treatment; the human lane takes the human
+   tint, so the two read apart at a glance, as they do in the legend. */
+ol.methodology-engagement-week { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+li.methodology-engagement-day { display: grid; align-content: start; gap: 9px; margin: 0; padding: 11px; border: 1px solid var(--rule); border-radius: 4px; background: var(--canvas); }
+.methodology-engagement-head { display: grid; gap: 5px; padding-bottom: 9px; border-bottom: 1px solid var(--rule); }
+.methodology-engagement-day-label { color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase; }
+.methodology-engagement-headline { font-size: 12px; font-weight: 620; line-height: 1.3; }
+.methodology-engagement-gate { justify-self: start; padding: 2px 6px 1px; border: 1.5px solid var(--accent); border-radius: 3px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 9px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase; }
+.methodology-engagement-lane { display: grid; gap: 6px; padding: 8px; border: 1px solid var(--rule-strong); border-radius: 4px; }
+.methodology-engagement-lane-human { border-color: var(--accent-mid); background: var(--accent-soft); }
+.methodology-engagement-lane-label { color: var(--muted); font-family: var(--font-mono); font-size: 9px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase; }
+.methodology-engagement-lane-human .methodology-engagement-lane-label { color: var(--accent); }
+.methodology-engagement-lane ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+li.methodology-engagement-cell { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1px 7px; align-items: start; margin: 0; padding: 0; }
+.methodology-engagement-meter { display: inline-flex; grid-row: 1 / span 2; gap: 2px; margin-top: 2px; }
+.methodology-engagement-meter i { display: block; width: 5px; height: 12px; border: 1px solid var(--rule-strong); border-radius: 1px; background: var(--canvas); }
+.methodology-engagement-high .methodology-engagement-meter i,
+.methodology-engagement-medium .methodology-engagement-meter i:nth-child(-n + 2),
+.methodology-engagement-low .methodology-engagement-meter i:first-child { border-color: var(--ink); background: var(--ink); }
+.methodology-engagement-lane-human .methodology-engagement-high .methodology-engagement-meter i,
+.methodology-engagement-lane-human .methodology-engagement-medium .methodology-engagement-meter i:nth-child(-n + 2),
+.methodology-engagement-lane-human .methodology-engagement-low .methodology-engagement-meter i:first-child { border-color: var(--accent); background: var(--accent); }
+.methodology-engagement-name { font-size: 11px; font-weight: 640; line-height: 1.3; }
+.methodology-engagement-level { color: var(--faint); font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+.methodology-engagement-note { grid-column: 2; color: var(--muted); font-size: 11px; line-height: 1.4; }
+
 /* Document status block for methodology and template documents. */
 .document-status { margin: 0 0 40px; padding: 18px 20px; border: 1px solid var(--rule); border-left: 1px solid var(--accent); border-radius: 4px; background: var(--paper-deep); font-family: var(--font-sans); font-size: var(--text-meta); }
 .document-status-list { display: grid; grid-template-columns: 164px minmax(0, 1fr); margin: 0; }
