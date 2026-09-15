@@ -13,6 +13,15 @@ updates:
         patterns: ["@types/*"]
       eslint:
         patterns: ["eslint", "eslint-config-next"]
+    ignore:
+      # typescript-eslint, through eslint-config-next, declares a peer range of
+      # ">=4.8.4 <6.1.0". TypeScript 7 cannot be taken until that lifts.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # ESLint 10 fails the lint step against the current config. Revisit when
+      # eslint-config-next supports it.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
